@@ -1,0 +1,130 @@
+@import url('./font.css');
+.popover-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+iframe {
+  overflow-clip-margin: content-box !important;
+  border-width: 0px;
+  border-style: inset;
+  border-color: initial;
+  border-image: initial;
+  overflow: clip !important;
+}
+
+.ant-checkbox-inner {
+  width: 15px !important;
+  height: 15px !important;
+  background-color: rgba(0, 0, 0, 0) !important;
+  border-width: 1px !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.ant-checkbox {
+  width: 15px !important;
+  height: 15px !important;
+
+  background-color: #383535 !important;
+}
+
+.ant-checkbox-checked {
+  background-color: #ffde04 !important;
+}
+
+.ant-switch {
+  background-color: #6a6868 !important;
+}
+
+.ant-switch {
+  &.ant-switch-checked {
+    background-color: #ffde04 !important;
+  }
+}
+
+.custom-switch {
+  &.ant-switch-checked {
+    background-color: #EBB94C !important;
+  }
+  
+  .ant-switch-handle::before {
+    background-color: #FFFFFF !important;
+  }
+}
+
+div {
+  border: 0px solid;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 2px;
+}
+
+// For scrollbar
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0);
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1) inset;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.rc-virtual-list-scrollbar {
+  width: 6px !important;
+}
+.rc-virtual-list-scrollbar-thumb {
+  border-radius: 3px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  background: #4f4d4d !important;
+}
+
+.ant-tooltip {
+  max-width: 300px !important;
+}
+
+// SidePanelExpand tooltip arrow position
+.side-panel-expand-tooltip .ant-tooltip-arrow {
+  left: auto !important;
+  right: 12px !important;
+}
+
+.ant-tag {
+  background-clip: unset !important;
+
+  &.ant-tag-orange {
+    -webkit-text-fill-color: orange !important;
+  }
+}
+
+// MergeCAT20Screen
+.ant-slider-rail {
+  background-color: #6a6868 !important;
+  height: 10px !important;
+}
+
+.ant-slider-track {
+  background: linear-gradient(103.92deg, #ebb94c 0%, #e97e00 100%) !important;
+  height: 10px !important;
+}
+
+.ant-slider-step {
+  height: 10px !important;
+}
+
+.ant-slider-handle {
+  margin-top: -3px !important;
+}
