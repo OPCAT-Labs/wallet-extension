@@ -1,0 +1,8 @@
+export { default as Connect } from './Connect';
+export { default as MultiSignMessage } from './MultiSignMessage';
+export { default as MultiSignPsbt } from './MultiSignPsbt';
+export { default as SignData } from './SignData';
+export { default as SignPsbt } from './SignPsbt';
+export { default as SignText } from './SignText';
+export { default as SwitchChain } from './SwitchChain';
+export { default as SwitchNetwork } from './SwitchNetwork';

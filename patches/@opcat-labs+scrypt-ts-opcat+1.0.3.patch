@@ -1,0 +1,13 @@
+diff --git a/node_modules/@opcat-labs/scrypt-ts-opcat/dist/cjs/psbt/signatureutils.cjs b/node_modules/@opcat-labs/scrypt-ts-opcat/dist/cjs/psbt/signatureutils.cjs
+index 38251a7..81cd050 100644
+--- a/node_modules/@opcat-labs/scrypt-ts-opcat/dist/cjs/psbt/signatureutils.cjs
++++ b/node_modules/@opcat-labs/scrypt-ts-opcat/dist/cjs/psbt/signatureutils.cjs
+@@ -37,7 +37,7 @@ const UInt8Schema = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(0x
+  * @param size - The exact length required for the Uint8Array
+  * @returns A validation schema that ensures the input is a Uint8Array of the specified size
+  */
+-const SignatureSchema = v.pipe(v.instance(Uint8Array), v.maxLength(72), v.minLength(69));
++const SignatureSchema = v.pipe(v.instance(Uint8Array), v.maxLength(72), v.minLength(64));
+ const ZERO = new Uint8Array(1);
+ /**
+  * Checks if the given hash type is a defined Bitcoin signature hash type.
