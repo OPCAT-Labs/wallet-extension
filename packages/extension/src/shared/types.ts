@@ -335,10 +335,9 @@ export interface AddressCAT20UtxoSummary {
 }
 
 export interface CAT20MergeOrder {
-  id: string;
-  batchIndex: number;
+  mergeData: string;
   batchCount: number;
-  ct: number;
+  // ct: number;
 }
 
 export interface WebsiteResult {

@@ -113,13 +113,14 @@ export default function SendCAT20Screen() {
   }, [toInfo, inputAmount]);
 
   const transferData = useRef<{
-    id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any;
     commitTx: string;
     commitToSignInputs: UserToSignInput[];
     revealTx: string;
     revealToSignInputs: UserToSignInput[];
   }>({
-    id: '',
+    transferData: null,
     commitTx: '',
     commitToSignInputs: [],
     revealTx: '',
@@ -132,7 +133,7 @@ export default function SendCAT20Screen() {
       const cat20Amount = runesUtils.fromDecimalAmount(inputAmount, cat20Balance.decimals);
       const step1 = await wallet.transferCAT20Step1(toInfo.address, cat20Balance.tokenId, cat20Amount, feeRate);
       if (step1) {
-        transferData.current.id = step1.id;
+        transferData.current.transferData = step1.transferData;
         transferData.current.commitTx = step1.commitTx;
         transferData.current.commitToSignInputs = step1.toSignInputs;
         setStep(1);
@@ -174,11 +175,12 @@ export default function SendCAT20Screen() {
           try {
             tools.showLoading(true);
             const step2 = await wallet.transferCAT20Step2(
-              transferData.current.id,
+              transferData.current.transferData,
               transferData.current.commitTx,
               transferData.current.commitToSignInputs
             );
 
+            transferData.current.transferData = step2.transferData;
             transferData.current.revealTx = step2.revealTx;
             transferData.current.revealToSignInputs = step2.toSignInputs;
 
@@ -219,7 +221,7 @@ export default function SendCAT20Screen() {
           tools.showLoading(true);
           try {
             const step3 = await wallet.transferCAT20Step3(
-              transferData.current.id,
+              transferData.current.transferData,
               transferData.current.revealTx,
               transferData.current.revealToSignInputs
             );

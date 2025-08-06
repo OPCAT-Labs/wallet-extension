@@ -1531,8 +1531,9 @@ export class WalletController extends BaseController {
     return tokenSummary;
   };
 
-  transferCAT20Step1ByMerge = async (mergeId: string) => {
-    return await openapiService.transferCAT20Step1ByMerge(mergeId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT20Step1ByMerge = async (mergeData: any, batchIndex: number) => {
+    return await openapiService.transferCAT20Step1ByMerge(mergeData, batchIndex);
   };
 
   transferCAT20Step1 = async (to: string, tokenId: string, tokenAmount: string, feeRate: number) => {
@@ -1579,11 +1580,6 @@ export class WalletController extends BaseController {
       utxoCount,
       feeRate
     );
-    return _res;
-  };
-
-  getMergeCAT20Status = async (mergeId: string) => {
-    const _res = await openapiService.getMergeCAT20Status(mergeId);
     return _res;
   };
 

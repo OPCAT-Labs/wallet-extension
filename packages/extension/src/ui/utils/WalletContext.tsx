@@ -428,20 +428,29 @@ export interface WalletController {
     tokenId: string,
     tokenAmount: string,
     feeRate: number
-  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
   transferCAT20Step2(
-    transferId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any,
     commitTx: string,
     toSignInputs: UserToSignInput[]
-  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[] }>;
-  transferCAT20Step3(transferId: string, revealTx: string, toSignInputs: UserToSignInput[]): Promise<{ txid: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[], transferData: any }>;
+  transferCAT20Step3(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any,
+    revealTx: string,
+    toSignInputs: UserToSignInput[],
+  ): Promise<{ txid: string }>;
 
   mergeCAT20Prepare(tokenId: string, utxoCount: number, feeRate: number): Promise<CAT20MergeOrder>;
   transferCAT20Step1ByMerge(
-    mergeId: string
-  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getMergeCAT20Status(mergeId: string): Promise<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mergeData: any,
+    batchIndex: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
 
   getAppList(): Promise<{ tab: string; items: AppInfo[] }[]>;
   getBannerList(): Promise<{ id: string; img: string; link: string }[]>;

@@ -422,23 +422,27 @@ export class OpenApiService {
     });
   }
 
-  async transferCAT20Step2(transferId: string, signedPsbt: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT20Step2(transferData: any, signedPsbt: string) {
     return this.httpPost('/v5/cat20/transfer-token-step2', {
-      id: transferId,
+      transferData,
       psbt: signedPsbt
     });
   }
 
-  async transferCAT20Step3(transferId: string, signedPsbt: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT20Step3(transferData: any, signedPsbt: string) {
     return this.httpPost('/v5/cat20/transfer-token-step3', {
-      id: transferId,
+      transferData,
       psbt: signedPsbt
     });
   }
 
-  async transferCAT20Step1ByMerge(mergeId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT20Step1ByMerge(mergeData: any, batchIndex: number) {
     return this.httpPost('/v5/cat20/transfer-token-step1-by-merge', {
-      mergeId
+      mergeData,
+      batchIndex
     });
   }
 
@@ -449,12 +453,6 @@ export class OpenApiService {
       tokenId,
       utxoCount,
       feeRate
-    });
-  }
-
-  async getMergeCAT20Status(mergeId: string) {
-    return this.httpPost('/v5/cat20/merge-token-status', {
-      id: mergeId
     });
   }
 

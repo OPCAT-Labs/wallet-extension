@@ -37,7 +37,7 @@ export default function MergeCAT20Screen() {
 
   const [disabled, setDisabled] = useState(false);
 
-  const [mergeOrder, setMergeOrder] = useState<CAT20MergeOrder | null>();
+  const [mergeOrder, setMergeOrder] = useState<CAT20MergeOrder & { batchIndex: number } | null>();
 
   const [tokenUtxoSummary, setTokenUtxoSummary] = useState<AddressCAT20UtxoSummary>({
     availableTokenAmounts: [],
@@ -161,9 +161,9 @@ export default function MergeCAT20Screen() {
     let failedCount = 0;
     for (i = order.batchIndex; i < order.batchCount; i++) {
       try {
-        const step1Data = await wallet.transferCAT20Step1ByMerge(order.id);
-        const step2Data = await wallet.transferCAT20Step2(step1Data.id, step1Data.commitTx, step1Data.toSignInputs);
-        const step3Data = await wallet.transferCAT20Step3(step1Data.id, step2Data.revealTx, step2Data.toSignInputs);
+        const step1Data = await wallet.transferCAT20Step1ByMerge(order.mergeData, i);
+        const step2Data = await wallet.transferCAT20Step2(step1Data.transferData, step1Data.commitTx, step1Data.toSignInputs);
+        const step3Data = await wallet.transferCAT20Step3(step2Data.transferData, step2Data.revealTx, step2Data.toSignInputs);
 
         mergeItems[i].status = ItemStatus.completed;
         mergeItems[i].txid = step3Data.txid;
@@ -204,7 +204,7 @@ export default function MergeCAT20Screen() {
     try {
       const order = await wallet.mergeCAT20Prepare(cat20Balance.tokenId, inputUtxoCount, feeRate);
       if (order) {
-        setMergeOrder(order);
+        setMergeOrder({ ...order, batchIndex: 0 });
       }
       tools.showLoading(false);
 
