@@ -43,7 +43,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Remove wallet-sdk patches
-        run: rm -rf node_modules/@unisat/wallet-sdk/patches 2>/dev/null || true
+        run: rm -rf node_modules/@opcatlabs/wallet-sdk/patches 2>/dev/null || true
 
       - name: Fix modules
         run: yarn fix:modules

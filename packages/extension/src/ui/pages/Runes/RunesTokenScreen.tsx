@@ -111,11 +111,7 @@ export default function RunesTokenScreen() {
 
   const chainType = useChainType();
   const enableTrade = useMemo(() => {
-    if (chainType === ChainType.BITCOIN_MAINNET || chainType === ChainType.FRACTAL_BITCOIN_MAINNET) {
-      return true;
-    } else {
-      return false;
-    }
+    return false;
   }, [chainType]);
   const marketPlaceUrl = useRunesMarketPlaceWebsite(tokenSummary.runeInfo.spacedRune);
 

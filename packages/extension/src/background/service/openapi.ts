@@ -21,7 +21,7 @@ import {
   VersionDetail,
   WalletConfig
 } from '@/shared/types';
-import { ToSignInput } from '@unisat/wallet-sdk';
+import { ToSignInput } from '@opcat-labs/wallet-sdk';
 
 import { preferenceService } from '.';
 

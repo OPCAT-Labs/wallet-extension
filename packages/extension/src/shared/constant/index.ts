@@ -146,12 +146,6 @@ export const getRestoreWallets = (): { value: RestoreWalletType; name: string; a
 ];
 
 export enum ChainType {
-  // BITCOIN_MAINNET = 'BITCOIN_MAINNET',
-  // BITCOIN_TESTNET = 'BITCOIN_TESTNET',
-  // BITCOIN_TESTNET4 = 'BITCOIN_TESTNET4',
-  // BITCOIN_SIGNET = 'BITCOIN_SIGNET',
-  // FRACTAL_BITCOIN_MAINNET = 'FRACTAL_BITCOIN_MAINNET',
-  // FRACTAL_BITCOIN_TESTNET = 'FRACTAL_BITCOIN_TESTNET',
   OPCAT_MAINNET = 'OPCAT_MAINNET',
   OPCAT_TESTNET = 'OPCAT_TESTNET'
 }
@@ -182,108 +176,6 @@ export type TypeChain = {
 };
 
 export const CHAINS_MAP: { [key: string]: TypeChain } = {
-  // [ChainType.BITCOIN_MAINNET]: {
-  //   enum: ChainType.BITCOIN_MAINNET,
-  //   label: 'Bitcoin',
-  //   iconLabel: 'Bitcoin',
-  //   icon: './images/artifacts/bitcoin-mainnet.svg',
-  //   unit: 'BTC',
-  //   networkType: NetworkType.MAINNET,
-  //   endpoints: ['https://wallet-api.unisat.io'],
-  //   mempoolSpaceUrl: 'https://mempool.space',
-  //   unisatUrl: 'https://unisat.io',
-  //   ordinalsUrl: 'https://ordinals.com',
-  //   unisatExplorerUrl: 'https://uniscan.cc',
-  //   okxExplorerUrl: '',
-  //   showPrice: true,
-  //   defaultExplorer: 'mempool-space'
-  // },
-  // [ChainType.BITCOIN_TESTNET]: {
-  //   enum: ChainType.BITCOIN_TESTNET,
-  //   label: 'Bitcoin Testnet',
-  //   iconLabel: 'Bitcoin',
-  //   icon: './images/artifacts/bitcoin-testnet.svg',
-  //   unit: 'tBTC',
-  //   networkType: NetworkType.TESTNET,
-  //   endpoints: ['https://wallet-api-testnet.unisat.io'],
-  //   mempoolSpaceUrl: 'https://mempool.space/testnet',
-  //   unisatUrl: 'https://testnet.unisat.io',
-  //   ordinalsUrl: 'https://testnet.ordinals.com',
-  //   unisatExplorerUrl: '',
-  //   okxExplorerUrl: '',
-  //   showPrice: false,
-  //   defaultExplorer: 'mempool-space'
-  // },
-  // [ChainType.BITCOIN_TESTNET4]: {
-  //   enum: ChainType.BITCOIN_TESTNET4,
-  //   label: 'Bitcoin Testnet4 (Beta)',
-  //   iconLabel: 'Bitcoin',
-  //   icon: './images/artifacts/bitcoin-testnet.svg',
-  //   unit: 'tBTC',
-  //   networkType: NetworkType.TESTNET,
-  //   endpoints: ['https://wallet-api-testnet4.unisat.io'],
-  //   mempoolSpaceUrl: 'https://mempool.space/testnet4',
-  //   unisatUrl: 'https://testnet4.unisat.io',
-  //   ordinalsUrl: 'https://testnet4.ordinals.com',
-  //   unisatExplorerUrl: '',
-  //   okxExplorerUrl: '',
-  //   showPrice: false,
-  //   defaultExplorer: 'mempool-space'
-  // },
-  // [ChainType.BITCOIN_SIGNET]: {
-  //   enum: ChainType.BITCOIN_SIGNET,
-  //   label: 'Bitcoin Signet',
-  //   iconLabel: 'Bitcoin',
-  //   icon: './images/artifacts/bitcoin-signet.svg',
-  //   unit: 'sBTC',
-  //   networkType: NetworkType.TESTNET,
-  //   endpoints: ['https://wallet-api-signet.unisat.io'],
-  //   mempoolSpaceUrl: 'https://mempool.space/signet',
-  //   unisatUrl: 'https://signet.unisat.io',
-  //   ordinalsUrl: 'https://signet.ordinals.com',
-  //   unisatExplorerUrl: '',
-  //   okxExplorerUrl: '',
-  //   showPrice: false,
-  //   defaultExplorer: 'mempool-space'
-  // },
-  // [ChainType.FRACTAL_BITCOIN_MAINNET]: {
-  //   enum: ChainType.FRACTAL_BITCOIN_MAINNET,
-  //   label: 'Fractal Bitcoin',
-  //   iconLabel: 'Fractal',
-  //   icon: './images/artifacts/fractal-mainnet.svg',
-  //   unit: 'FB',
-  //   networkType: NetworkType.MAINNET,
-  //   endpoints: ['https://wallet-api-fractal.unisat.io'],
-  //   mempoolSpaceUrl: 'https://mempool.fractalbitcoin.io',
-  //   unisatUrl: 'https://fractal.unisat.io',
-  //   ordinalsUrl: 'https://ordinals.fractalbitcoin.io',
-  //   unisatExplorerUrl: 'https://fractal.uniscan.cc',
-  //   okxExplorerUrl: '',
-  //   isViewTxHistoryInternally: false,
-  //   disable: false,
-  //   isFractal: true,
-  //   showPrice: true,
-  //   defaultExplorer: 'unisat-explorer'
-  // },
-  // [ChainType.FRACTAL_BITCOIN_TESTNET]: {
-  //   enum: ChainType.FRACTAL_BITCOIN_TESTNET,
-  //   label: 'Fractal Bitcoin Testnet',
-  //   iconLabel: 'Fractal',
-  //   icon: './images/artifacts/fractal-testnet.svg',
-  //   unit: 'tFB',
-  //   networkType: NetworkType.MAINNET,
-  //   endpoints: ['https://wallet-api-fractal-testnet.unisat.io'],
-  //   mempoolSpaceUrl: 'https://mempool-testnet.fractalbitcoin.io',
-  //   unisatUrl: 'https://fractal-testnet.unisat.io',
-  //   ordinalsUrl: 'https://ordinals-testnet.fractalbitcoin.io',
-  //   unisatExplorerUrl: 'https://fractal-testnet.unisat.io/explorer',
-  //   okxExplorerUrl: '',
-  //   isViewTxHistoryInternally: false,
-  //   isFractal: true,
-  //   showPrice: false,
-  //   defaultExplorer: 'unisat-explorer',
-  //   enableBrc20SingleStep: true
-  // },
   [ChainType.OPCAT_MAINNET]: {
     enum: ChainType.OPCAT_MAINNET,
     label: 'OPCAT Mainnet',
@@ -311,7 +203,8 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
     icon: './images/artifacts/opcat-testnet.svg',
     unit: 'tOPCAT',
     networkType: NetworkType.TESTNET,
-    endpoints: ['http://127.0.0.1:3000'],
+    endpoints: ['https://wallet-api-testnet.opcatlabs.io'],
+    // endpoints: ['http://localhost:3000'],
     mempoolSpaceUrl: 'https://testnet.opcatlabs.io',
     unisatUrl: '',
     ordinalsUrl: '',
@@ -336,28 +229,6 @@ export type TypeChainGroup = {
 };
 
 export const CHAIN_GROUPS: TypeChainGroup[] = [
-  // {
-  //   type: 'single',
-  //   chain: CHAINS_MAP[ChainType.BITCOIN_MAINNET]
-  // },
-  // {
-  //   type: 'list',
-  //   label: 'Bitcoin Testnet',
-  //   icon: './images/artifacts/bitcoin-testnet-all.svg',
-  //   items: [
-  //     CHAINS_MAP[ChainType.BITCOIN_TESTNET],
-  //     CHAINS_MAP[ChainType.BITCOIN_TESTNET4],
-  //     CHAINS_MAP[ChainType.BITCOIN_SIGNET]
-  //   ]
-  // },
-  // {
-  //   type: 'single',
-  //   chain: CHAINS_MAP[ChainType.FRACTAL_BITCOIN_MAINNET]
-  // },
-  // {
-  //   type: 'single',
-  //   chain: CHAINS_MAP[ChainType.FRACTAL_BITCOIN_TESTNET]
-  // },
   {
     type: 'single',
     chain: CHAINS_MAP[ChainType.OPCAT_MAINNET]
@@ -420,20 +291,20 @@ export const TO_LOCALE_STRING_CONFIG = {
 
 export const SAFE_DOMAIN_CONFIRMATION = 3;
 
-export const GITHUB_URL = 'https://github.com/unisat-wallet/extension';
-export const DISCORD_URL = 'https://discord.com/invite/EMskB2sMz8';
-export const TWITTER_URL = 'https://twitter.com/unisat_wallet';
-export const TELEGRAM_URL = 'https://t.me/unisat_wallet';
-export const WEBSITE_URL = 'https://unisat.io';
-export const FEEDBACK_URL = 'https://feedback.unisat.io';
-export const EMAIL_URL = 'contact@unisat.io';
-export const DOCS_URL = ' https://docs.unisat.io/dev/unisat-developer-center ';
-export const MEDIUM_URL = 'https://unisat-wallet.medium.com/';
-export const UPDATE_URL = 'https://chromewebstore.google.com/detail/unisat-wallet/ppbibelpcjmhbdihakflkdcoccbgbkpo';
+export const GITHUB_URL = '#';
+export const DISCORD_URL = '#';
+export const TWITTER_URL = 'https://x.com/opcatlayer';
+export const TELEGRAM_URL = '#';
+export const WEBSITE_URL = 'https://opcatlabs.io';
+export const FEEDBACK_URL = '#';
+export const EMAIL_URL = 'info@opcatlabs.io';
+export const DOCS_URL = '#';
+export const MEDIUM_URL = '#';
+export const UPDATE_URL = '#';
 export const REVIEW_URL =
-  'https://chromewebstore.google.com/detail/unisat-wallet/ppbibelpcjmhbdihakflkdcoccbgbkpo/reviews';
-export const TERMS_OF_SERVICE_URL = 'https://unisat.io/terms-of-service.html';
-export const PRIVACY_POLICY_URL = 'https://unisat.io/privacy-policy.html';
+  '#';
+export const TERMS_OF_SERVICE_URL = '#';
+export const PRIVACY_POLICY_URL = '#';
 
 export const WALLET_NAME = 'OPCAT'
 export const WALLET_FULL_NAME = 'OPCAT Wallet'
@@ -441,7 +312,7 @@ export const X_CLIENT_HEADER = 'OPCAT Wallet'
 export const PAGE_PROVIDER_VARIABLE_NAME = 'opcat'
 export const PAGE_PROVIDER_VARIABLE_NAME_ALIAS = 'opcat_wallet'
 export const MESSAGE_EVENT_PRE = 'OPCAT_WALLET_'
-export const ADDRESS_VERIFIER_URL = 'https://github.com/unisat-wallet/bitcoin-address-verifier'
+export const ADDRESS_VERIFIER_URL = '#'
 
 export const CHANNEL = process.env.channel!;
 export const VERSION = process.env.release!;

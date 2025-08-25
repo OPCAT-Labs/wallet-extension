@@ -21,7 +21,7 @@ import {
 } from '@/ui/state/transactions/hooks';
 import { colors } from '@/ui/theme/colors';
 import { isValidAddress, showLongNumber } from '@/ui/utils';
-import { getAddressUtxoDust } from '@unisat/wallet-sdk/lib/transaction';
+import { getAddressUtxoDust } from '@opcat-labs/wallet-sdk/lib/transaction';
 
 export default function SendRunesScreen() {
   const { state } = useLocation();

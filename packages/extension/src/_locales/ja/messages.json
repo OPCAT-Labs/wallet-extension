@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat Wallet" },
+  "appName": { "message": "Opcat Wallet" },
   "appDescription": {
-    "message": "世界初のオープンソースOrdinals ChromeウォレットでインスクリプションをInscribeして保存しましょう！"
+    "message": "オープンソースのopcatウォレット"
   },
   "receive": {
     "message": "受信"

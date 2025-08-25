@@ -11,7 +11,7 @@ import { useI18n } from '@/ui/hooks/useI18n';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { useCreateSplitTxCallback, useOrdinalsTx } from '@/ui/state/transactions/hooks';
 import { useWallet } from '@/ui/utils';
-import { getAddressUtxoDust } from '@unisat/wallet-sdk/lib/transaction';
+import { getAddressUtxoDust } from '@opcat-labs/wallet-sdk/lib/transaction';
 
 import { useNavigate } from '../MainRoute';
 

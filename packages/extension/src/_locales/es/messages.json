@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat Wallet" },
+  "appName": { "message": "Opcat Wallet" },
   "appDescription": {
-    "message": "¡Inscribe y guarda tus inscripciones en la primera billetera Ordinals de código abierto para Chrome del mundo!"
+    "message": "Monedero opcat de código abierto"
   },
   "receive": {
     "message": "Recibir"

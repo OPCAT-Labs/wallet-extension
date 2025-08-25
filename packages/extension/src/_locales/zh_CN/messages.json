@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat 钱包" },
+  "appName": { "message": "Opcat 钱包" },
   "appDescription": {
-    "message": "在全球首个开源的 Ordinals Chrome 钱包中铭刻并存储您的铭文！"
+    "message": "开源的 Opcat 钱包"
   },
   "receive": {
     "message": "接收"

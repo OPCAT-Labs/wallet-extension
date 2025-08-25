@@ -24,8 +24,8 @@ import {
 } from '@/ui/state/transactions/hooks';
 import { fontSizes } from '@/ui/theme/font';
 import { getUiType, showLongNumber, useWallet } from '@/ui/utils';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
-import { getAddressUtxoDust } from '@unisat/wallet-sdk/lib/transaction';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
+import { getAddressUtxoDust } from '@opcat-labs/wallet-sdk/lib/transaction';
 
 import { SignPsbt } from '../Approval/components';
 import { useNavigate } from '../MainRoute';

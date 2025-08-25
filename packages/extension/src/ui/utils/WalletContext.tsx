@@ -49,8 +49,8 @@ import {
   WalletKeyring,
   WebsiteResult
 } from '@/shared/types';
-import { AddressType, UnspentOutput } from '@unisat/wallet-sdk';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
+import { AddressType, UnspentOutput } from '@opcat-labs/wallet-sdk';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 export interface WalletController {
   openapi: {

@@ -1,4 +1,4 @@
-import { UnspentOutput } from '@unisat/wallet-sdk';
+import { UnspentOutput } from '@opcat-labs/wallet-sdk';
 import { CHAINS_ENUM, PaymentChannelType } from './constant';
 
 export enum AddressType {

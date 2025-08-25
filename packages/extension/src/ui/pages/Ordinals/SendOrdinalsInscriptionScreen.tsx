@@ -15,7 +15,7 @@ import {
   usePrepareSendOrdinalsInscriptionCallback
 } from '@/ui/state/transactions/hooks';
 import { isValidAddress, useWallet } from '@/ui/utils';
-import { getAddressUtxoDust } from '@unisat/wallet-sdk/lib/transaction';
+import { getAddressUtxoDust } from '@opcat-labs/wallet-sdk/lib/transaction';
 
 import { useNavigate } from '../MainRoute';
 

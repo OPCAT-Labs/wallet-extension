@@ -1,19 +1,19 @@
 {
-  "name": "@unisat/wallet-sdk",
+  "name": "@opcat-labs/wallet-sdk",
   "version": "1.8.1",
-  "description": "UniSat Wallet SDK",
+  "description": "OPCAT Wallet SDK",
   "keywords": [
     "bitcoin",
     "keyring",
-    "unisat"
+    "opcat"
   ],
-  "homepage": "https://github.com/unisat-wallet/wallet-sdk#readme",
+  "homepage": "https://github.com/OPCAT-Labs/wallet-extension#readme",
   "bugs": {
-    "url": "https://github.com/unisat-wallet/wallet-sdk/issues"
+    "url": "https://github.com/OPCAT-Labs/wallet-extension/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/unisat-wallet/wallet-sdk.git"
+    "url": "https://github.com/OPCAT-Labs/wallet-extension.git"
   },
   "author": "cybersinsloth",
   "license": "ISC",

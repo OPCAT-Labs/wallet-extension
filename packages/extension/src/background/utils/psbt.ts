@@ -1,5 +1,5 @@
 import { Psbt } from '@opcat-labs/scrypt-ts-opcat';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 export function psbtFromHex<T=bitcoin.Psbt>(hex: string): T {
     // let error: Error

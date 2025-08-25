@@ -39,17 +39,17 @@ import {
 } from '@/shared/types';
 import { getChainInfo } from '@/shared/utils';
 import { psbtFromString } from '@/ui/utils/psbt-utils';
-import { txHelpers } from '@unisat/wallet-sdk';
-import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@unisat/wallet-sdk/lib/address';
-import { bitcoin, ECPair } from '@unisat/wallet-sdk/lib/bitcoin-core';
-import { KeystoneKeyring } from '@unisat/wallet-sdk/lib/keyring';
+import { txHelpers } from '@opcat-labs/wallet-sdk';
+import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
+import { bitcoin, ECPair } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
+import { KeystoneKeyring } from '@opcat-labs/wallet-sdk/lib/keyring';
 import {
   genPsbtOfBIP322Simple,
   getSignatureFromPsbtOfBIP322Simple,
   signMessageOfBIP322Simple
-} from '@unisat/wallet-sdk/lib/message';
-import { toPsbtNetwork } from '@unisat/wallet-sdk/lib/network';
-import { toXOnly } from '@unisat/wallet-sdk/lib/utils';
+} from '@opcat-labs/wallet-sdk/lib/message';
+import { toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/network';
+import { toXOnly } from '@opcat-labs/wallet-sdk/lib/utils';
 
 import { ContactBookItem } from '../service/contactBook';
 import { OpenApiService } from '../service/openapi';
@@ -271,7 +271,7 @@ export class WalletController extends BaseController {
     );
     const keyring = this.displayedKeyringToWalletKeyring(displayedKeyring, keyringService.keyrings.length - 1);
     this.changeKeyring(keyring);
-    preferenceService.setShowSafeNotice(true);
+    // preferenceService.setShowSafeNotice(true);
   };
 
   createTmpKeyringWithMnemonics = async (
@@ -298,7 +298,7 @@ export class WalletController extends BaseController {
   createTmpKeyringWithPrivateKey = async (privateKey: string, addressType: AddressType) => {
     const originKeyring = keyringService.createTmpKeyring(KEYRING_TYPE.SimpleKeyring, [privateKey]);
     const displayedKeyring = await keyringService.displayForKeyring(originKeyring, addressType, -1);
-    preferenceService.setShowSafeNotice(true);
+    // preferenceService.setShowSafeNotice(true);
     return this.displayedKeyringToWalletKeyring(displayedKeyring, -1, false);
   };
 

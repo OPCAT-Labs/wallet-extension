@@ -113,11 +113,7 @@ export default function BRC20TokenScreen() {
   const chain = useChain();
 
   const enableTrade = useMemo(() => {
-    if (chainType === ChainType.BITCOIN_MAINNET || chainType === ChainType.FRACTAL_BITCOIN_MAINNET) {
-      return true;
-    } else {
-      return false;
-    }
+    return false;
   }, [chainType]);
 
   const shouldUseTwoRowLayout = useMemo(() => {
