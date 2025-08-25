@@ -12,6 +12,12 @@ import { Popover } from '../Popover';
 import { Row } from '../Row';
 import { Text } from '../Text';
 
+/**
+ * this component is from unisat wallet, currently we don't have this feature.
+ * but we still keep it here for future reference.
+ * we disable it by commenting all `setShowSafeNotice(true)`
+ */
+
 export const NoticePopover = ({ onClose }: { onClose: () => void }) => {
   const [checked1, setChecked1] = useState(false);
 
