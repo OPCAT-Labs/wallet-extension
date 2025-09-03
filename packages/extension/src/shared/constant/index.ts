@@ -124,25 +124,25 @@ export const ADDRESS_TYPES: {
 export const getRestoreWallets = (): { value: RestoreWalletType; name: string; addressTypes: AddressType[] }[] => [
   {
     value: RestoreWalletType.UNISAT,
-    name: 'UniSat Wallet',
+    name: 'Opcat Wallet',
     addressTypes: [
       AddressType.P2PKH
     ]
   },
-  {
-    value: RestoreWalletType.SPARROW,
-    name: 'Sparrow Wallet',
-    addressTypes: [
-      AddressType.P2PKH
-    ]
-  },
-  {
-    value: RestoreWalletType.OTHERS,
-    name: t('other_wallet'),
-    addressTypes: [
-      AddressType.P2PKH,
-    ]
-  }
+  // {
+  //   value: RestoreWalletType.SPARROW,
+  //   name: 'Sparrow Wallet',
+  //   addressTypes: [
+  //     AddressType.P2PKH
+  //   ]
+  // },
+  // {
+  //   value: RestoreWalletType.OTHERS,
+  //   name: t('other_wallet'),
+  //   addressTypes: [
+  //     AddressType.P2PKH,
+  //   ]
+  // }
 ];
 
 export enum ChainType {
