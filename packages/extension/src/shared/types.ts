@@ -429,7 +429,7 @@ export interface RequestMethodSignPsbtsParams {
   options?: any;
 }
 
-export interface RequestMethodGetBitcoinUtxosParams {
+export interface RequestMethodGetPaymentUtxosParams {
   cursor: number;
   size: number;
 }

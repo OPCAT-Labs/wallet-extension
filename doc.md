@@ -168,39 +168,6 @@ The `accountsChanged` will be emitted whenever the user's exposed account addres
 
 The following provides several methods to list the wallet's assets and construct corresponding send transactions.
 
-### getBalanceV2
-
-```
-opcat.getBalanceV2()
-```
-
-Get BTC balance
-
-**Parameters**
-
-none
-
-**Returns**
-
-- `Promise` - `Object`:
-  - `available` - `number` : the available satoshis
-  - `unavailable` - `number` : the unavailable satoshis
-  - `total` - `number` : the total satoshis
-
-**Example**
-
-```javascript
-try {
-    let res = await window.opcat.getBalanceV2();
-    console.log(res)
-} catch (e) {
-    console.log(e);
-}
-
-> {"available":10000,"unavailable":546,"total":10546}
-
-```
-
 ### getBalance
 
 ```

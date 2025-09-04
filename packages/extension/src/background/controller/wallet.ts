@@ -815,7 +815,6 @@ export class WalletController extends BaseController {
     return NETWORK_TYPES[networkType].name;
   };
 
-  // todo remove it
   getLegacyNetworkName = () => {
     const chainType = this.getChainType();
     if (

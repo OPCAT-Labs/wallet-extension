@@ -178,7 +178,7 @@ export type TypeChain = {
 export const CHAINS_MAP: { [key: string]: TypeChain } = {
   [ChainType.OPCAT_MAINNET]: {
     enum: ChainType.OPCAT_MAINNET,
-    label: 'OPCAT Mainnet',
+    label: 'OPCAT Layer Mainnet',
     iconLabel: 'OPCAT',
     icon: './images/artifacts/opcat-mainnet.svg',
     unit: 'OPCAT',
@@ -198,7 +198,7 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
   },
   [ChainType.OPCAT_TESTNET]: {
     enum: ChainType.OPCAT_TESTNET,
-    label: 'OPCAT Testnet',
+    label: 'OPCAT Layer Testnet',
     iconLabel: 'OPCAT',
     icon: './images/artifacts/opcat-testnet.svg',
     unit: 'tOPCAT',

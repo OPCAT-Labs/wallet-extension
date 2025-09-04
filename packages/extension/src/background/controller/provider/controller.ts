@@ -27,10 +27,14 @@ class ProviderController extends BaseController {
     sessionService.broadcastEvent('accountsChanged', account);
     const connectSite = permissionService.getConnectedSite(origin);
     if (connectSite) {
-      const network = wallet.getLegacyNetworkName()
+    const chainType = wallet.getChainType();
+    const networkType = wallet.getNetworkType()
+    const network = NETWORK_TYPES[networkType].name
+    const networkName = CHAINS_MAP[chainType].label
       sessionService.broadcastEvent(
         'networkChanged',
         {
+          name: networkName,
           network
         },
         origin
@@ -56,7 +60,14 @@ class ProviderController extends BaseController {
 
   @Reflect.metadata('SAFE', true)
   getNetwork = async () => {
-    return wallet.getLegacyNetworkName()
+    const chainType = wallet.getChainType();
+    const networkType = wallet.getNetworkType()
+    const network = NETWORK_TYPES[networkType].name
+    const networkName = CHAINS_MAP[chainType].label
+    return {
+      name: networkName,
+      network
+    }
   };
 
   @Reflect.metadata('APPROVAL', ['SwitchNetwork', (req) => {
@@ -77,7 +88,7 @@ class ProviderController extends BaseController {
   switchNetwork = async (req) => {
     const { data: { params: { networkType } } } = req;
     wallet.setNetworkType(networkType)
-    return NETWORK_TYPES[networkType].name
+    return this.getNetwork()
   }
 
 
@@ -124,18 +135,6 @@ class ProviderController extends BaseController {
   };
 
   @Reflect.metadata('SAFE', true)
-  getBalanceV2 = async () => {
-    const account = await wallet.getCurrentAccount();
-    if (!account) return null;
-    const balance = await wallet.getAddressBalanceV2(account.address)
-    return {
-      available: balance.availableBalance,
-      unavailable: balance.unavailableBalance,
-      total: balance.totalBalance
-    };
-  };
-
-  @Reflect.metadata('SAFE', true)
   verifyMessageOfBIP322Simple = async (req) => {
     const { data: { params } } = req;
     return verifyMessageOfBIP322Simple(params.address, params.message, params.signature, params.network) ? 1 : 0;
@@ -150,8 +149,9 @@ class ProviderController extends BaseController {
       throw new Error('satoshis is required')
     }
   }])
-  sendBitcoin = async ({ approvalRes: { psbtHex } }) => {
-    const psbt = bitcoin.Psbt.fromHex(psbtHex);
+  sendBitcoin = async ({ approvalRes: { psbtHex }, ...args }) => {
+    console.log('sendBitcoin', args)
+    const psbt = psbtFromHex(psbtHex);
     const tx = psbt.extractTransaction(true);
     const rawtx = tx.toHex()
     return await wallet.pushTx(rawtx)
@@ -278,7 +278,7 @@ class ProviderController extends BaseController {
   };
 
   @Reflect.metadata('SAFE', true)
-  getBitcoinUtxos = async () => {
+  getPaymentUtxos = async () => {
     const account = await wallet.getCurrentAccount();
     if (!account) return [];
     const utxos = await wallet.getBTCUtxos()
