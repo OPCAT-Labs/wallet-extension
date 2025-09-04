@@ -27,10 +27,10 @@ class ProviderController extends BaseController {
     sessionService.broadcastEvent('accountsChanged', account);
     const connectSite = permissionService.getConnectedSite(origin);
     if (connectSite) {
-    const chainType = wallet.getChainType();
-    const networkType = wallet.getNetworkType()
-    const network = NETWORK_TYPES[networkType].name
-    const networkName = CHAINS_MAP[chainType].label
+      const chainType = wallet.getChainType();
+      const networkType = wallet.getNetworkType()
+      const network = NETWORK_TYPES[networkType].name
+      const networkName = CHAINS_MAP[chainType].label
       sessionService.broadcastEvent(
         'networkChanged',
         {
