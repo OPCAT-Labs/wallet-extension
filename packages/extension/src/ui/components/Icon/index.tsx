@@ -57,8 +57,6 @@ export const svgRegistry = {
   bitcoin: './images/icons/bitcoin.svg',
   'circle-question': '/images/icons/circle-question.svg',
   split: '/images/icons/scissors.svg',
-  ordinals: '/images/icons/ordinals.svg',
-  atomicals: '/images/icons/atomicals.svg',
   info: '/images/icons/info.svg',
   warning: '/images/icons/warning.svg',
   alert: '/images/icons/alert.svg',

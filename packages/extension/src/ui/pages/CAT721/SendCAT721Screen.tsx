@@ -10,11 +10,7 @@ import { FeeRateBar } from '@/ui/components/FeeRateBar';
 import { MergeBTCPopover } from '@/ui/components/MergeBTCPopover';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
-import { useNetworkType } from '@/ui/state/settings/hooks';
-import { useRunesTx } from '@/ui/state/transactions/hooks';
 import { isValidAddress, useWallet } from '@/ui/utils';
-import { AddressType } from '@unisat/wallet-sdk';
-import { getAddressType } from '@unisat/wallet-sdk/lib/address';
 
 import { SignPsbt } from '../Approval/components';
 
@@ -32,20 +28,17 @@ export default function SendCAT721Screen() {
   const { t } = useI18n();
 
   const navigate = useNavigate();
-  const runesTx = useRunesTx();
   const [inputAmount] = useState('');
   const [disabled, setDisabled] = useState(false);
   const [toInfo, setToInfo] = useState<{
     address: string;
     domain: string;
   }>({
-    address: runesTx.toAddress,
-    domain: runesTx.toDomain,
+    address: '',
+    domain: '',
   });
 
   const [error, setError] = useState('');
-
-  const networkType = useNetworkType();
 
   const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
   const tools = useTools();
@@ -57,12 +50,6 @@ export default function SendCAT721Screen() {
     setDisabled(true);
 
     if (!isValidAddress(toInfo.address)) {
-      return;
-    }
-
-    const addressType = getAddressType(toInfo.address, networkType);
-    if (addressType !== AddressType.P2TR && addressType !== AddressType.P2WPKH) {
-      setError(t('the_recipient_must_be_p2tr_or_p2wpkh_address_type'));
       return;
     }
 

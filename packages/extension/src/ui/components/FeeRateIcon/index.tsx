@@ -19,7 +19,8 @@ enum FeeRateType {
   CUSTOM
 }
 
-const FEE_TITLES = ['low_priority', 'medium_priority', 'high_priority'];
+// const FEE_TITLES = ['low_priority', 'medium_priority', 'high_priority'];
+const FEE_TITLES = ['current_fee_rate'];
 
 interface FeeOption {
   title: string;
@@ -88,33 +89,28 @@ function FeeOptionsPopover({ feeOptions, onClose }: { feeOptions: FeeOption[]; o
         <Row style={{ borderBottomWidth: 1, borderColor: colors.border, marginBottom: 10, paddingBottom: 10 }}>
           <Text text={t('network_fee_2')} preset="bold" />
         </Row>
-        {feeOptions.map((v, i) => {
-          return (
-            <Card
-              key={i}
-              mb="sm"
-              preset="style1"
-              itemsCenter
-              style={{
-                height: 50,
-                minHeight: 50,
-                backgroundColor: 'rgba(255,255,255,0.08)',
-                borderBottomColor: colors.transparent,
-                borderBottomWidth: 0.2
-              }}>
-              <Row justifyBetween full itemsCenter>
-                <Column>
-                  <Text color={'textDim'} size="sm" text={t(FEE_TITLES[i] || v.title)}></Text>
-                </Column>
+          <Card
+            mb="sm"
+            preset="style1"
+            itemsCenter
+            style={{
+              height: 50,
+              minHeight: 50,
+              backgroundColor: 'rgba(255,255,255,0.08)',
+              borderBottomColor: colors.transparent,
+              borderBottomWidth: 0.2
+            }}>
+            <Row justifyBetween full itemsCenter>
+              <Column>
+                <Text color={'textDim'} size="sm" text={t(FEE_TITLES[0])}></Text>
+              </Column>
 
-                <Row>
-                  <Text color={'white'} size="sm" text={v.feeRate}></Text>
-                  <Text color={'textDim'} size="sm" text="sats/vB"></Text>
-                </Row>
+              <Row>
+                <Text color={'white'} size="sm" text={feeOptions[0].feeRate}></Text>
+                <Text color={'textDim'} size="sm" text="sats/vB"></Text>
               </Row>
-            </Card>
-          );
-        })}
+            </Row>
+          </Card>
       </Column>
     </Popover>
   );

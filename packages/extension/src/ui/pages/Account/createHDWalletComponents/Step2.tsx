@@ -35,14 +35,6 @@ export function Step2({
         return false;
       }
 
-      if (!contextData.isRestore && v.isUnisatLegacy) {
-        return false;
-      }
-
-      if (contextData.customHdPath && v.isUnisatLegacy) {
-        return false;
-      }
-
       return true;
     })
       .sort((a, b) => a.displayIndex - b.displayIndex)
@@ -51,7 +43,6 @@ export function Step2({
           label: v.name,
           hdPath: v.hdPath,
           addressType: v.value,
-          isUnisatLegacy: v.isUnisatLegacy
         };
       });
   }, [contextData]);
@@ -64,7 +55,6 @@ export function Step2({
           label: v.name,
           hdPath: v.hdPath,
           addressType: v.value,
-          isUnisatLegacy: v.isUnisatLegacy
         };
       });
   }, []);
@@ -76,7 +66,7 @@ export function Step2({
   >([]);
 
   const [addressAssets, setAddressAssets] = useState<{
-    [key: string]: { total_btc: string; satoshis: number; total_inscription: number };
+    [key: string]: { total_btc: string; satoshis: number; };
   }>({});
 
   const [error, setError] = useState('');
@@ -146,7 +136,7 @@ export function Step2({
     const balances = await wallet.getMultiAddressAssets(addresses.join(','));
     setLoading(false);
 
-    const addressAssets: { [key: string]: { total_btc: string; satoshis: number; total_inscription: number } } = {};
+    const addressAssets: { [key: string]: { total_btc: string; satoshis: number; } } = {};
     let maxSatoshis = 0;
     let recommended = 0;
     for (let i = 0; i < addresses.length; i++) {
@@ -156,7 +146,6 @@ export function Step2({
       addressAssets[address] = {
         total_btc: satoshisToAmount(balance.totalSatoshis),
         satoshis,
-        total_inscription: balance.inscriptionCount
       };
       if (satoshis > maxSatoshis) {
         maxSatoshis = satoshis;
@@ -325,12 +314,7 @@ export function Step2({
           const assets = addressAssets[address] || {
             total_btc: '--',
             satoshis: 0,
-            total_inscription: 0
           };
-          const hasVault = contextData.isRestore && assets.satoshis > 0;
-          if (item.isUnisatLegacy && !hasVault) {
-            return null;
-          }
 
           const hdPath = (contextData.customHdPath || item.hdPath) + '/0';
           return (

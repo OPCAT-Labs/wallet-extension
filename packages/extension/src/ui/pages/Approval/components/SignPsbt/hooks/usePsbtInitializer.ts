@@ -58,7 +58,7 @@ export const usePsbtInitializer = (setTxInfo, setLoading, tools) => {
 
         let toSignInputs = [];
         if (
-          [TxType.SEND_BITCOIN, TxType.SEND_ORDINALS_INSCRIPTION, TxType.SEND_RUNES, TxType.SEND_ALKANES].includes(type)
+          [TxType.SEND_BITCOIN,].includes(type)
         ) {
           toSignInputs = decodedPsbt.inputInfos.map((v, index) => ({
             index,
@@ -101,7 +101,6 @@ export const usePsbtInitializer = (setTxInfo, setLoading, tools) => {
         setTxInfo({
           decodedPsbt,
           changedBalance: 0,
-          changedInscriptions: [],
           psbtHex: finalPsbtHex,
           rawtx: '',
           toSignInputs,

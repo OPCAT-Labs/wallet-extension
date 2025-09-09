@@ -1,4 +1,4 @@
-import { UnspentOutput } from '@unisat/wallet-sdk';
+import { UnspentOutput } from '@opcat-labs/wallet-sdk';
 import { CHAINS_ENUM, PaymentChannelType } from './constant';
 
 export enum AddressType {
@@ -37,9 +37,6 @@ export interface BitcoinBalance {
   confirm_btc_amount: string;
   pending_btc_amount: string;
   btc_amount: string;
-  confirm_inscription_amount: string;
-  pending_inscription_amount: string;
-  inscription_amount: string;
   usd_value: string;
 }
 
@@ -187,7 +184,6 @@ export interface TokenInfo {
   totalMinted: string;
   decimal: number;
   holder: string;
-  // inscriptionId: string;
   selfMint?: boolean;
   holdersCount: number;
   historyCount: number;
@@ -196,8 +192,6 @@ export interface TokenInfo {
 export interface TokenTransfer {
   ticker: string;
   amount: string;
-  // inscriptionId: string;
-  // inscriptionNumber: number;
   timestamp: number;
   confirmations: number;
   satoshi: number;
@@ -335,10 +329,9 @@ export interface AddressCAT20UtxoSummary {
 }
 
 export interface CAT20MergeOrder {
-  id: string;
-  batchIndex: number;
+  mergeData: string;
   batchCount: number;
-  ct: number;
+  // ct: number;
 }
 
 export interface WebsiteResult {
@@ -397,11 +390,6 @@ export interface RequestMethodSendBitcoinParams {
 }
 
 export interface RequestMethodSignPsbtParams {
-  // sendInscriptionParams: {
-  //   toAddress: string;
-  //   inscriptionId: string;
-  //   feeRate: number | undefined;
-  // };
   type: TxType;
 }
 
@@ -430,7 +418,7 @@ export interface RequestMethodSignPsbtsParams {
   options?: any;
 }
 
-export interface RequestMethodGetBitcoinUtxosParams {
+export interface RequestMethodGetPaymentUtxosParams {
   cursor: number;
   size: number;
 }

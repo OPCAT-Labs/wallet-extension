@@ -17,7 +17,7 @@ import { useImportAccountsFromKeystoneCallback } from '@/ui/state/global/hooks';
 import { colors } from '@/ui/theme/colors';
 import { useWallet } from '@/ui/utils';
 import { ScanOutlined, UsbOutlined } from '@ant-design/icons';
-import { AddressType } from '@unisat/wallet-sdk';
+import { AddressType } from '@opcat-labs/wallet-sdk';
 
 import { useNavigate } from '../MainRoute';
 
@@ -236,7 +236,7 @@ function Step3({
       setError((e as any).message);
       return;
     }
-    wallet.setShowSafeNotice(true);
+    // wallet.setShowSafeNotice(true);
     navigate('MainScreen');
   };
 

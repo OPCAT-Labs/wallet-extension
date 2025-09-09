@@ -5,7 +5,6 @@ import { CHAINS_MAP, CHANNEL, VERSION, X_CLIENT_HEADER } from '@/shared/constant
 import { getCurrentLocaleAsync } from '@/shared/modules/i18n';
 import {
   AddressSummary,
-  AddressTokenSummary,
   AppInfo,
   AppSummary,
   BitcoinBalance,
@@ -16,12 +15,11 @@ import {
   DecodedPsbt,
   FeeSummary,
   TickPriceItem,
-  TokenTransfer,
   UTXO,
   VersionDetail,
   WalletConfig
 } from '@/shared/types';
-import { ToSignInput } from '@unisat/wallet-sdk';
+import { ToSignInput } from '@opcat-labs/wallet-sdk';
 
 import { preferenceService } from '.';
 
@@ -347,23 +345,6 @@ export class OpenApiService {
     return this.httpGet('/v5/address/search', { domain });
   }
 
-  async getAddressTokenSummary(address: string, ticker: string): Promise<AddressTokenSummary> {
-    return this.httpGet('/v5/brc20/token-summary', { address, ticker: encodeURIComponent(ticker) });
-  }
-
-  async getTokenTransferableList(
-    address: string,
-    ticker: string,
-    cursor: number,
-    size: number
-  ): Promise<{ list: TokenTransfer[]; total: number }> {
-    return this.httpGet('/v5/brc20/transferable-list', {
-      address,
-      ticker: encodeURIComponent(ticker),
-      cursor,
-      size
-    });
-  }
 
   async decodePsbt(psbtHex: string, website: string): Promise<DecodedPsbt> {
     return this.httpPost('/v5/tx/decode2', { psbtHex, website });
@@ -422,23 +403,27 @@ export class OpenApiService {
     });
   }
 
-  async transferCAT20Step2(transferId: string, signedPsbt: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT20Step2(transferData: any, signedPsbt: string) {
     return this.httpPost('/v5/cat20/transfer-token-step2', {
-      id: transferId,
+      transferData,
       psbt: signedPsbt
     });
   }
 
-  async transferCAT20Step3(transferId: string, signedPsbt: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT20Step3(transferData: any, signedPsbt: string) {
     return this.httpPost('/v5/cat20/transfer-token-step3', {
-      id: transferId,
+      transferData,
       psbt: signedPsbt
     });
   }
 
-  async transferCAT20Step1ByMerge(mergeId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT20Step1ByMerge(mergeData: any, batchIndex: number) {
     return this.httpPost('/v5/cat20/transfer-token-step1-by-merge', {
-      mergeId
+      mergeData,
+      batchIndex
     });
   }
 
@@ -449,12 +434,6 @@ export class OpenApiService {
       tokenId,
       utxoCount,
       feeRate
-    });
-  }
-
-  async getMergeCAT20Status(mergeId: string) {
-    return this.httpPost('/v5/cat20/merge-token-status', {
-      id: mergeId
     });
   }
 

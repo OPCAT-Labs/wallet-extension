@@ -9,8 +9,8 @@ import eventBus from '@/shared/eventBus';
 import { t } from '@/shared/modules/i18n';
 import { AddressType } from '@/shared/types';
 import { ObservableStore } from '@metamask/obs-store';
-import { keyring } from '@unisat/wallet-sdk';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
+import { keyring } from '@opcat-labs/wallet-sdk';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 import { default as preference } from '../preference';
 import DisplayKeyring from './display';

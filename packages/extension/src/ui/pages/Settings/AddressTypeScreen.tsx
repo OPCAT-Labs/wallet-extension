@@ -90,7 +90,6 @@ export default function AddressTypeScreen() {
             const assets = addressAssets[address] || {
               total_btc: '--',
               satoshis: 0,
-              total_inscription: 0
             };
             let name = `${item.name} (${item.hdPath}/${account.index})`;
             if (currentKeyring.type === KEYRING_TYPE.SimpleKeyring) {

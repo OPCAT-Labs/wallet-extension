@@ -39,17 +39,17 @@ import {
 } from '@/shared/types';
 import { getChainInfo } from '@/shared/utils';
 import { psbtFromString } from '@/ui/utils/psbt-utils';
-import { txHelpers } from '@unisat/wallet-sdk';
-import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@unisat/wallet-sdk/lib/address';
-import { bitcoin, ECPair } from '@unisat/wallet-sdk/lib/bitcoin-core';
-import { KeystoneKeyring } from '@unisat/wallet-sdk/lib/keyring';
+import { txHelpers } from '@opcat-labs/wallet-sdk';
+import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
+import { bitcoin, ECPair } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
+import { KeystoneKeyring } from '@opcat-labs/wallet-sdk/lib/keyring';
 import {
   genPsbtOfBIP322Simple,
   getSignatureFromPsbtOfBIP322Simple,
   signMessageOfBIP322Simple
-} from '@unisat/wallet-sdk/lib/message';
-import { toPsbtNetwork } from '@unisat/wallet-sdk/lib/network';
-import { toXOnly } from '@unisat/wallet-sdk/lib/utils';
+} from '@opcat-labs/wallet-sdk/lib/message';
+import { toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/network';
+import { toXOnly } from '@opcat-labs/wallet-sdk/lib/utils';
 
 import { ContactBookItem } from '../service/contactBook';
 import { OpenApiService } from '../service/openapi';
@@ -152,9 +152,6 @@ export class WalletController extends BaseController {
       confirm_btc_amount: '0',
       pending_btc_amount: '0',
       btc_amount: '0',
-      confirm_inscription_amount: '0',
-      pending_inscription_amount: '0',
-      inscription_amount: '0'
     };
     if (!address) return defaultBalance;
     return preferenceService.getAddressBalance(address) || defaultBalance;
@@ -271,7 +268,7 @@ export class WalletController extends BaseController {
     );
     const keyring = this.displayedKeyringToWalletKeyring(displayedKeyring, keyringService.keyrings.length - 1);
     this.changeKeyring(keyring);
-    preferenceService.setShowSafeNotice(true);
+    // preferenceService.setShowSafeNotice(true);
   };
 
   createTmpKeyringWithMnemonics = async (
@@ -298,7 +295,7 @@ export class WalletController extends BaseController {
   createTmpKeyringWithPrivateKey = async (privateKey: string, addressType: AddressType) => {
     const originKeyring = keyringService.createTmpKeyring(KEYRING_TYPE.SimpleKeyring, [privateKey]);
     const displayedKeyring = await keyringService.displayForKeyring(originKeyring, addressType, -1);
-    preferenceService.setShowSafeNotice(true);
+    // preferenceService.setShowSafeNotice(true);
     return this.displayedKeyringToWalletKeyring(displayedKeyring, -1, false);
   };
 
@@ -815,7 +812,6 @@ export class WalletController extends BaseController {
     return NETWORK_TYPES[networkType].name;
   };
 
-  // todo remove it
   getLegacyNetworkName = () => {
     const chainType = this.getChainType();
     if (
@@ -882,8 +878,6 @@ export class WalletController extends BaseController {
         data: v.data || '',
         addressType: v.addressType,
         pubkey: account.pubkey,
-        inscriptions: v.inscriptions,
-        atomicals: v.atomicals
       };
     });
     return btcUtxos;
@@ -900,9 +894,7 @@ export class WalletController extends BaseController {
         satoshis: v.satoshis,
         scriptPk: v.scriptPk,
         addressType: v.addressType,
-        pubkey: account.pubkey,
-        inscriptions: v.inscriptions,
-        atomicals: v.atomicals
+        pubkey: account.pubkey
       };
     });
     return unavailableUtxos;
@@ -1531,8 +1523,9 @@ export class WalletController extends BaseController {
     return tokenSummary;
   };
 
-  transferCAT20Step1ByMerge = async (mergeId: string) => {
-    return await openapiService.transferCAT20Step1ByMerge(mergeId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT20Step1ByMerge = async (mergeData: any, batchIndex: number) => {
+    return await openapiService.transferCAT20Step1ByMerge(mergeData, batchIndex);
   };
 
   transferCAT20Step1 = async (to: string, tokenId: string, tokenAmount: string, feeRate: number) => {
@@ -1579,11 +1572,6 @@ export class WalletController extends BaseController {
       utxoCount,
       feeRate
     );
-    return _res;
-  };
-
-  getMergeCAT20Status = async (mergeId: string) => {
-    const _res = await openapiService.getMergeCAT20Status(mergeId);
     return _res;
   };
 
@@ -1681,7 +1669,6 @@ export class WalletController extends BaseController {
     this.setPsbtSignNonSegwitEnable(psbt, false);
     return psbt.toHex();
   };
-  // createBabylonDeposit = async (amount: string) => {};
 }
 
 export default new WalletController();

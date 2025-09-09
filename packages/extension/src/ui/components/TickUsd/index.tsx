@@ -61,10 +61,7 @@ export function TickUsd(
 }
 
 export enum TokenType {
-  BRC20 = 'brc20',
   CAT20 = 'CAT20',
-  RUNES = 'runes',
-  ALKANES = 'alkanes'
 }
 
 export function TickUsdWithoutPrice(
@@ -87,45 +84,9 @@ export function TickUsdWithoutPrice(
     setShown(false);
 
     if (tick) {
-      if (type === TokenType.BRC20) {
-        wallet
-          .getBrc20sPrice([tick])
-          .then((priceMap) => {
-            setPrice(priceMap[tick]);
-            if (priceMap[tick].curPrice > 0) {
-              setShown(true);
-            }
-          })
-          .catch(() => {
-            setShown(false);
-          });
-      } else if (type === TokenType.RUNES) {
-        wallet
-          .getRunesPrice([tick])
-          .then((priceMap) => {
-            setPrice(priceMap[tick]);
-            if (priceMap[tick].curPrice > 0) {
-              setShown(true);
-            }
-          })
-          .catch(() => {
-            setShown(false);
-          });
-      } else if (type === TokenType.CAT20) {
+      if (type === TokenType.CAT20) {
         wallet
           .getCAT20sPrice([tick])
-          .then((priceMap) => {
-            setPrice(priceMap[tick]);
-            if (priceMap[tick].curPrice > 0) {
-              setShown(true);
-            }
-          })
-          .catch(() => {
-            setShown(false);
-          });
-      } else if (type === TokenType.ALKANES) {
-        wallet
-          .getAlkanesPrice([tick])
           .then((priceMap) => {
             setPrice(priceMap[tick]);
             if (priceMap[tick].curPrice > 0) {

@@ -3,7 +3,7 @@ import { ethErrors, serializeError } from 'eth-rpc-errors';
 import { EventEmitter } from 'events';
 
 import {
-  RequestMethodGetBitcoinUtxosParams,
+  RequestMethodGetPaymentUtxosParams,
   RequestMethodSendBitcoinParams,
   RequestMethodSignMessageParams,
   RequestMethodSignMessagesParams,
@@ -22,7 +22,7 @@ const log = (_event: string, ..._args: any[]) => {
     // console.log(
     //   `%c [opcat] (${new Date().toTimeString().slice(0, 8)}) ${event}`,
     //   'font-weight: 600; background-color: #7d6ef9; color: white;',
-    //   ...args
+    //   ..._args
     // );
   }
 };
@@ -266,12 +266,6 @@ export class OpcatProvider extends EventEmitter {
     });
   };
 
-  getBalanceV2 = async () => {
-    return this[requestMethodKey]({
-      method: 'getBalanceV2'
-    });
-  };
-
   signMessage = async (text: string, type: string) => {
     const params: RequestMethodSignMessageParams = {
       text,
@@ -315,7 +309,7 @@ export class OpcatProvider extends EventEmitter {
     });
   };
 
-  sendBitcoin = async (
+  sendTransfer = async (
     toAddress: string,
     satoshis: number,
     options?: { feeRate: number; memo?: string; memos?: string[] }
@@ -386,22 +380,21 @@ export class OpcatProvider extends EventEmitter {
     });
   };
 
-  // deprecated
-  isAtomicalsEnabled = async () => {
-    return this[requestMethodKey]({
-      method: 'isAtomicalsEnabled'
-    });
-  };
-
-  getBitcoinUtxos = async (cursor = 0, size = 20) => {
-    const params: RequestMethodGetBitcoinUtxosParams = {
+  getPaymentUtxos = async (cursor = 0, size = 20) => {
+    const params: RequestMethodGetPaymentUtxosParams = {
       cursor,
       size
     };
-    return this[requestMethodKey]({
-      method: 'getBitcoinUtxos',
+    const utxos = await this[requestMethodKey]({
+      method: 'getPaymentUtxos',
       params
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (utxos as any).forEach(utxo => {
+      delete utxo.inscriptions
+      delete utxo.atomicals
+    });
+    return utxos;
   };
 }
 

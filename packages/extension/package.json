@@ -1,23 +1,23 @@
 {
-  "name": "unisat-extension",
-  "version": "1.7.0",
+  "name": "@opcat-labs/wallet-extension",
+  "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/unisat-wallet/extension#readme",
+  "homepage": "https://github.com/OPCAT-Labs/wallet-extension#readme",
   "bugs": {
-    "url": "https://github.com/unisat-wallet/extension/issues"
+    "url": "https://github.com/OPCAT-Labs/wallet-extension/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/unisat-wallet/extension.git"
+    "url": "https://github.com/OPCAT-Labs/wallet-extension.git"
   },
   "scripts": {
     "clean": "mkdir -p dist && rm -rf dist/* && cp -r build/_raw/* dist",
-    "build:chrome:dev": "webpack --progress --env browser=chrome manifest=mv2 config=dev channel=github version=1.7.0",
+    "build:chrome:dev": "webpack --progress --env browser=chrome manifest=mv2 config=dev channel=github version=0.1.0",
     "build:chrome": "gulp build --env=pro --browser=chrome --manifest=mv2 --channel=github",
     "build:firefox": "gulp build --env=pro --browser=firefox --manifest=mv2 --channel=github",
     "build:brave": "gulp build --env=pro --browser=brave --manifest=mv2 --channel=github",
     "build:edge": "gulp build --env=pro --browser=edge --manifest=mv2 --channel=github",
-    "build:chrome:mv3:dev": "webpack --progress --env browser=chrome manifest=mv3 config=dev channel=github version=1.7.0",
+    "build:chrome:mv3:dev": "webpack --progress --env browser=chrome manifest=mv3 config=dev channel=github version=0.1.0",
     "build:chrome:mv3": "gulp build --env=pro --browser=chrome --manifest=mv3 --channel=store",
     "lint": "eslint src --fix --ext .js,.ts,.tsx,.json  && npm run format",
     "lint:fix": "eslint --fix src/**/*.{js,jsx,ts,tsx,json}",
@@ -63,7 +63,7 @@
     "@types/react": "^18.0.9",
     "@types/react-cache": "^2.0.1",
     "@types/react-dom": "^18.0.4",
-    "@unisat/wallet-sdk": "^1.8.1",
+    "@opcat-labs/wallet-sdk": "^0.1.0",
     "antd": "^4.20.4",
     "antd-dayjs-webpack-plugin": "1.0.6",
     "assert": "^2.0.0",

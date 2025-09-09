@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat 钱包" },
+  "appName": { "message": "Opcat 钱包" },
   "appDescription": {
-    "message": "在全球首个开源的 Ordinals Chrome 钱包中铭刻并存储您的铭文！"
+    "message": "开源的 Opcat 钱包"
   },
   "receive": {
     "message": "接收"
@@ -399,6 +399,9 @@
   "output_value": {
     "message": "输出值"
   },
+  "confirmed": {
+    "message": "已确认"
+  },
   "unconfirmed": {
     "message": "未确认"
   },
@@ -670,7 +673,7 @@
   "babylon_bitcoin_staking_stats": {
     "message": "Babylon 比特币质押统计"
   },
-  "confirmed": {
+  "confirmed_tvl": {
     "message": "已确认"
   },
   "tvl": {

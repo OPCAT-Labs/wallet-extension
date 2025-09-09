@@ -26,7 +26,7 @@ export default function AboutUsScreen() {
 
           {/* App Name */}
           <Column itemsCenter>
-            <Text text="UniSat Wallet" preset="title-bold" size="xxl" />
+            <Text text="OPCAT Wallet" preset="title-bold" size="xxl" />
           </Column>
 
           {/* Version Info */}
@@ -49,7 +49,7 @@ export default function AboutUsScreen() {
                   whiteSpace: 'nowrap',
                   gap: 0
                 }}
-                onClick={() => window.open('https://unisat.io/extension/update')}>
+                onClick={() => window.open('https://opcatlabs.io/extension/update')}>
                 <Icon icon="arrowUp" size={14} />
                 <Text
                   text={t('new_update_available')}

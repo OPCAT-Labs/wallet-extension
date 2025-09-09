@@ -21,8 +21,6 @@ const main = async () => {
                 "data": "",
                 "addressType": AddressType.P2PKH,
                 "pubkey": "039ff2b789dd2b2862ec0a95d7b5a02dff02641fce54213fe48f2e4fb532f4e626",
-                "inscriptions": [],
-                "atomicals": []
             },
             {
                 "txid": "a13dcd44b897e3c115153431837de13535a08a1d544518741e886daffcd6741c",
@@ -32,8 +30,6 @@ const main = async () => {
                 "data": "",
                 "addressType": AddressType.P2PKH,
                 "pubkey": "039ff2b789dd2b2862ec0a95d7b5a02dff02641fce54213fe48f2e4fb532f4e626",
-                "inscriptions": [],
-                "atomicals": []
             }
         ],
         tos: [

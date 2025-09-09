@@ -65,10 +65,10 @@ export default function TxCreateScreen() {
 
   const [rawTxInfo, setRawTxInfo] = useState<RawTxInfo>();
 
-  const availableAmount = satoshisToAmount(accountBalance.availableBalance);
-  const unavailableAmount = satoshisToAmount(accountBalance.unavailableBalance);
+  const availableAmount = satoshisToAmount(+accountBalance.amount * 1e8);
+  const unavailableAmount = satoshisToAmount(0);
 
-  const showUnavailable = accountBalance.unavailableBalance > 0;
+  const showUnavailable = false;
 
   const chain = useChain();
   const { openUtxoTools } = useUtxoTools(chain);
@@ -87,7 +87,7 @@ export default function TxCreateScreen() {
       return;
     }
 
-    if (toSatoshis > accountBalance.availableBalance) {
+    if (toSatoshis > +accountBalance.amount * 1e8) {
       setError(t('amount_exceeds_your_available_balance'));
       return;
     }

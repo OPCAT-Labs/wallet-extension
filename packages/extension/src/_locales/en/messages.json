@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat Wallet" },
+  "appName": { "message": "Opcat Wallet" },
   "appDescription": {
-    "message": "Inscribe and store your inscriptions in the world's first open-source Ordinals Chrome wallet!"
+    "message": "Open source opcat wallet"
   },
   "receive": {
     "message": "Receive"
@@ -267,6 +267,9 @@
   },
   "is_unconfirmed_please_wait_for_confirmation": {
     "message": "is unconfirmed, please wait for confirmation"
+  },
+  "confirmed": {
+    "message": "confirmed"
   },
   "unconfirmed": {
     "message": "unconfirmed"

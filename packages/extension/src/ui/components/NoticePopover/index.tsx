@@ -12,6 +12,12 @@ import { Popover } from '../Popover';
 import { Row } from '../Row';
 import { Text } from '../Text';
 
+/**
+ * this component is from unisat wallet, currently we don't have this feature.
+ * but we still keep it here for future reference.
+ * we disable it by commenting all `setShowSafeNotice(true)`
+ */
+
 export const NoticePopover = ({ onClose }: { onClose: () => void }) => {
   const [checked1, setChecked1] = useState(false);
 
@@ -50,15 +56,6 @@ export const NoticePopover = ({ onClose }: { onClose: () => void }) => {
             </Checkbox>
           </div>
           <Row style={{ borderTopWidth: 1, borderColor: colors.border }} my="md" />
-
-          {/* <div>
-            <Checkbox checked={checked2} onChange={(e) => setChecked2(e.target.checked)}>
-              <div style={{ fontSize: fontSizes.sm }}>
-                {t('for_atomicals_assets')} <span style={{ color: '#EBB94C' }}>{t('non_arc20')}</span>
-                {t('are_not_supported_yet')}
-              </div>
-            </Checkbox>
-          </div> */}
         </Column>
 
         <Row full>

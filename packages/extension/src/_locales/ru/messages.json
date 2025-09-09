@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat Wallet" },
+  "appName": { "message": "Opcat Wallet" },
   "appDescription": {
-    "message": "Создавайте и храните свои надписи в первом в мире Chrome-кошельке для Ordinals с открытым исходным кодом!"
+    "message": "Кошелек opcat с открытым исходным кодом"
   },
   "receive": {
     "message": "Получить"
@@ -266,6 +266,9 @@
   },
   "is_unconfirmed_please_wait_for_confirmation": {
     "message": "не подтверждена, пожалуйста, дождитесь подтверждения"
+  },
+  "confirmed": {
+    "message": "подтверждено"
   },
   "unconfirmed": {
     "message": "не подтверждено"

@@ -50,7 +50,7 @@ const $stylePresets: {
 
 type Presets = keyof typeof $viewPresets;
 
-export interface InscriptionProps {
+export interface CAT721Props {
   collectionId: string;
   contentType: string;
   localId: string;
@@ -59,7 +59,7 @@ export interface InscriptionProps {
   preset: Presets;
 }
 
-export default function CAT721Preview({ collectionId, contentType, localId, onClick, preset }: InscriptionProps) {
+export default function CAT721Preview({ collectionId, contentType, localId, onClick, preset }: CAT721Props) {
   const style = $stylePresets[preset];
 
   const contentBaseUrl = useCAT721NFTContentBaseUrl();

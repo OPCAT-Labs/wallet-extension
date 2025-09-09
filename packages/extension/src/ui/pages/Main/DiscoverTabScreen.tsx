@@ -19,7 +19,6 @@ import { useWallet } from '@/ui/utils';
 import { useNavigate } from '../MainRoute';
 import { SwitchChainModal } from '../Settings/SwitchChainModal';
 
-// const APP_ID_BABYLON_STAKING = 1103;
 
 function BannerItem({ img, link }: { img: string; link: string }) {
   return (

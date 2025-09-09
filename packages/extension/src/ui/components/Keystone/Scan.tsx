@@ -59,7 +59,7 @@ export default function KeystoneScan({
           <AnimatedQRScanner
             handleScan={onSucceed}
             handleError={onError}
-            urTypes={['crypto-account', 'crypto-psbt', 'btc-signature', 'cosmos-signature']}
+            urTypes={['crypto-account', 'crypto-psbt', 'btc-signature']}
             onProgress={onProgress}
             options={{
               blur: false,

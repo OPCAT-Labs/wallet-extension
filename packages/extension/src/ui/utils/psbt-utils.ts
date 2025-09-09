@@ -1,7 +1,7 @@
 import { psbtFromBase64, psbtFromHex } from '@/background/utils/psbt';
-import { AddressType, ToSignInput } from '@unisat/wallet-sdk';
-import { getAddressType } from '@unisat/wallet-sdk/lib/address';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
+import { AddressType, ToSignInput } from '@opcat-labs/wallet-sdk';
+import { getAddressType } from '@opcat-labs/wallet-sdk/lib/address';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 const DUMMY_SCRIPTS = {
   P2TR_FINAL_SCRIPT_WITNESS:

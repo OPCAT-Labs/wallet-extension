@@ -7,19 +7,12 @@ import { ConnectedSite } from '@/background/service/permission';
 import { AddressFlagType, CHAINS_ENUM, ChainType } from '@/shared/constant';
 import {
   Account,
-  AddressAlkanesTokenSummary,
   AddressCAT20TokenSummary,
   AddressCAT20UtxoSummary,
   AddressCAT721CollectionSummary,
-  AddressRunesTokenSummary,
   AddressSummary,
-  AddressTokenSummary,
-  AlkanesBalance,
-  AlkanesCollection,
-  AlkanesInfo,
   AppInfo,
   AppSummary,
-  Arc20Balance,
   BitcoinBalance,
   BitcoinBalanceV2,
   BtcChannelItem,
@@ -27,30 +20,21 @@ import {
   CAT20MergeOrder,
   CAT721Balance,
   CoinPrice,
-  CosmosBalance,
-  CosmosSignDataType,
   DecodedPsbt,
   FeeSummary,
-  InscribeOrder,
-  Inscription,
-  InscriptionSummary,
   NetworkType,
-  RuneBalance,
   SignPsbtOptions,
   TickPriceItem,
-  TokenBalance,
-  TokenTransfer,
   TxHistoryItem,
   UserToSignInput,
   UTXO,
-  UTXO_Detail,
   VersionDetail,
   WalletConfig,
   WalletKeyring,
   WebsiteResult
 } from '@/shared/types';
-import { AddressType, UnspentOutput } from '@unisat/wallet-sdk';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
+import { AddressType } from '@opcat-labs/wallet-sdk';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 export interface WalletController {
   openapi: {
@@ -90,12 +74,6 @@ export interface WalletController {
   findGroupAssets(
     groups: { type: number; address_arr: string[]; pubkey_arr: string[] }[]
   ): Promise<{ type: number; address_arr: string[]; pubkey_arr: string[]; satoshis_arr: number[] }[]>;
-
-  getAddressInscriptions(
-    address: string,
-    cursor: number,
-    size: number
-  ): Promise<{ list: Inscription[]; total: number }>;
 
   getAddressHistory: (params: {
     address: string;
@@ -186,42 +164,12 @@ export interface WalletController {
 
   sendAllBTC(data: { to: string; btcUtxos: UTXO[]; feeRate: number; enableRBF: boolean }): Promise<string>;
 
-  sendOrdinalsInscription(data: {
-    to: string;
-    inscriptionId: string;
-    feeRate: number;
-    outputValue?: number;
-    enableRBF: boolean;
-    btcUtxos: UTXO[];
-  }): Promise<string>;
-
-  sendOrdinalsInscriptions(data: {
-    to: string;
-    inscriptionIds: string[];
-    feeRate: number;
-    enableRBF: boolean;
-    btcUtxos: UTXO[];
-  }): Promise<string>;
-
-  splitOrdinalsInscription(data: {
-    inscriptionId: string;
-    feeRate: number;
-    outputValue: number;
-    enableRBF: boolean;
-    btcUtxos: UTXO[];
-  }): Promise<{ psbtHex: string; splitedCount: number }>;
 
   pushTx(rawtx: string): Promise<string>;
 
-  queryDomainInfo(domain: string): Promise<Inscription>;
-
-  getInscriptionSummary(): Promise<InscriptionSummary>;
   getAppSummary(): Promise<AppSummary>;
   getBTCUtxos(): Promise<UTXO[]>;
   getUnavailableUtxos(): Promise<UTXO[]>;
-  getAssetUtxosAtomicalsFT(ticker: string): Promise<UTXO[]>;
-  getAssetUtxosAtomicalsNFT(atomicalId: string): Promise<UTXO[]>;
-  getAssetUtxosInscriptions(inscriptionId: string): Promise<UTXO[]>;
 
   getNetworkType(): Promise<NetworkType>;
   setNetworkType(type: NetworkType): Promise<void>;
@@ -244,10 +192,7 @@ export interface WalletController {
   setAccountAlianName(account: Account, name: string): Promise<Account>;
   getFeeSummary(): Promise<FeeSummary>;
   getCoinPrice(): Promise<CoinPrice>;
-  getBrc20sPrice(ticks: string[]): Promise<{ [tick: string]: TickPriceItem }>;
-  getRunesPrice(ticks: string[]): Promise<{ [tick: string]: TickPriceItem }>;
   getCAT20sPrice(tokenIds: string[]): Promise<{ [tokenId: string]: TickPriceItem }>;
-  getAlkanesPrice(alkaneid: string[]): Promise<{ [tick: string]: TickPriceItem }>;
 
   setEditingKeyring(keyringIndex: number): Promise<void>;
   getEditingKeyring(): Promise<WalletKeyring>;
@@ -255,58 +200,10 @@ export interface WalletController {
   setEditingAccount(account: Account): Promise<void>;
   getEditingAccount(): Promise<Account>;
 
-  inscribeBRC20Transfer(
-    address: string,
-    tick: string,
-    amount: string,
-    feeRate: number,
-    outputValue: number
-  ): Promise<InscribeOrder>;
-  getInscribeResult(orderId: string): Promise<TokenTransfer>;
-
   decodePsbt(psbtHex: string, website: string): Promise<DecodedPsbt>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   decodeContracts(contracts: any[], account: any): Promise<any[]>;
-
-  getAllInscriptionList(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: Inscription[] }>;
-
-  getBRC20List(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: TokenBalance[] }>;
-
-  getBRC20List5Byte(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: TokenBalance[] }>;
-
-  getBRC20TransferableList(
-    address: string,
-    ticker: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: TokenTransfer[] }>;
-
-  getOrdinalsInscriptions(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: Inscription[] }>;
-
-  getAtomicalsNFTs(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: Inscription[] }>;
-
-  getBRC20Summary(address: string, ticker: string): Promise<AddressTokenSummary>;
 
   expireUICachedData(address: string): Promise<void>;
 
@@ -315,40 +212,12 @@ export interface WalletController {
   getSkippedVersion(): Promise<string>;
   setSkippedVersion(version: string): Promise<void>;
 
-  getInscriptionUtxoDetail(inscriptionId: string): Promise<UTXO_Detail>;
-  getUtxoByInscriptionId(inscriptionId: string): Promise<UTXO>;
-  getInscriptionInfo(inscriptionId: string): Promise<Inscription>;
-
   checkWebsite(website: string): Promise<WebsiteResult>;
 
   readTab(tabName: string): Promise<void>;
   readApp(appid: number): Promise<void>;
 
   formatOptionsToSignInputs(psbtHex: string, options?: SignPsbtOptions): Promise<ToSignInput[]>;
-
-  getArc20BalanceList(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: Arc20Balance[] }>;
-
-  sendAtomicalsNFT(data: {
-    to: string;
-    atomicalId: string;
-    feeRate: number;
-    enableRBF: boolean;
-    btcUtxos: UTXO[];
-  }): Promise<string>;
-
-  sendAtomicalsFT(data: {
-    to: string;
-    ticker: string;
-    amount: number;
-    feeRate: number;
-    enableRBF: boolean;
-    btcUtxos: UTXO[];
-    assetUtxos: UTXO[];
-  }): Promise<string>;
 
   getAddressSummary(address: string): Promise<AddressSummary>;
 
@@ -366,49 +235,9 @@ export interface WalletController {
   genSignMsgUr(text: string, msgType?: string): Promise<{ type: string; cbor: string; requestId: string }>;
   parseSignMsgUr(type: string, cbor: string, msgType: string): Promise<{ signature: string }>;
   getKeystoneConnectionType(): Promise<'USB' | 'QR'>;
-  genSignCosmosUr(cosmosSignRequest: {
-    requestId?: string;
-    signData: string;
-    dataType: CosmosSignDataType;
-    path: string;
-    chainId?: string;
-    accountNumber?: string;
-    address?: string;
-  }): Promise<{ type: string; cbor: string; requestId: string }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  parseCosmosSignUr(type: string, cbor: string): Promise<any>;
-
-  cosmosSignData(
-    chainId: string,
-    signBytesHex: string
-  ): Promise<{
-    publicKey: string;
-    signature: string;
-  }>;
 
   getEnableSignData(): Promise<boolean>;
   setEnableSignData(enable: boolean): Promise<void>;
-
-  getRunesList(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: RuneBalance[] }>;
-
-  getAssetUtxosRunes(rune: string): Promise<UnspentOutput[]>;
-
-  getAddressRunesTokenSummary(address: string, runeid: string): Promise<AddressRunesTokenSummary>;
-
-  sendRunes(data: {
-    to: string;
-    runeid: string;
-    runeAmount: string;
-    feeRate: number;
-    enableRBF: boolean;
-    btcUtxos?: UnspentOutput[];
-    assetUtxos?: UnspentOutput[];
-    outputValue?: number;
-  }): Promise<string>;
 
   setAutoLockTimeId(timeId: number): Promise<void>;
   getAutoLockTimeId(): Promise<number>;
@@ -428,20 +257,29 @@ export interface WalletController {
     tokenId: string,
     tokenAmount: string,
     feeRate: number
-  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
   transferCAT20Step2(
-    transferId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any,
     commitTx: string,
     toSignInputs: UserToSignInput[]
-  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[] }>;
-  transferCAT20Step3(transferId: string, revealTx: string, toSignInputs: UserToSignInput[]): Promise<{ txid: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[], transferData: any }>;
+  transferCAT20Step3(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any,
+    revealTx: string,
+    toSignInputs: UserToSignInput[],
+  ): Promise<{ txid: string }>;
 
   mergeCAT20Prepare(tokenId: string, utxoCount: number, feeRate: number): Promise<CAT20MergeOrder>;
   transferCAT20Step1ByMerge(
-    mergeId: string
-  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getMergeCAT20Status(mergeId: string): Promise<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mergeData: any,
+    batchIndex: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
 
   getAppList(): Promise<{ tab: string; items: AppInfo[] }[]>;
   getBannerList(): Promise<{ id: string; img: string; link: string }[]>;
@@ -472,9 +310,11 @@ export interface WalletController {
   createBuyCoinPaymentUrl(coin: string, address: string, channel: string): Promise<string>;
 
 
+  // todo: confirm to delete
   createSendTokenStep1(
     chainId: string,
-    tokenBalance: CosmosBalance,
+    // tokenBalance: CosmosBalance,
+    tokenBalance: any,
     to: string,
     memo: string,
     {
@@ -496,33 +336,6 @@ export interface WalletController {
   listContacts(): Promise<ContactBookItem[]>;
   saveContactsOrder(contacts: ContactBookItem[]): Promise<void>;
 
-  singleStepTransferBRC20Step1(params: {
-    userAddress: string;
-    userPubkey: string;
-    receiver: string;
-    ticker: string;
-    amount: string;
-    feeRate: number;
-  }): Promise<{
-    orderId: string;
-    psbtHex: string;
-    toSignInputs: UserToSignInput[];
-  }>;
-
-  singleStepTransferBRC20Step2(params: {
-    orderId: string;
-    commitTx: string;
-    toSignInputs: UserToSignInput[];
-  }): Promise<{
-    psbtHex: string;
-    toSignInputs: UserToSignInput[];
-  }>;
-
-  singleStepTransferBRC20Step3(params: {
-    orderId: string;
-    revealTx: string;
-    toSignInputs: UserToSignInput[];
-  }): Promise<{ txid: string }>;
 
   setLastActiveTime(): void;
 
@@ -530,54 +343,6 @@ export interface WalletController {
   setOpenInSidePanel(openInSidePanel: boolean): Promise<void>;
 
   sendCoinBypassHeadOffsets(tos: { address: string; satoshis: number }[], feeRate: number): Promise<string>;
-
-  getAlkanesList(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; total: number; list: AlkanesBalance[] }>;
-
-  getAssetUtxosAlkanes(rune: string): Promise<UnspentOutput[]>;
-
-  getAddressAlkanesTokenSummary(
-    address: string,
-    alkaneid: string,
-    fetchAvailable: boolean
-  ): Promise<AddressAlkanesTokenSummary>;
-
-  createAlkanesSendTx(params: {
-    userAddress: string;
-    userPubkey: string;
-    receiver: string;
-    alkaneid: string;
-    amount: string;
-    feeRate: number;
-  }): Promise<{
-    psbtHex: string;
-    toSignInputs: UserToSignInput[];
-  }>;
-
-  signAlkanesSendTx(params: { commitTx: string; toSignInputs: ToSignInput[] }): Promise<{ txid: string }>;
-
-  sendAlkanes(params: {
-    to: string;
-    alkaneid: string;
-    amount: string;
-    feeRate: number;
-    enableRBF: boolean;
-  }): Promise<string>;
-
-  getAlkanesCollectionList(
-    address: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ list: AlkanesCollection[]; total: number }>;
-  getAlkanesCollectionItems(
-    address: string,
-    collectionId: string,
-    currentPage: number,
-    pageSize: number
-  ): Promise<{ currentPage: number; pageSize: number; list: AlkanesInfo[]; total: number }>;
 }
 
 const WalletContext = createContext<{

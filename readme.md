@@ -42,7 +42,7 @@ The extension should now be installed and visible in your Chrome extensions list
 ### Project Structure
 
 ```
-opcat-wallet2/
+wallet-extension/
 ├── packages/
 │   ├── extension/     # Chrome extension source code
 │   └── utils/         # Shared utilities and libraries

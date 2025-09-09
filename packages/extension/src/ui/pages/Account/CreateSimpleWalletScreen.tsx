@@ -42,7 +42,7 @@ function Step1({
 
   const btnClick = async () => {
     try {
-      const _res = await wallet.createTmpKeyringWithPrivateKey(wif, AddressType.P2TR);
+      const _res = await wallet.createTmpKeyringWithPrivateKey(wif, AddressType.P2PKH);
       if (_res.accounts.length == 0) {
         throw new Error(t('invalid_privatekey'));
       }
@@ -93,9 +93,6 @@ function Step2({
       if (v.displayIndex < 0) {
         return false;
       }
-      if (v.isUnisatLegacy) {
-        return false;
-      }
       return true;
     })
       .sort((a, b) => a.displayIndex - b.displayIndex)
@@ -104,7 +101,6 @@ function Step2({
           label: v.name,
           hdPath: v.hdPath,
           addressType: v.value,
-          isUnisatLegacy: v.isUnisatLegacy
         };
       });
   }, [contextData]);
@@ -112,7 +108,7 @@ function Step2({
   const [previewAddresses, setPreviewAddresses] = useState<string[]>(hdPathOptions.map(() => ''));
 
   const [addressAssets, setAddressAssets] = useState<{
-    [key: string]: { total_btc: string; satoshis: number; total_inscription: number };
+    [key: string]: { total_btc: string; satoshis: number; };
   }>({});
 
   const selfRef = useRef({
@@ -139,7 +135,6 @@ function Step2({
       self.addressBalances[address] = {
         total_btc: satoshisToAmount(balance.totalSatoshis),
         satoshis,
-        total_inscription: balance.inscriptionCount
       };
       if (satoshis > self.maxSatoshis) {
         self.maxSatoshis = satoshis;
@@ -178,12 +173,7 @@ function Step2({
         const assets = addressAssets[address] || {
           total_btc: '--',
           satoshis: 0,
-          total_inscription: 0
         };
-        const hasVault = assets.satoshis > 0;
-        if (item.isUnisatLegacy && !hasVault) {
-          return null;
-        }
         return (
           <AddressTypeCard
             key={index}
@@ -227,7 +217,7 @@ interface UpdateContextDataParams {
 export default function CreateSimpleWalletScreen() {
   const [contextData, setContextData] = useState<ContextData>({
     wif: '',
-    addressType: AddressType.P2WPKH,
+    addressType: AddressType.P2PKH,
     step1Completed: false,
     tabType: TabType.STEP1
   });

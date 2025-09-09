@@ -61,9 +61,9 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
 
   const backgroundImage = './images/artifacts/balance-bg-btc.png';
 
-  const totalAmount = satoshisToAmount(accountBalance.totalBalance);
-  const availableAmount = satoshisToAmount(accountBalance.availableBalance);
-  const unavailableAmount = satoshisToAmount(accountBalance.unavailableBalance);
+  const totalAmount = satoshisToAmount(+accountBalance.amount * 1e8);
+  const confirmedAmount = satoshisToAmount(+accountBalance.confirm_btc_amount * 1e8);
+  const unconfirmedAmount = satoshisToAmount(+accountBalance.pending_btc_amount * 1e8);
 
   const handleExpandToggle = () => {
     setIsExpanded(!isExpanded);
@@ -160,17 +160,17 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       </div>
 
       <div className={styles.usdValue}>
-        <BtcUsd sats={accountBalance.totalBalance} color="black_muted" size="sm" isHidden={isBalanceHidden} />
+        <BtcUsd sats={+accountBalance.btc_amount} color="black_muted" size="sm" isHidden={isBalanceHidden} />
       </div>
 
       {/* Expandable details */}
       <div className={styles.detailsWrapper}>
         <Row itemsCenter fullY mx="md" justifyCenter={disableUtxoTools}>
           <div className={styles.column}>
-            <span className={styles.label}>{t('available')}</span>
+            <span className={styles.label}>{t('confirmed')}</span>
             <div className={styles.detailsAmount}>
-              <span>{isBalanceHidden ? '*****' : availableAmount.split('.')[0]}</span>
-              {!isBalanceHidden && <span className={styles.detailsDecimal}>.{availableAmount.split('.')[1]}</span>}
+              <span>{isBalanceHidden ? '*****' : confirmedAmount.split('.')[0]}</span>
+              {!isBalanceHidden && <span className={styles.detailsDecimal}>.{confirmedAmount.split('.')[1]}</span>}
               <span>{btcUnit}</span>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
           <Row itemsCenter gap="zero">
             {disableUtxoTools == false ? <div className={styles.divider} /> : null}
             <div className={styles.column}>
-              <Tooltip
+              {/* <Tooltip
                 overlayStyle={{
                   maxWidth: '328px',
                   padding: 0
@@ -200,16 +200,20 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
                 placement="top"
                 destroyTooltipOnHide={true}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
-                  <span className={styles.label}>{t('unavailable')}</span>
+                  <span className={styles.label}>{t('unconfirmed')}</span>
 
                   <span className={styles.questionIconWrapper}>
                     <Icon icon="balance-question" style={{ width: 16, height: 16, cursor: 'pointer' }} />
                   </span>
                 </div>
-              </Tooltip>
+              </Tooltip> */}
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
+                  <span className={styles.label}>{t('unconfirmed')}</span>
+                </div>
               <div className={styles.detailsAmount}>
-                <span>{isBalanceHidden ? '*****' : unavailableAmount.split('.')[0]}</span>
-                {!isBalanceHidden && <span className={styles.detailsDecimal}>.{unavailableAmount.split('.')[1]}</span>}
+                <span>{isBalanceHidden ? '*****' : unconfirmedAmount.split('.')[0]}</span>
+                {!isBalanceHidden && <span className={styles.detailsDecimal}>.{unconfirmedAmount.split('.')[1]}</span>}
                 <span>{btcUnit}</span>
               </div>
             </div>

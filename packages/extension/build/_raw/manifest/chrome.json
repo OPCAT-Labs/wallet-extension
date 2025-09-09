@@ -1,6 +1,6 @@
 {
   "externally_connectable": {
-    "matches": ["https://unisat.io/*"],
+    "matches": ["https://opcatlabs.io/*"],
     "ids": ["*"]
   },
   "minimum_chrome_version": "88"

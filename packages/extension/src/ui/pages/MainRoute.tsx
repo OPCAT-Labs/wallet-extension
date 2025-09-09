@@ -274,7 +274,7 @@ export function useNavigate() {
   return useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (routKey: RouteTypes | '#back', state?: any, pathState?: any) => {
-      /** Prevent duplicate route stack caused by parent-child inscription navigation */
+      /** Prevent duplicate route stack caused by parent-child inscr1ption navigation */
       if (navigatingRef.current) {
         return;
       }

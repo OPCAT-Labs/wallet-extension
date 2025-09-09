@@ -4,9 +4,8 @@ import { KEYRING_TYPE } from '@/shared/constant';
 import { RawTxInfo, ToAddressInfo, UTXO } from '@/shared/types';
 import { useTools } from '@/ui/components/ActionComponent';
 import { useI18n } from '@/ui/hooks/useI18n';
-import { useBTCUnit } from '@/ui/state/settings/hooks';
 import { satoshisToBTC, sleep, useWallet } from '@/ui/utils';
-import { bitcoin } from '@unisat/wallet-sdk/lib/bitcoin-core';
+import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 import { psbtFromHex } from '@/background/utils/psbt';
 import { AppState } from '..';
@@ -14,15 +13,6 @@ import { useAccountAddress, useCurrentAccount } from '../accounts/hooks';
 import { accountActions } from '../accounts/reducer';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { transactionsActions } from './reducer';
-
-// todo: check it
-function isFBByUnit(_btcUnit: string) {
-  // return (
-  //   btcUnit === CHAINS_MAP[ChainType.FRACTAL_BITCOIN_MAINNET].unit ||
-  //   btcUnit === CHAINS_MAP[ChainType.FRACTAL_BITCOIN_TESTNET].unit
-  // );
-  return false;
-}
 
 export function useTransactionsState(): AppState['transactions'] {
   return useAppSelector((state) => state.transactions);
@@ -40,7 +30,6 @@ export function usePrepareSendBTCCallback() {
   const utxos = useUtxos();
   const fetchUtxos = useFetchUtxosCallback();
   const account = useCurrentAccount();
-  const btcUnit = useBTCUnit();
   const { t } = useI18n();
   return useCallback(
     async ({
@@ -64,7 +53,7 @@ export function usePrepareSendBTCCallback() {
       if (_utxos.length === 0) {
         _utxos = await fetchUtxos();
       }
-      const safeBalance = _utxos.filter((v) => v.inscriptions.length == 0).reduce((pre, cur) => pre + cur.satoshis, 0);
+      const safeBalance = _utxos.reduce((pre, cur) => pre + cur.satoshis, 0);
       if (safeBalance < toAmount) {
         throw new Error(t('insufficient_balance'));
       }
@@ -95,14 +84,6 @@ export function usePrepareSendBTCCallback() {
       }
 
       const psbt = psbtFromHex(psbtHex)
-      // use the unknown keyValue to indicate FB tx in psbt for keystone
-      if (isFBByUnit(btcUnit) && account.type === KEYRING_TYPE.KeystoneKeyring) {
-        const keysString = 'chain';
-        // use ff as the keyType in the psbt global unknown
-        const key = Buffer.from('ff' + Buffer.from(keysString).toString('hex'), 'hex');
-        psbt.addUnknownKeyValToGlobal({ key, value: Buffer.from(btcUnit.toLowerCase()) });
-        psbtHex = psbt.toHex();
-      }
 
       const rawtx = account.type === KEYRING_TYPE.KeystoneKeyring ? '' : psbt.extractTransaction(true).toHex();
       const fee = account.type === KEYRING_TYPE.KeystoneKeyring ? 0 : psbt.getFee();
@@ -133,7 +114,6 @@ export function usePrepareSendBypassHeadOffsetsCallback() {
   const wallet = useWallet();
   const fromAddress = useAccountAddress();
   const account = useCurrentAccount();
-  const btcUnit = useBTCUnit();
   return useCallback(
     async ({
       toAddressInfo,
@@ -144,7 +124,7 @@ export function usePrepareSendBypassHeadOffsetsCallback() {
       toAmount: number;
       feeRate: number;
     }) => {
-      let psbtHex = await wallet.sendCoinBypassHeadOffsets(
+      const psbtHex = await wallet.sendCoinBypassHeadOffsets(
         [
           {
             address: toAddressInfo.address,
@@ -155,15 +135,6 @@ export function usePrepareSendBypassHeadOffsetsCallback() {
       );
 
       const psbt = bitcoin.Psbt.fromHex(psbtHex);
-
-      // use the unknown keyValue to indicate FB tx in psbt for keystone
-      if (isFBByUnit(btcUnit) && account.type === KEYRING_TYPE.KeystoneKeyring) {
-        const keysString = 'chain';
-        // use ff as the keyType in the psbt global unknown
-        const key = Buffer.from('ff' + Buffer.from(keysString).toString('hex'), 'hex');
-        psbt.addUnknownKeyValToGlobal({ key, value: Buffer.from(btcUnit.toLowerCase()) });
-        psbtHex = psbt.toHex();
-      }
 
       const rawtx = account.type === KEYRING_TYPE.KeystoneKeyring ? '' : psbt.extractTransaction(true).toHex();
       const fee = account.type === KEYRING_TYPE.KeystoneKeyring ? 0 : psbt.getFee();
@@ -260,7 +231,7 @@ export function useSetSpendUnavailableUtxosCallback() {
 export function useSafeBalance() {
   const utxos = useUtxos();
   return useMemo(() => {
-    const satoshis = utxos.filter((v) => v.inscriptions.length === 0).reduce((pre, cur) => pre + cur.satoshis, 0);
+    const satoshis = utxos.reduce((pre, cur) => pre + cur.satoshis, 0);
     return satoshisToBTC(satoshis);
   }, [utxos]);
 }

@@ -1,10 +1,10 @@
-import { BitcoinBalanceV2 } from '@/shared/types';
+import { BitcoinBalance } from '@/shared/types';
 
 export interface BalanceCardProps {
   /**
    * The account balance
    */
-  accountBalance: BitcoinBalanceV2;
+  accountBalance: BitcoinBalance;
   /**
    * Whether to disable the utxo tools
    */

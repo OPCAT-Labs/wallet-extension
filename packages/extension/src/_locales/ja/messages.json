@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat Wallet" },
+  "appName": { "message": "Opcat Wallet" },
   "appDescription": {
-    "message": "世界初のオープンソースOrdinals ChromeウォレットでインスクリプションをInscribeして保存しましょう！"
+    "message": "オープンソースのopcatウォレット"
   },
   "receive": {
     "message": "受信"
@@ -266,6 +266,9 @@
   },
   "is_unconfirmed_please_wait_for_confirmation": {
     "message": "は未確認です。確認をお待ちください"
+  },
+  "confirmed": {
+    "message": "確認済み"
   },
   "unconfirmed": {
     "message": "未確認"

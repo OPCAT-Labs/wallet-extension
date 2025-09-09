@@ -34,10 +34,14 @@ export function useAccountBalance() {
   const accountsState = useAccountsState();
   const currentAccount = useCurrentAccount();
   return (
-    accountsState.balanceV2Map[currentAccount.address] || {
+    accountsState.balanceMap[currentAccount.address] || {
       availableBalance: 0,
-      unavailableBalance: 0,
-      totalBalance: 0
+      pending_amount: 0,
+      amount: 0,
+      btc_amount: 0,
+      confirm_btc_amount: 0,
+      pending_btc_amount: 0,
+      usd_value: 0
     }
   );
 }
@@ -47,16 +51,6 @@ export function useAddressSummary() {
   return accountsState.addressSummary;
 }
 
-export function useAccountInscriptions() {
-  const accountsState = useAccountsState();
-  const currentAccount = useCurrentAccount();
-  return accountsState.inscriptionsMap[currentAccount.address] || { list: [], expired: true };
-}
-
-export function useInscriptionSummary() {
-  const accountsState = useAccountsState();
-  return accountsState.inscriptionSummary;
-}
 
 export function useAppSummary() {
   const accountsState = useAccountsState();
@@ -183,22 +177,16 @@ export function useFetchBalanceCallback() {
   const balance = useAccountBalance();
   return useCallback(async () => {
     if (!currentAccount.address) return;
-    // const cachedBalance = await wallet.getAddressCacheBalance(currentAccount.address);
-    // const _accountBalance = await wallet.getAddressBalance(currentAccount.address);
-    // dispatch(
-    //   accountActions.setBalance({
-    //     address: currentAccount.address,
-    //     amount: _accountBalance.amount,
-    //     btc_amount: _accountBalance.btc_amount,
-    //     inscription_amount: _accountBalance.inscription_amount,
-    //     confirm_btc_amount: _accountBalance.confirm_btc_amount,
-    //     pending_btc_amount: _accountBalance.pending_btc_amount
-    //   })
-    // );
-    // if (cachedBalance.amount !== _accountBalance.amount) {
-    //   wallet.expireUICachedData(currentAccount.address);
-    //   dispatch(accountActions.expireHistory());
-    // }
+    const _accountBalance = await wallet.getAddressBalance(currentAccount.address);
+    dispatch(
+      accountActions.setBalance({
+        address: currentAccount.address,
+        amount: _accountBalance.amount,
+        btc_amount: _accountBalance.btc_amount,
+        confirm_btc_amount: _accountBalance.confirm_btc_amount,
+        pending_btc_amount: _accountBalance.pending_btc_amount
+      })
+    );
 
     const summary = await wallet.getAddressSummary(currentAccount.address);
     summary.address = currentAccount.address;
@@ -231,7 +219,6 @@ export function useReloadAccounts() {
     dispatch(accountActions.setCurrent(account));
 
     dispatch(accountActions.expireBalance());
-    dispatch(accountActions.expireInscriptions());
 
     wallet.getWalletConfig().then((data) => {
       dispatch(settingsActions.updateSettings({ walletConfig: data }));

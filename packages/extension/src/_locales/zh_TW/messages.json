@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "UniSat 錢包" },
+  "appName": { "message": "Opcat 錢包" },
   "appDescription": {
-    "message": "在世界第一個開源 Ordinals Chrome 錢包中銘刻並儲存您的銘文！"
+    "message": "開源 Opcat 錢包"
   },
   "receive": {
     "message": "接收"
@@ -266,6 +266,9 @@
   },
   "is_unconfirmed_please_wait_for_confirmation": {
     "message": "尚未確認，請等待確認"
+  },
+  "confirmed": {
+    "message": "已確認"
   },
   "unconfirmed": {
     "message": "未確認"

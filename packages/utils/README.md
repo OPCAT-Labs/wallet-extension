@@ -1,4 +1,4 @@
-# UniSat Wallet SDK
+# Opcat Wallet SDK
 
 ## Getting Started
 
@@ -17,19 +17,19 @@ yarn test
 
 ## Usage
 
-To integrate the UniSat Wallet SDK into your project, use the following command:
+To integrate the Opcat Wallet SDK into your project, use the following command:
 
 ```shell
 
-yarn add @unisat/wallet-sdk
+yarn add @opcat-labs/wallet-sdk
 
 ```
 
-This command adds the UniSat Wallet SDK to your project, allowing you to start integrating wallet functionalities right away.
+This command adds the Opcat Wallet SDK to your project, allowing you to start integrating wallet functionalities right away.
 
 ## Features
 
-The UniSat Wallet SDK provides a range of features designed to facilitate the management of digital wallets and transactions.
+The Opcat Wallet SDK provides a range of features designed to facilitate the management of digital wallets and transactions.
 Key features include:
 
 - **Wallet Management**: Create and manage user wallets efficiently.
@@ -38,7 +38,7 @@ Key features include:
 
 ## Contributing
 
-We welcome contributions to the UniSat Wallet SDK. If you are interested in contributing and you have a bug or an idea,
+We welcome contributions to the Opcat Wallet SDK. If you are interested in contributing and you have a bug or an idea,
 browse the open issues before opening a new one. You can also take a look at the [Open Source Guides](https://opensource.guide/).
 
 ## Support
@@ -48,4 +48,4 @@ We are committed to providing support and resolving problems swiftly.
 
 ## License
 
-The UniSat Wallet SDK is licensed under the ISC License. For detailed licensing information, please refer to the `LICENSE` file in the repository.
+The Opcat Wallet SDK is licensed under the ISC License. For detailed licensing information, please refer to the `LICENSE` file in the repository.

@@ -4,19 +4,16 @@ import React, { CSSProperties, useEffect, useState } from 'react';
 
 import { ChainType, SAFE_DOMAIN_CONFIRMATION } from '@/shared/constant';
 import { getSatsName } from '@/shared/lib/satsname-utils';
-import { Inscription } from '@/shared/types';
 import { Icon, Row, Text } from '@/ui/components';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { getAddressTips, useChain } from '@/ui/state/settings/hooks';
 import { colors } from '@/ui/theme/colors';
 import { spacing } from '@/ui/theme/spacing';
-import { isValidBech32Address, useWallet } from '@/ui/utils';
+import { useWallet } from '@/ui/utils';
 import { ArrowRightOutlined, SearchOutlined } from '@ant-design/icons';
 
-import { AccordingInscription } from '../AccordingInscription';
 import { Column } from '../Column';
 import { ContactsModal } from '../ContactsModal';
-import { CopyableAddress } from '../CopyableAddress';
 import { $textPresets } from '../Text';
 import './index.less';
 
@@ -35,7 +32,7 @@ export interface InputProps {
   style?: CSSProperties;
   containerStyle?: CSSProperties;
   addressInputData?: { address: string; domain: string };
-  onAddressInputChange?: (params: { address: string; domain: string; inscription?: Inscription }) => void;
+  onAddressInputChange?: (params: { address: string; domain: string; }) => void;
   onAmountInputChange?: (amount: string) => void;
   disabled?: boolean;
   disableDecimal?: boolean;
@@ -54,7 +51,6 @@ const $inputPresets = {
   password: {},
   amount: {},
   address: {},
-  cosmosAddress: {},
   text: {},
   search: {}
 };
@@ -210,7 +206,6 @@ export const AddressInput = (props: InputProps) => {
   const [parseAddress, setParseAddress] = useState(addressInputData.domain ? addressInputData.address : '');
   const [parseError, setParseError] = useState('');
   const [formatError, setFormatError] = useState('');
-  const [inscription, setInscription] = useState<Inscription>();
   const [inputVal, setInputVal] = useState(addressInputData.domain || addressInputData.address || '');
   const [searching, setSearching] = useState(false);
   const [addressTip, setAddressTip] = useState('');
@@ -219,14 +214,13 @@ export const AddressInput = (props: InputProps) => {
   const chain = useChain();
   const networkType = propsNetworkType || chain.enum;
 
-  const SUPPORTED_DOMAINS = [];
+  const SUPPORTED_DOMAINS: string[] = [];
   const inputAddressPlaceholder = props.addressPlaceholder || t('address_or_name_sats_unisat_etc');
 
   useEffect(() => {
     onAddressInputChange({
       address: validAddress,
       domain: parseAddress ? inputVal : '',
-      inscription
     });
 
     const addressTips = getAddressTips(validAddress, chain.enum);
@@ -251,10 +245,6 @@ export const AddressInput = (props: InputProps) => {
     if (validAddress) {
       setValidAddress('');
     }
-
-    if (inscription) {
-      setInscription(undefined);
-    }
     setParseName(false);
   };
 
@@ -277,7 +267,6 @@ export const AddressInput = (props: InputProps) => {
               setParseError(`${inputAddress} ${t('does_not_exist')}`);
               return;
             }
-            setInscription(inscription);
             if (inscription.utxoConfirmation < SAFE_DOMAIN_CONFIRMATION) {
               setParseError(
                 `${t('this_domain_has_been_transferred_or_inscribed_recently_please_wait_for_block_confirmations')} (${
@@ -357,12 +346,6 @@ export const AddressInput = (props: InputProps) => {
             <Text preset="sub" text={t('loading')} />
           </Row>
         )}
-        {inscription && (
-          <Row full itemsCenter mt="sm">
-            <CopyableAddress address={parseAddress} />
-            <AccordingInscription inscription={inscription} />
-          </Row>
-        )}
       </div>
 
       {parseName ? (
@@ -415,78 +398,6 @@ export const AddressInput = (props: InputProps) => {
           selectedNetworkFilter={networkType}
         />
       )}
-    </div>
-  );
-};
-
-export const CosmosAddressInput = (props: InputProps) => {
-  const { placeholder, onAddressInputChange, addressInputData, style: $inputStyleOverride, ...rest } = props;
-  const { t } = useI18n();
-  if (!addressInputData || !onAddressInputChange) {
-    return <div />;
-  }
-  const [validAddress, setValidAddress] = useState(addressInputData.address);
-  const [parseAddress, setParseAddress] = useState(addressInputData.domain ? addressInputData.address : '');
-  const [parseError, setParseError] = useState('');
-  const [formatError, setFormatError] = useState('');
-
-  const [inputVal, setInputVal] = useState(addressInputData.domain || addressInputData.address);
-
-  useEffect(() => {
-    onAddressInputChange({
-      address: validAddress,
-      domain: parseAddress ? inputVal : ''
-    });
-  }, [validAddress]);
-
-  const resetState = () => {
-    if (parseError) {
-      setParseError('');
-    }
-    if (parseAddress) {
-      setParseAddress('');
-    }
-    if (formatError) {
-      setFormatError('');
-    }
-
-    if (validAddress) {
-      setValidAddress('');
-    }
-  };
-
-  const handleInputAddress = (e) => {
-    const inputAddress: string = e.target.value.trim();
-    setInputVal(inputAddress);
-
-    resetState();
-
-    if (!isValidBech32Address(inputAddress)) {
-      setFormatError(t('recipient_address_is_invalid'));
-      return;
-    }
-
-    setValidAddress(inputAddress);
-  };
-
-  return (
-    <div style={{ alignSelf: 'stretch' }}>
-      <div style={Object.assign({}, $baseContainerStyle, { flexDirection: 'column', minHeight: '56.5px' })}>
-        <input
-          placeholder={placeholder}
-          type={'text'}
-          style={Object.assign({}, $baseInputStyle, $inputStyleOverride)}
-          onChange={async (e) => {
-            handleInputAddress(e);
-          }}
-          defaultValue={inputVal}
-          {...rest}
-        />
-      </div>
-
-      {parseError && <Text text={parseError} preset="regular" color="error" />}
-
-      <Text text={formatError} preset="regular" color="error" />
     </div>
   );
 };
@@ -561,8 +472,6 @@ export function Input(props: InputProps) {
     return <AmountInput {...props} />;
   } else if (preset === 'address') {
     return <AddressInput {...props} />;
-  } else if (preset === 'cosmosAddress') {
-    return <CosmosAddressInput {...props} />;
   } else if (preset === 'search') {
     return <SearchInput {...props} />;
   } else {
