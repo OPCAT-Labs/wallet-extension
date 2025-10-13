@@ -298,13 +298,21 @@ export interface WalletController {
     collectionId: string,
     localId: string,
     feeRate: number
-  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
   transferCAT721Step2(
-    transferId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any, 
     commitTx: string,
     toSignInputs: UserToSignInput[]
-  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[] }>;
-  transferCAT721Step3(transferId: string, revealTx: string, toSignInputs: UserToSignInput[]): Promise<{ txid: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[], transferData: any }>;
+  transferCAT721Step3(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any, 
+    revealTx: string, 
+    toSignInputs: UserToSignInput[]
+  ): Promise<{ txid: string }>;
 
   getBuyCoinChannelList(coin: string): Promise<BtcChannelItem[]>;
   createBuyCoinPaymentUrl(coin: string, address: string, channel: string): Promise<string>;

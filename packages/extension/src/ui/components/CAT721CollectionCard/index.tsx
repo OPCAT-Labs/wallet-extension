@@ -63,7 +63,7 @@ export function CAT721CollectionCard(props: CAT721CollectionCardProps) {
       return isHTML ? (
         <Iframe
           key={key}
-          preview={`${contentBaseUrl}/api/collections/${cat721Balance.collectionId}/localId/${localId}/content`}
+          preview={`${contentBaseUrl}/api/v1/collections/${cat721Balance.collectionId}/localId/${localId}/content`}
           style={{
             width: size,
             height: size,
@@ -73,7 +73,7 @@ export function CAT721CollectionCard(props: CAT721CollectionCardProps) {
       ) : (
         <Image
           key={key}
-          src={`${contentBaseUrl}/api/collections/${cat721Balance.collectionId}/localId/${localId}/content`}
+          src={`${contentBaseUrl}/api/v1/collections/${cat721Balance.collectionId}/localId/${localId}/content`}
           width={size}
           height={size}
           style={{

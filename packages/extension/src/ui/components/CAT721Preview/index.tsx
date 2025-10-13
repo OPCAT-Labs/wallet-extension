@@ -68,12 +68,12 @@ export default function CAT721Preview({ collectionId, contentType, localId, onCl
       {contentType && contentType.includes('html') ? (
         <Iframe
           disableSandbox
-          preview={`${contentBaseUrl}/api/collections/${collectionId}/localId/${localId}/content`}
+          preview={`${contentBaseUrl}/api/v1/collections/${collectionId}/localId/${localId}/content`}
           style={$stylePresets[preset]}
         />
       ) : (
         <Image
-          src={`${contentBaseUrl}/api/collections/${collectionId}/localId/${localId}/content`}
+          src={`${contentBaseUrl}/api/v1/collections/${collectionId}/localId/${localId}/content`}
           width={style.width}
           height={style.height}
           style={{

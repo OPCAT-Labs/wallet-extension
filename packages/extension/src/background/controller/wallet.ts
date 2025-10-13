@@ -30,6 +30,7 @@ import {
   AddressType,
   AddressUserToSignInput,
   BitcoinBalance,
+  CAT721Balance,
   NetworkType,
   PublicKeyUserToSignInput,
   SignPsbtOptions,
@@ -1545,17 +1546,19 @@ export class WalletController extends BaseController {
     return _res;
   };
 
-  transferCAT20Step2 = async (transferId: string, commitTx: string, toSignInputs: ToSignInput[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT20Step2 = async (transferData: any, commitTx: string, toSignInputs: ToSignInput[]) => {
     const psbt = psbtFromBase64(commitTx);
     await this.signPsbt(psbt, toSignInputs, psbt instanceof bitcoin.Psbt);
-    const _res = await openapiService.transferCAT20Step2(transferId, psbt.toBase64());
+    const _res = await openapiService.transferCAT20Step2(transferData, psbt.toBase64());
     return _res;
   };
 
-  transferCAT20Step3 = async (transferId: string, revealTx: string, toSignInputs: ToSignInput[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT20Step3 = async (transferData: any, revealTx: string, toSignInputs: ToSignInput[]) => {
     const psbt = psbtFromBase64(revealTx);
     await this.signPsbt(psbt, toSignInputs, psbt instanceof bitcoin.Psbt);
-    const _res = await openapiService.transferCAT20Step3(transferId, psbt.toBase64());
+    const _res = await openapiService.transferCAT20Step3(transferData, psbt.toBase64());
     return _res;
   };
 
@@ -1589,7 +1592,7 @@ export class WalletController extends BaseController {
     return openapiService.getBlockActiveInfo();
   };
 
-  getCAT721List = async (address: string, currentPage: number, pageSize: number) => {
+  getCAT721List = async (address: string, currentPage: number, pageSize: number): Promise<{ currentPage: number; pageSize: number; total: number; list: CAT721Balance[] }> => {
     const cursor = (currentPage - 1) * pageSize;
     const size = pageSize;
     const { total, list } = await openapiService.getCAT721CollectionList(address, cursor, size);
@@ -1624,21 +1627,19 @@ export class WalletController extends BaseController {
     return _res;
   };
 
-  transferCAT721Step2 = async (transferId: string, commitTx: string, toSignInputs: ToSignInput[]) => {
-    const networkType = this.getNetworkType();
-    const psbtNetwork = toPsbtNetwork(networkType);
-    const psbt = bitcoin.Psbt.fromBase64(commitTx, { network: psbtNetwork });
-    await this.signPsbt(psbt, toSignInputs, true);
-    const _res = await openapiService.transferCAT721Step2(transferId, psbt.toBase64());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT721Step2 = async (transferData: any, commitTx: string, toSignInputs: ToSignInput[]) => {
+    const psbt = psbtFromBase64(commitTx);
+    await this.signPsbt(psbt, toSignInputs, false);
+    const _res = await openapiService.transferCAT721Step2(transferData, psbt.toBase64());
     return _res;
   };
 
-  transferCAT721Step3 = async (transferId: string, revealTx: string, toSignInputs: ToSignInput[]) => {
-    const networkType = this.getNetworkType();
-    const psbtNetwork = toPsbtNetwork(networkType);
-    const psbt = bitcoin.Psbt.fromBase64(revealTx, { network: psbtNetwork });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT721Step3 = async (transferData: any, revealTx: string, toSignInputs: ToSignInput[]) => {
+    const psbt = psbtFromBase64(revealTx);
     await this.signPsbt(psbt, toSignInputs, false);
-    const _res = await openapiService.transferCAT721Step3(transferId, psbt.toBase64());
+    const _res = await openapiService.transferCAT721Step3(transferData, psbt.toBase64());
     return _res;
   };
 
