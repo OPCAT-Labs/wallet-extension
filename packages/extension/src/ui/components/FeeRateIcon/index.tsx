@@ -13,8 +13,8 @@ import { Row } from '../Row';
 import { Text } from '../Text';
 
 enum FeeRateType {
-  SLOW,
-  AVG,
+  // SLOW,
+  // AVG,
   FAST,
   CUSTOM
 }
@@ -40,7 +40,7 @@ export function FeeRateIcon() {
     });
   }, [chainType]);
 
-  const feeRate = feeOptions[FeeRateType.AVG] ? feeOptions[FeeRateType.AVG].feeRate : 0;
+  const feeRate = feeOptions[FeeRateType.FAST] ? feeOptions[FeeRateType.FAST].feeRate : 0;
 
   let color = 'textDim';
   if (feeRate > 100) {

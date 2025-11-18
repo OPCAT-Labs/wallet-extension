@@ -29,17 +29,14 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
       // if (Fast = Avg = Slow) -> show Fast time (30s) for all
       // if (Fast = Avg) -> show Fast time (30s) for both
       // if (Avg = Slow) -> show Avg time (1.5m) for both
-      const { FAST, SLOW } = FeeRateType;
+      const { FAST,} = FeeRateType;
       const fastRate = v.list[FAST].feeRate;
-      const slowRate = v.list[SLOW].feeRate;
+      // const slowRate = v.list[SLOW].feeRate;
 
       const translatedList = v.list.map((option, index) => {
         const keys = translationKeys[index];
         if (keys) {
           let desc = t(keys.desc);
-          if (fastRate === slowRate) {
-            desc = t('about_10_minutes');
-          }
           return {
             ...option,
             title: t(keys.title),
@@ -57,7 +54,7 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
     });
   }, []);
 
-  const [feeOptionIndex, setFeeOptionIndex] = useState(FeeRateType.AVG);
+  const [feeOptionIndex, setFeeOptionIndex] = useState(FeeRateType.FAST);
   const [feeRateInputVal, setFeeRateInputVal] = useState('');
 
   useEffect(() => {

@@ -220,8 +220,8 @@ export function useCAT721NFTContentBaseUrl() {
   if (chainType === ChainType.OPCAT_MAINNET) {
     return 'https://openapi.opcatlabs.io';
   } else if (chainType === ChainType.OPCAT_TESTNET) {
-    // return 'https://testnet-openapi.opcatlabs.io';
-    return 'http://localhost:2999';
+    return 'https://testnet-openapi.opcatlabs.io';
+    // return 'http://localhost:2999';
   } else {
     return '';
   }

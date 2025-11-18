@@ -1,13 +1,13 @@
 enum FeeRateType {
-  SLOW,
-  AVG,
+  // SLOW,
+  // AVG,
   FAST,
   CUSTOM
 }
 
 const translationKeys = {
-  [FeeRateType.SLOW]: { title: 'slow', desc: 'about_1_hour' },
-  [FeeRateType.AVG]: { title: 'avg', desc: 'about_30_minutes' },
+  // [FeeRateType.SLOW]: { title: 'slow', desc: 'about_1_hour' },
+  // [FeeRateType.AVG]: { title: 'avg', desc: 'about_30_minutes' },
   [FeeRateType.FAST]: { title: 'fast', desc: 'about_10_minutes' }
 };
 
