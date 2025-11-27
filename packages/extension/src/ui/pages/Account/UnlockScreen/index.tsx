@@ -40,16 +40,22 @@ export default function UnlockScreen() {
       setLoading(true);
       await unlock(password);
 
-      if (!isInNotification) {
-        const hasVault = await wallet.hasVault();
-        if (!hasVault) {
-          navigate('WelcomeScreen');
-          return;
-        } else {
-          navigate('MainScreen');
+      const hasVault = await wallet.hasVault();
+      if (!hasVault) {
+        navigate('WelcomeScreen');
+        return;
+      }
+
+      if (isInNotification) {
+        // In notification mode, check if there's a pending approval request
+        const approval = await wallet.getApproval();
+        if (approval) {
+          navigate('ApprovalScreen');
           return;
         }
       }
+
+      navigate('MainScreen');
     } catch (e) {
       console.log(e);
       tools.toastError(t('password_error'));
