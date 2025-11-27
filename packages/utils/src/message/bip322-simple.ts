@@ -3,7 +3,7 @@ import { addressToScriptPk, getAddressType } from '../address';
 import { bitcoin } from '../bitcoin-core';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType } from '../types';
-import { schnorrValidator, validator } from '../utils';
+import { validator } from '../utils';
 import { AbstractWallet } from '../wallet';
 function bip0322_hash(message: string) {
   const { sha256 } = bitcoin.crypto;
@@ -111,38 +111,8 @@ function verifySignatureOfBIP322Simple_P2TR(
   sign: string,
   networkType: NetworkType = NetworkType.MAINNET
 ) {
-  const network = toPsbtNetwork(networkType);
-  const outputScript = bitcoin.address.toOutputScript(address, network);
-  const prevoutHash = Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex');
-  const prevoutIndex = 0xffffffff;
-  const sequence = 0;
-  const scriptSig = Buffer.concat([Buffer.from('0020', 'hex'), Buffer.from(bip0322_hash(msg), 'hex')]);
-
-  const txToSpend = new bitcoin.Transaction();
-  txToSpend.version = 0;
-  txToSpend.addInput(prevoutHash, prevoutIndex, sequence, scriptSig);
-  txToSpend.addOutput(outputScript, 0);
-
-  const data = Buffer.from(sign, 'base64');
-  const _res = bitcoin.script.decompile(data.slice(1));
-  const signature = _res[0] as Buffer;
-  const pubkey = Buffer.from('02' + outputScript.subarray(2).toString('hex'), 'hex');
-
-  const psbtToSign = new bitcoin.Psbt();
-  psbtToSign.setVersion(0);
-  psbtToSign.addInput({
-    hash: txToSpend.getHash(),
-    index: 0,
-    sequence: 0,
-    witnessUtxo: {
-      script: outputScript,
-      value: 0
-    }
-  });
-  psbtToSign.addOutput({ script: Buffer.from('6a', 'hex'), value: 0 });
-  const tapKeyHash = (psbtToSign as any).__CACHE.__TX.hashForWitnessV1(0, [outputScript], [0], 0);
-  const valid = schnorrValidator(pubkey, tapKeyHash, signature);
-  return valid;
+  // P2TR (Taproot) is not supported by OpCat
+  throw new Error('P2TR signature verification is not supported');
 }
 
 function verifySignatureOfBIP322Simple_P2PWPKH(

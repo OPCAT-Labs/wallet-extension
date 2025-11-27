@@ -1,10 +1,8 @@
-import { isTaprootInput } from 'bitcoinjs-lib/src/psbt/bip371';
 import { decode } from 'bs58check';
 import { EventEmitter } from 'events';
 import { ECPair, ECPairInterface, bitcoin } from '../bitcoin-core';
 import { signMessageOfDeterministicECDSA, verifyMessageOfECDSA } from '../message';
 import { ToSignInput } from '../types';
-import { tweakSigner } from '../utils';
 import { wrapSigner } from '../opcatSigner';
 
 const type = 'Simple Key Pair';
@@ -59,31 +57,8 @@ export class SimpleKeyring extends EventEmitter {
   async signTransaction(psbt: bitcoin.Psbt, inputs: ToSignInput[], opts?: any) {
     inputs.forEach((input) => {
       const keyPair = this._getPrivateKeyFor(input.publicKey);
-      if (isTaprootInput(psbt.data.inputs[input.index])) {
-        let signer: bitcoin.Signer = keyPair;
-        let tweak = true; // default to use tweaked signer
-        if (typeof input.useTweakedSigner === 'boolean') {
-          tweak = input.useTweakedSigner;
-        } else if (typeof input.disableTweakSigner === 'boolean') {
-          tweak = !input.disableTweakSigner;
-        }
-
-        if (tweak) {
-          signer = tweakSigner(keyPair, opts);
-        }
-        psbt.signTaprootInput(input.index, signer, input.tapLeafHashToSign, input.sighashTypes);
-      } else {
-        let signer: bitcoin.Signer = keyPair;
-        let tweak = false; // default not to use tweaked signer
-        if (typeof input.useTweakedSigner === 'boolean') {
-          tweak = input.useTweakedSigner;
-        }
-        if (tweak) {
-          signer = tweakSigner(keyPair, opts);
-        }
-        psbt.signInput(input.index, wrapSigner(signer as any, psbt), input.sighashTypes);
-        // psbt.signInput(input.index, signer, input.sighashTypes);
-      }
+      // OpCat only uses P2PKH with ECDSA signatures
+      psbt.signInput(input.index, wrapSigner(keyPair as any, psbt), input.sighashTypes);
     });
     return psbt;
   }
@@ -98,15 +73,12 @@ export class SimpleKeyring extends EventEmitter {
   }
 
   // Sign any content, but note that the content signed by this method is unreadable, so use it with caution.
-  async signData(publicKey: string, data: string, type: 'ecdsa' | 'schnorr' = 'ecdsa') {
+  async signData(publicKey: string, data: string, type: 'ecdsa' = 'ecdsa') {
     const keyPair = this._getPrivateKeyFor(publicKey);
     if (type === 'ecdsa') {
       return keyPair.sign(Buffer.from(data, 'hex')).toString('hex');
-    } else if (type === 'schnorr') {
-      return keyPair.signSchnorr(Buffer.from(data, 'hex')).toString('hex');
-    } else {
-      throw new Error('Not support type');
     }
+    throw new Error('Not support type');
   }
 
   private _getPrivateKeyFor(publicKey: string) {
@@ -139,13 +111,10 @@ export class SimpleKeyring extends EventEmitter {
   }
 }
 
-export function verifySignData(publicKey: string, hash: string, type: 'ecdsa' | 'schnorr', signature: string) {
+export function verifySignData(publicKey: string, hash: string, type: 'ecdsa', signature: string) {
   const keyPair = ECPair.fromPublicKey(Buffer.from(publicKey, 'hex'));
   if (type === 'ecdsa') {
     return keyPair.verify(Buffer.from(hash, 'hex'), Buffer.from(signature, 'hex'));
-  } else if (type === 'schnorr') {
-    return keyPair.verifySchnorr(Buffer.from(hash, 'hex'), Buffer.from(signature, 'hex'));
-  } else {
-    throw new Error('Not support type');
   }
+  throw new Error('Not support type');
 }

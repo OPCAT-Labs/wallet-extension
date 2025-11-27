@@ -4,7 +4,6 @@ import { UTXO_DUST } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType, ToSignInput, UnspentOutput } from '../types';
-import { toXOnly } from '../utils';
 import { EstimateWallet } from '../wallet';
 import { utxoHelper } from './utxo';
 interface TxInput {

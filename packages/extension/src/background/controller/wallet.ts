@@ -50,7 +50,6 @@ import {
   signMessageOfBIP322Simple
 } from '@opcat-labs/wallet-sdk/lib/message';
 import { toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/network';
-import { toXOnly } from '@opcat-labs/wallet-sdk/lib/utils';
 
 import { ContactBookItem } from '../service/contactBook';
 import { OpenApiService } from '../service/openapi';
@@ -565,60 +564,7 @@ export class WalletController extends BaseController {
         return;
       }
 
-      let isP2TR = false;
-      try {
-        bitcoin.payments.p2tr({ output: input.witnessUtxo?.script, network: psbtNetwork });
-        isP2TR = true;
-      } catch (e) {
-        // skip
-      }
-
-      if (isP2TR) {
-        // fix p2tr input data
-        let isKeyPathP2TR = false;
-
-        try {
-          const originXPubkey = toXOnly(Buffer.from(account.pubkey, 'hex')).toString('hex');
-          const tapInternalKey = toXOnly(Buffer.from(account.pubkey, 'hex'));
-          const { output } = bitcoin.payments.p2tr({
-            internalPubkey: tapInternalKey,
-            network: psbtNetwork
-          });
-          if (input.witnessUtxo?.script.toString('hex') == output?.toString('hex')) {
-            isKeyPathP2TR = true;
-          }
-          if (isKeyPathP2TR) {
-            input.tapInternalKey = tapInternalKey;
-          } else {
-            // only keypath p2tr can have tapInternalKey
-            delete input.tapInternalKey;
-          }
-
-          if (isKeyPathP2TR) {
-            // keypath p2tr should be signed with origin signer
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const isToBeSigned: any = toSignInputs.find((v) => v.index === index);
-            if (isToBeSigned.useTweakedSigner == undefined && isToBeSigned.disableTweakSigner == undefined) {
-              if (input.tapLeafScript && input.tapLeafScript.length > 0) {
-                const script = input.tapLeafScript[0].script.toString('hex');
-                if (script.includes(originXPubkey)) {
-                  // if tapLeafScript contains origin pubkey, use origin signer
-                  isToBeSigned.useTweakedSigner = false;
-                } else {
-                  // if tapLeafScript not contains origin pubkey, use tweaked signer
-                  isToBeSigned.useTweakedSigner = true;
-                }
-              } else {
-                // if no tapLeafScript, use origin signer
-                isToBeSigned.useTweakedSigner = false;
-              }
-            }
-          }
-        } catch (e) {
-          // skip
-        }
-      }
+      // OpCat only uses P2PKH, no Taproot handling needed
 
       if (isKeystone) {
         input.bip32Derivation = [bip32Derivation];

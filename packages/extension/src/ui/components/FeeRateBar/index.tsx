@@ -36,7 +36,7 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
       const translatedList = v.list.map((option, index) => {
         const keys = translationKeys[index];
         if (keys) {
-          let desc = t(keys.desc);
+          const desc = t(keys.desc);
           return {
             ...option,
             title: t(keys.title),
