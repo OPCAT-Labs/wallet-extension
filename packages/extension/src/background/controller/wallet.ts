@@ -68,8 +68,7 @@ export type AccountAsset = {
 export class WalletController extends BaseController {
   openapi: OpenApiService = openapiService;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  timer: any = null;
+  static readonly AUTO_LOCK_ALARM_NAME = 'auto-lock-alarm';
 
   /* wallet */
   boot = (password: string) => keyringService.boot(password);
@@ -1436,15 +1435,41 @@ export class WalletController extends BaseController {
   };
 
   _resetTimeout = async () => {
-    if (this.timer) {
-      clearTimeout(this.timer);
+    // Use chrome.alarms instead of setTimeout for MV3 compatibility
+    // setTimeout doesn't survive service worker suspension, but alarms do
+    try {
+      await chrome.alarms.clear(WalletController.AUTO_LOCK_ALARM_NAME);
+    } catch (e) {
+      // Ignore if alarm doesn't exist
     }
 
     const timeId = preferenceService.getAutoLockTimeId();
     const timeConfig = AUTO_LOCK_TIMES[timeId] || AUTO_LOCK_TIMES[DEFAULT_LOCKTIME_ID];
-    this.timer = setTimeout(() => {
-      this.lockWallet();
-    }, timeConfig.time);
+
+    // Create an alarm that fires after the configured time
+    // delayInMinutes must be at least 1 minute for chrome.alarms in production
+    // For shorter times, we need a hybrid approach
+    const delayInMinutes = timeConfig.time / 60000;
+
+    if (delayInMinutes >= 1) {
+      await chrome.alarms.create(WalletController.AUTO_LOCK_ALARM_NAME, {
+        delayInMinutes: delayInMinutes
+      });
+    } else {
+      // For times less than 1 minute, use when (timestamp) which allows more precision
+      await chrome.alarms.create(WalletController.AUTO_LOCK_ALARM_NAME, {
+        when: Date.now() + timeConfig.time
+      });
+    }
+  };
+
+  // This method should be called during background script initialization to set up the alarm listener
+  setupAutoLockAlarmListener = () => {
+    chrome.alarms.onAlarm.addListener((alarm) => {
+      if (alarm.name === WalletController.AUTO_LOCK_ALARM_NAME) {
+        this.lockWallet();
+      }
+    });
   };
 
   getCAT20List = async (address: string, currentPage: number, pageSize: number) => {
