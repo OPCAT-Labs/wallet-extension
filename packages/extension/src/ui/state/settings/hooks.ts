@@ -216,10 +216,12 @@ export function useAddressTips() {
 // todo : change it
 export function useCAT721NFTContentBaseUrl() {
   const chainType = useChainType();
+  // todo: change the url
   if (chainType === ChainType.OPCAT_MAINNET) {
-    return 'https://tracker-fractal-mainnet.catprotocol.org';
+    return 'https://openapi.opcatlabs.io';
   } else if (chainType === ChainType.OPCAT_TESTNET) {
-    return 'https://tracker-fractal-testnet.catprotocol.org';
+    return 'https://testnet-openapi.opcatlabs.io';
+    // return 'http://localhost:2999';
   } else {
     return '';
   }

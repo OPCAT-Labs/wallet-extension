@@ -128,21 +128,7 @@ export const getRestoreWallets = (): { value: RestoreWalletType; name: string; a
     addressTypes: [
       AddressType.P2PKH
     ]
-  },
-  // {
-  //   value: RestoreWalletType.SPARROW,
-  //   name: 'Sparrow Wallet',
-  //   addressTypes: [
-  //     AddressType.P2PKH
-  //   ]
-  // },
-  // {
-  //   value: RestoreWalletType.OTHERS,
-  //   name: t('other_wallet'),
-  //   addressTypes: [
-  //     AddressType.P2PKH,
-  //   ]
-  // }
+  }
 ];
 
 export enum ChainType {

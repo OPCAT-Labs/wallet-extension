@@ -2,12 +2,7 @@ import { UnspentOutput } from '@opcat-labs/wallet-sdk';
 import { CHAINS_ENUM, PaymentChannelType } from './constant';
 
 export enum AddressType {
-  P2PKH,
-  // P2WPKH,
-  // P2TR,
-  // P2SH_P2WPKH,
-  // M44_P2WPKH,
-  // M44_P2TR
+  P2PKH
 }
 
 export enum NetworkType {

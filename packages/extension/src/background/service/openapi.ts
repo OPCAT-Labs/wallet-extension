@@ -10,6 +10,7 @@ import {
   BitcoinBalance,
   BitcoinBalanceV2,
   CAT20Balance,
+  CAT721Balance,
   CAT721CollectionInfo,
   CoinPrice,
   DecodedPsbt,
@@ -441,7 +442,7 @@ export class OpenApiService {
     address: string,
     cursor: number,
     size: number
-  ): Promise<{ list: CAT721CollectionInfo[]; total: number }> {
+  ): Promise<{ list: CAT721Balance[]; total: number }> {
     return this.httpGet('/v5/cat721/collection/list', { address, cursor, size });
   }
 
@@ -467,16 +468,18 @@ export class OpenApiService {
     });
   }
 
-  async transferCAT721Step2(transferId: string, signedPsbt: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT721Step2(transferData: any, signedPsbt: string) {
     return this.httpPost('/v5/cat721/transfer-nft-step2', {
-      id: transferId,
+      transferData,
       psbt: signedPsbt
     });
   }
 
-  async transferCAT721Step3(transferId: string, signedPsbt: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async transferCAT721Step3(transferData: any, signedPsbt: string) {
     return this.httpPost('/v5/cat721/transfer-nft-step3', {
-      id: transferId,
+      transferData,
       psbt: signedPsbt
     });
   }

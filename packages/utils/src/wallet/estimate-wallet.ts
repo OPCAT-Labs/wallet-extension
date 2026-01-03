@@ -4,7 +4,6 @@ import { SimpleKeyring } from '../keyring';
 import { signMessageOfBIP322Simple } from '../message';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType, AddressUserToSignInput, PublicKeyUserToSignInput, SignPsbtOptions, ToSignInput } from '../types';
-import { toXOnly } from '../utils';
 import { AbstractWallet } from './abstract-wallet';
 
 /**
@@ -77,8 +76,7 @@ export class EstimateWallet implements AbstractWallet {
         return {
           index,
           publicKey: accountPubkey,
-          sighashTypes,
-          disableTweakSigner: input.disableTweakSigner
+          sighashTypes
         };
       });
     } else {

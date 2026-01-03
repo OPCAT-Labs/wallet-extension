@@ -1,6 +1,62 @@
 import { ExtPsbt, DefaultSigner, PrivateKey, Networks, fromSupportedNetwork, hexToUint8Array } from '@opcat-labs/scrypt-ts-opcat'
 import { bitcoin, ECPairInterface } from './bitcoin-core'
 
+/**
+ * Converts a buffer to a DER-encoded buffer.
+ * Removes leading zeros unless the next byte's MSB is 1.
+ * @param x - The buffer to be converted.
+ * @returns The DER-encoded buffer.
+ */
+function toDER(x: Uint8Array): Uint8Array {
+  let i = 0
+  // Remove leading zeros
+  while (x[i] === 0) ++i
+
+  // If all zeros, return single zero byte
+  if (i === x.length) return new Uint8Array([0])
+
+  // Remove leading zeros
+  x = x.slice(i)
+
+  // Add leading zero if MSB is set (to indicate positive number)
+  if (x[0] & 0x80) {
+    const result = new Uint8Array(x.length + 1)
+    result[0] = 0
+    result.set(x, 1)
+    return result
+  }
+
+  return x
+}
+
+/**
+ * Encodes a 64-byte raw signature (r || s) into DER format.
+ * @param sig - Raw 64-byte signature
+ * @returns DER-encoded signature
+ */
+function toDerSig(sig: Uint8Array): Uint8Array {
+  const r = toDER(sig.subarray(0, 32))
+  const s = toDER(sig.subarray(32, 64))
+
+  const lenR = r.length
+  const lenS = s.length
+  const totalLen = 6 + lenR + lenS
+
+  const result = new Uint8Array(totalLen)
+
+  // DER format: 0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S]
+  result[0] = 0x30                    // SEQUENCE tag
+  result[1] = totalLen - 2            // Total length (excluding first 2 bytes)
+  result[2] = 0x02                    // INTEGER tag for R
+  result[3] = lenR                    // R length
+  result.set(r, 4)                    // R value
+  result[4 + lenR] = 0x02             // INTEGER tag for S
+  result[5 + lenR] = lenS             // S length
+  result.set(s, 6 + lenR)             // S value
+
+  return result
+}
+
 export class WrapSigner {
   constructor(private readonly signer: bitcoin.Signer) { }
 
@@ -13,9 +69,17 @@ export class WrapSigner {
   }
 
   sign(hash: Uint8Array, _lowR?: boolean): Uint8Array {
+    // Reverse hash for OpCat compatibility
     hash = hash.reverse()
-    const sig = toDerSig(new Uint8Array(this.signer.sign(Buffer.from(hash), _lowR)))
-    return sig
+
+    // Get raw 64-byte signature (r: 32 bytes + s: 32 bytes)
+    const rawSig = this.signer.sign(Buffer.from(hash), _lowR)
+
+    // Convert to DER encoding for OpCat's ExtPsbt
+    // OpCat's signatureutils.encode() expects DER-encoded signatures (68-72 bytes)
+    const derSig = toDerSig(new Uint8Array(rawSig))
+
+    return derSig
   }
 
   signSchnorr(hash: Uint8Array): Uint8Array {
@@ -33,74 +97,4 @@ export function wrapSigner(signer: ECPairInterface, psbt: bitcoin.Psbt | ExtPsbt
   }
   // if is signing for opcat, we need to wrap the signer
   return new WrapSigner(signer) as any
-}
-
-
-/**
- * Convert 64-byte ECDSA signature to DER format
- * @param sig 64-byte signature (32r + 32s)
- * @returns DER encoded signature
- */
-export function toDerSig(sig: Uint8Array): Uint8Array {
-  // Input validation
-  if (sig.length !== 64) {
-    throw new Error('Invalid signature length. Expected 64 bytes');
-  }
-
-  // Separate r/s values (ignore the last sighashtype)
-  const r = sig.subarray(0, 32);
-  const s = sig.subarray(32, 64);
-
-  // Process r value
-  let rBytes = new Uint8Array(r);
-  if (r[0] & 0x80) { // Check if the highest bit is 1
-    rBytes = new Uint8Array([0x00, ...r]);
-  }
-
-  // Process s value
-  let sBytes = new Uint8Array(s);
-  if (s[0] & 0x80) { // Check if the highest bit is 1
-    sBytes = new Uint8Array([0x00, ...s]);
-  }
-
-  // Build DER components
-  const derComponents = [
-    new Uint8Array([0x30]), // SEQUENCE
-    encodeLength(2 + rBytes.length + 2 + sBytes.length), // Total length
-    new Uint8Array([0x02]), // INTEGER
-    encodeLength(rBytes.length),
-    rBytes,
-    new Uint8Array([0x02]), // INTEGER
-    encodeLength(sBytes.length),
-    sBytes
-  ];
-
-  // Combine all parts
-  return concatUint8Arrays(derComponents);
-}
-
-/** Encode ASN.1 length field */
-function encodeLength(length: number): Uint8Array {
-  if (length < 0x80) {
-    return new Uint8Array([length]);
-  }
-  const lenBytes = [];
-  let n = length;
-  while (n > 0) {
-    lenBytes.unshift(n & 0xff);
-    n = n >> 8;
-  }
-  return new Uint8Array([0x80 | lenBytes.length, ...lenBytes]);
-}
-
-/** Concatenate Uint8Array arrays */
-function concatUint8Arrays(arrays: Uint8Array[]): Uint8Array {
-  const totalLength = arrays.reduce((acc, arr) => acc + arr.length, 0);
-  const result = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const arr of arrays) {
-    result.set(arr, offset);
-    offset += arr.length;
-  }
-  return result;
 }

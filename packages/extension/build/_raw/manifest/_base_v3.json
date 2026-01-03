@@ -28,7 +28,7 @@
     "service_worker": "background.js"
   },
   "homepage_url": "https://opcatlabs.io",
-  "permissions": ["storage", "unlimitedStorage", "activeTab", "declarativeNetRequest", "sidePanel"],
+  "permissions": ["storage", "unlimitedStorage", "activeTab", "declarativeNetRequest", "sidePanel", "alarms"],
   "host_permissions": ["<all_urls>"],
   "short_name": "__MSG_appName__",
 

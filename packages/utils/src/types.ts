@@ -1,8 +1,6 @@
 interface BaseUserToSignInput {
   index: number;
   sighashTypes?: number[] | undefined;
-  disableTweakSigner?: boolean;
-  tapLeafHashToSign?: Buffer;
 }
 
 export interface AddressUserToSignInput extends BaseUserToSignInput {
@@ -24,12 +22,6 @@ export interface ToSignInput {
   index: number; // index of input to sign
   publicKey: string; // public key in hex format
   sighashTypes?: number[]; // sighash types to sign
-
-  useTweakedSigner?: boolean; // whether to use tweak signer
-
-  // only for taproot input , deprecated
-  disableTweakSigner?: boolean; // whether to use taproot tweak signer, default is true
-  tapLeafHashToSign?: Buffer;
 }
 
 export interface UnspentOutput {
@@ -45,12 +37,5 @@ export interface UnspentOutput {
 
 export enum AddressType {
   P2PKH,
-  // P2WPKH,
-  // P2TR,
-  // P2SH_P2WPKH,
-  // M44_P2WPKH, // deprecated
-  // M44_P2TR, // deprecated
-  // P2WSH,
-  // P2SH,
   UNKNOWN
 }

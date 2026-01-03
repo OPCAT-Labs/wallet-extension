@@ -57,13 +57,14 @@ export default function SendCAT721Screen() {
   }, [toInfo, inputAmount]);
 
   const transferData = useRef<{
-    id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transferData: any;
     commitTx: string;
     commitToSignInputs: UserToSignInput[];
     revealTx: string;
     revealToSignInputs: UserToSignInput[];
   }>({
-    id: '',
+    transferData: null,
     commitTx: '',
     commitToSignInputs: [],
     revealTx: '',
@@ -75,7 +76,7 @@ export default function SendCAT721Screen() {
     try {
       const step1 = await wallet.transferCAT721Step1(toInfo.address, collectionInfo.collectionId, localId, feeRate);
       if (step1) {
-        transferData.current.id = step1.id;
+        transferData.current.transferData = step1.transferData;
         transferData.current.commitTx = step1.commitTx;
         transferData.current.commitToSignInputs = step1.toSignInputs;
         setStep(1);
@@ -117,13 +118,14 @@ export default function SendCAT721Screen() {
           try {
             tools.showLoading(true);
             const step2 = await wallet.transferCAT721Step2(
-              transferData.current.id,
+              transferData.current.transferData,
               transferData.current.commitTx,
               transferData.current.commitToSignInputs
             );
 
             transferData.current.revealTx = step2.revealTx;
             transferData.current.revealToSignInputs = step2.toSignInputs;
+            transferData.current.transferData = step2.transferData;
 
             setStep(1.5);
             setTimeout(() => {
@@ -162,7 +164,7 @@ export default function SendCAT721Screen() {
           tools.showLoading(true);
           try {
             const step3 = await wallet.transferCAT721Step3(
-              transferData.current.id,
+              transferData.current.transferData,
               transferData.current.revealTx,
               transferData.current.revealToSignInputs
             );

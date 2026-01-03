@@ -30,6 +30,7 @@ import {
   AddressType,
   AddressUserToSignInput,
   BitcoinBalance,
+  CAT721Balance,
   NetworkType,
   PublicKeyUserToSignInput,
   SignPsbtOptions,
@@ -49,7 +50,6 @@ import {
   signMessageOfBIP322Simple
 } from '@opcat-labs/wallet-sdk/lib/message';
 import { toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/network';
-import { toXOnly } from '@opcat-labs/wallet-sdk/lib/utils';
 
 import { ContactBookItem } from '../service/contactBook';
 import { OpenApiService } from '../service/openapi';
@@ -68,8 +68,7 @@ export type AccountAsset = {
 export class WalletController extends BaseController {
   openapi: OpenApiService = openapiService;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  timer: any = null;
+  static readonly AUTO_LOCK_ALARM_NAME = 'auto-lock-alarm';
 
   /* wallet */
   boot = (password: string) => keyringService.boot(password);
@@ -564,60 +563,7 @@ export class WalletController extends BaseController {
         return;
       }
 
-      let isP2TR = false;
-      try {
-        bitcoin.payments.p2tr({ output: input.witnessUtxo?.script, network: psbtNetwork });
-        isP2TR = true;
-      } catch (e) {
-        // skip
-      }
-
-      if (isP2TR) {
-        // fix p2tr input data
-        let isKeyPathP2TR = false;
-
-        try {
-          const originXPubkey = toXOnly(Buffer.from(account.pubkey, 'hex')).toString('hex');
-          const tapInternalKey = toXOnly(Buffer.from(account.pubkey, 'hex'));
-          const { output } = bitcoin.payments.p2tr({
-            internalPubkey: tapInternalKey,
-            network: psbtNetwork
-          });
-          if (input.witnessUtxo?.script.toString('hex') == output?.toString('hex')) {
-            isKeyPathP2TR = true;
-          }
-          if (isKeyPathP2TR) {
-            input.tapInternalKey = tapInternalKey;
-          } else {
-            // only keypath p2tr can have tapInternalKey
-            delete input.tapInternalKey;
-          }
-
-          if (isKeyPathP2TR) {
-            // keypath p2tr should be signed with origin signer
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const isToBeSigned: any = toSignInputs.find((v) => v.index === index);
-            if (isToBeSigned.useTweakedSigner == undefined && isToBeSigned.disableTweakSigner == undefined) {
-              if (input.tapLeafScript && input.tapLeafScript.length > 0) {
-                const script = input.tapLeafScript[0].script.toString('hex');
-                if (script.includes(originXPubkey)) {
-                  // if tapLeafScript contains origin pubkey, use origin signer
-                  isToBeSigned.useTweakedSigner = false;
-                } else {
-                  // if tapLeafScript not contains origin pubkey, use tweaked signer
-                  isToBeSigned.useTweakedSigner = true;
-                }
-              } else {
-                // if no tapLeafScript, use origin signer
-                isToBeSigned.useTweakedSigner = false;
-              }
-            }
-          }
-        } catch (e) {
-          // skip
-        }
-      }
+      // OpCat only uses P2PKH, no Taproot handling needed
 
       if (isKeystone) {
         input.bip32Derivation = [bip32Derivation];
@@ -1489,15 +1435,41 @@ export class WalletController extends BaseController {
   };
 
   _resetTimeout = async () => {
-    if (this.timer) {
-      clearTimeout(this.timer);
+    // Use chrome.alarms instead of setTimeout for MV3 compatibility
+    // setTimeout doesn't survive service worker suspension, but alarms do
+    try {
+      await chrome.alarms.clear(WalletController.AUTO_LOCK_ALARM_NAME);
+    } catch (e) {
+      // Ignore if alarm doesn't exist
     }
 
     const timeId = preferenceService.getAutoLockTimeId();
     const timeConfig = AUTO_LOCK_TIMES[timeId] || AUTO_LOCK_TIMES[DEFAULT_LOCKTIME_ID];
-    this.timer = setTimeout(() => {
-      this.lockWallet();
-    }, timeConfig.time);
+
+    // Create an alarm that fires after the configured time
+    // delayInMinutes must be at least 1 minute for chrome.alarms in production
+    // For shorter times, we need a hybrid approach
+    const delayInMinutes = timeConfig.time / 60000;
+
+    if (delayInMinutes >= 1) {
+      await chrome.alarms.create(WalletController.AUTO_LOCK_ALARM_NAME, {
+        delayInMinutes: delayInMinutes
+      });
+    } else {
+      // For times less than 1 minute, use when (timestamp) which allows more precision
+      await chrome.alarms.create(WalletController.AUTO_LOCK_ALARM_NAME, {
+        when: Date.now() + timeConfig.time
+      });
+    }
+  };
+
+  // This method should be called during background script initialization to set up the alarm listener
+  setupAutoLockAlarmListener = () => {
+    chrome.alarms.onAlarm.addListener((alarm) => {
+      if (alarm.name === WalletController.AUTO_LOCK_ALARM_NAME) {
+        this.lockWallet();
+      }
+    });
   };
 
   getCAT20List = async (address: string, currentPage: number, pageSize: number) => {
@@ -1545,17 +1517,19 @@ export class WalletController extends BaseController {
     return _res;
   };
 
-  transferCAT20Step2 = async (transferId: string, commitTx: string, toSignInputs: ToSignInput[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT20Step2 = async (transferData: any, commitTx: string, toSignInputs: ToSignInput[]) => {
     const psbt = psbtFromBase64(commitTx);
     await this.signPsbt(psbt, toSignInputs, psbt instanceof bitcoin.Psbt);
-    const _res = await openapiService.transferCAT20Step2(transferId, psbt.toBase64());
+    const _res = await openapiService.transferCAT20Step2(transferData, psbt.toBase64());
     return _res;
   };
 
-  transferCAT20Step3 = async (transferId: string, revealTx: string, toSignInputs: ToSignInput[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT20Step3 = async (transferData: any, revealTx: string, toSignInputs: ToSignInput[]) => {
     const psbt = psbtFromBase64(revealTx);
     await this.signPsbt(psbt, toSignInputs, psbt instanceof bitcoin.Psbt);
-    const _res = await openapiService.transferCAT20Step3(transferId, psbt.toBase64());
+    const _res = await openapiService.transferCAT20Step3(transferData, psbt.toBase64());
     return _res;
   };
 
@@ -1589,7 +1563,7 @@ export class WalletController extends BaseController {
     return openapiService.getBlockActiveInfo();
   };
 
-  getCAT721List = async (address: string, currentPage: number, pageSize: number) => {
+  getCAT721List = async (address: string, currentPage: number, pageSize: number): Promise<{ currentPage: number; pageSize: number; total: number; list: CAT721Balance[] }> => {
     const cursor = (currentPage - 1) * pageSize;
     const size = pageSize;
     const { total, list } = await openapiService.getCAT721CollectionList(address, cursor, size);
@@ -1624,21 +1598,19 @@ export class WalletController extends BaseController {
     return _res;
   };
 
-  transferCAT721Step2 = async (transferId: string, commitTx: string, toSignInputs: ToSignInput[]) => {
-    const networkType = this.getNetworkType();
-    const psbtNetwork = toPsbtNetwork(networkType);
-    const psbt = bitcoin.Psbt.fromBase64(commitTx, { network: psbtNetwork });
-    await this.signPsbt(psbt, toSignInputs, true);
-    const _res = await openapiService.transferCAT721Step2(transferId, psbt.toBase64());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT721Step2 = async (transferData: any, commitTx: string, toSignInputs: ToSignInput[]) => {
+    const psbt = psbtFromBase64(commitTx);
+    await this.signPsbt(psbt, toSignInputs, false);
+    const _res = await openapiService.transferCAT721Step2(transferData, psbt.toBase64());
     return _res;
   };
 
-  transferCAT721Step3 = async (transferId: string, revealTx: string, toSignInputs: ToSignInput[]) => {
-    const networkType = this.getNetworkType();
-    const psbtNetwork = toPsbtNetwork(networkType);
-    const psbt = bitcoin.Psbt.fromBase64(revealTx, { network: psbtNetwork });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transferCAT721Step3 = async (transferData: any, revealTx: string, toSignInputs: ToSignInput[]) => {
+    const psbt = psbtFromBase64(revealTx);
     await this.signPsbt(psbt, toSignInputs, false);
-    const _res = await openapiService.transferCAT721Step3(transferId, psbt.toBase64());
+    const _res = await openapiService.transferCAT721Step3(transferData, psbt.toBase64());
     return _res;
   };
 

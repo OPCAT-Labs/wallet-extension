@@ -103,6 +103,10 @@ restoreAppState();
 // Initialize phishing protection features
 phishingController.init();
 
+// Set up auto-lock alarm listener for MV3 compatibility
+// This must be done at top level to ensure the listener is registered even after service worker restart
+walletController.setupAutoLockAlarmListener();
+
 // for page provider
 browserRuntimeOnConnect((port) => {
   if (port.name === 'popup' || port.name === 'notification' || port.name === 'tab' || port.name === 'sidepanel') {

@@ -4,7 +4,6 @@ import { HdKeyring, SimpleKeyring } from '../keyring';
 import { signMessageOfBIP322Simple } from '../message';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType, AddressUserToSignInput, PublicKeyUserToSignInput, SignPsbtOptions, ToSignInput } from '../types';
-import { toXOnly } from '../utils';
 import { AbstractWallet } from './abstract-wallet';
 
 export class LocalWallet implements AbstractWallet {
@@ -98,9 +97,7 @@ export class LocalWallet implements AbstractWallet {
         return {
           index,
           publicKey: accountPubkey,
-          sighashTypes,
-          disableTweakSigner: input.disableTweakSigner,
-          tapLeafHashToSign: input.tapLeafHashToSign
+          sighashTypes
         };
       });
     } else {
@@ -176,7 +173,7 @@ export class LocalWallet implements AbstractWallet {
     }
   }
 
-  async signData(data: string, type: 'ecdsa' | 'schnorr' = 'ecdsa') {
+  async signData(data: string, type: 'ecdsa' = 'ecdsa') {
     const pubkey = await this.getPublicKey();
     return await this.keyring.signData(pubkey, data, type);
   }
