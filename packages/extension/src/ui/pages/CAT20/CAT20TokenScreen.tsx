@@ -16,6 +16,7 @@ import { useCAT20MarketPlaceWebsite, useCAT20TokenInfoExplorerUrl, useChainType 
 import { colors } from '@/ui/theme/colors';
 import { fontSizes } from '@/ui/theme/font';
 import { showLongNumber, useLocationState, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import { useNavigate } from '../MainRoute';
@@ -107,7 +108,7 @@ export default function CAT20TokenScreen() {
   }
 
   return (
-    <Layout>
+    <Layout testid={TestIds.CAT20.TOKEN_SCREEN}>
       <Header
         onBack={() => {
           window.history.go(-1);
@@ -116,7 +117,14 @@ export default function CAT20TokenScreen() {
       {tokenSummary && (
         <Content>
           <Column py="xl" pb="lg" style={{ borderBottomWidth: 1, borderColor: colors.white_muted }}>
-            <Text text={tokenSummary.cat20Info.name} preset="title-bold" textCenter size="xxl" color="gold" />
+            <Text
+              text={tokenSummary.cat20Info.name}
+              preset="title-bold"
+              textCenter
+              size="xxl"
+              color="gold"
+              testid={TestIds.CAT20.TOKEN_NAME}
+            />
             <Row itemsCenter fullX justifyCenter>
               <Text
                 text={`${runesUtils.toDecimalAmount(
@@ -167,6 +175,7 @@ export default function CAT20TokenScreen() {
                 preset="home"
                 icon="send"
                 disabled={!enableTransfer}
+                testid={TestIds.CAT20.SEND_BUTTON}
                 onClick={(_e) => {
                   if (keyring.type === KEYRING_TYPE.KeystoneKeyring) {
                     tools.toastError(t('send_cat20_is_not_supported_for_keystone_yet'));

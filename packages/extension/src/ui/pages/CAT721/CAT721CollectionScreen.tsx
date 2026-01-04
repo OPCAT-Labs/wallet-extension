@@ -11,6 +11,7 @@ import { useIsInExpandView } from '@/ui/state/ui/hooks';
 import { colors } from '@/ui/theme/colors';
 import { fontSizes } from '@/ui/theme/font';
 import { useLocationState, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import { useNavigate } from '../MainRoute';
@@ -81,7 +82,7 @@ export default function CAT721CollectionScreen() {
   }
 
   return (
-    <Layout>
+    <Layout testid={TestIds.CAT721.COLLECTION_SCREEN}>
       <Header
         onBack={() => {
           window.history.go(-1);

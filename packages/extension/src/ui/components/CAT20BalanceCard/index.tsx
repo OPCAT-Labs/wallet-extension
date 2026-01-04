@@ -1,6 +1,7 @@
 import { runesUtils } from '@/shared/lib/runes-utils';
 import { CAT20Balance, TickPriceItem } from '@/shared/types';
 import { TickPriceChange, TickUsd } from '@/ui/components/TickUsd';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Card } from '../Card';
 import { Column } from '../Column';
@@ -28,6 +29,9 @@ export function CAT20BalanceCard(props: CAT20BalanceCardProps) {
         borderRadius: 12
       }}
       fullX
+      testid={TestIds.CAT20.TOKEN_ITEM}
+      data-token-symbol={tokenBalance.symbol}
+      data-token-name={tokenBalance.name}
       onClick={() => {
         onClick && onClick();
       }}>

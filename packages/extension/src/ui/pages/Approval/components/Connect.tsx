@@ -8,6 +8,7 @@ import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { useCurrentKeyring } from '@/ui/state/keyrings/hooks';
 import { fontSizes } from '@/ui/theme/font';
 import { shortAddress, useApproval, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { CheckCircleFilled, LoadingOutlined } from '@ant-design/icons';
 
 interface MyItemProps {
@@ -171,8 +172,8 @@ export default function Connect({ params: { session } }: Props) {
 
       <Footer>
         <Row full>
-          <Button text={t('cancel')} preset="default" onClick={handleCancel} full />
-          <Button text={t('connect')} preset="primary" onClick={handleConnect} full />
+          <Button text={t('cancel')} preset="default" onClick={handleCancel} full testid={TestIds.APPROVAL.REJECT_BUTTON} />
+          <Button text={t('connect')} preset="primary" onClick={handleConnect} full testid={TestIds.APPROVAL.APPROVE_BUTTON} />
         </Row>
       </Footer>
     </Layout>

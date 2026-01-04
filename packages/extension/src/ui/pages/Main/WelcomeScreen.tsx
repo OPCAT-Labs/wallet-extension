@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button, Column, Content, Layout, Logo, Row, Text } from '@/ui/components';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { useNavigate } from '../MainRoute';
 import { ConnectHardwareModal } from './ConnectHardwareModal';
@@ -34,6 +35,7 @@ export default function WelcomeScreen() {
             <Button
               text={t('create_new_wallet')}
               preset="primary"
+              testid={TestIds.WELCOME.CREATE_WALLET_BUTTON}
               onClick={async () => {
                 const isBooted = await wallet.isBooted();
                 if (isBooted) {
@@ -46,6 +48,7 @@ export default function WelcomeScreen() {
             <Button
               text={t('i_already_have_a_wallet')}
               preset="default"
+              testid={TestIds.WELCOME.IMPORT_WALLET_BUTTON}
               onClick={async () => {
                 const isBooted = await wallet.isBooted();
                 if (isBooted) {
@@ -58,6 +61,7 @@ export default function WelcomeScreen() {
             <Button
               text={t('connect_to_hardware_wallet')}
               preset="default"
+              testid={TestIds.WELCOME.CONNECT_HARDWARE_BUTTON}
               onClick={async () => {
                 setConnectHardwareModalVisible(true);
               }}

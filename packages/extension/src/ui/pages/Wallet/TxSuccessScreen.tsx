@@ -4,6 +4,7 @@ import { useNavigate } from '@/ui/pages/MainRoute';
 import { useTxExplorerUrl } from '@/ui/state/settings/hooks';
 import { spacing } from '@/ui/theme/spacing';
 import { useLocationState } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 interface LocationState {
   txid: string;
@@ -19,7 +20,7 @@ export default function TxSuccessScreen() {
     <Layout>
       <Header />
 
-      <Content style={{ gap: spacing.small }}>
+      <Content style={{ gap: spacing.small }} testid={TestIds.TX_SUCCESS.CONTAINER}>
         <Column justifyCenter mt="xxl" gap="xl">
           <Row justifyCenter>
             <Icon icon="success" size={50} style={{ alignSelf: 'center' }} />
@@ -30,6 +31,7 @@ export default function TxSuccessScreen() {
 
           <Row
             justifyCenter
+            testid={TestIds.TX_SUCCESS.VIEW_EXPLORER_BUTTON}
             onClick={() => {
               window.open(`${txidUrl}`);
             }}>
@@ -42,6 +44,7 @@ export default function TxSuccessScreen() {
         <Button
           full
           text={t('done')}
+          testid={TestIds.TX_SUCCESS.DONE_BUTTON}
           onClick={() => {
             navigate('MainScreen');
           }}

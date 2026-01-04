@@ -1,6 +1,7 @@
 import { Card, Column, Content, Header, Layout, Text } from '@/ui/components';
 import { useExtensionIsInTab } from '@/ui/features/browser/tabs';
 import { useI18n } from '@/ui/hooks/useI18n';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { useNavigate } from '../MainRoute';
 
@@ -45,6 +46,7 @@ export default function AddKeyringScreen() {
 
           <Card
             justifyCenter
+            testid={TestIds.ACCOUNT_MANAGEMENT.RESTORE_PRIVATE_KEY_OPTION}
             onClick={() => {
               navigate('CreateSimpleWalletScreen');
             }}>

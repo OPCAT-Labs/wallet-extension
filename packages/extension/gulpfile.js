@@ -87,7 +87,25 @@ function task_webpack(cb) {
       manifest: options.manifest,
       channel: options.channel
     }),
-    cb
+    (err, stats) => {
+      if (err) {
+        console.error('Webpack fatal error:', err);
+        cb(err);
+        return;
+      }
+      if (stats.hasErrors()) {
+        const info = stats.toJson();
+        console.error('Webpack compilation errors:');
+        info.errors.forEach(e => console.error(e.message || e));
+        cb(new Error('Webpack compilation failed'));
+        return;
+      }
+      if (stats.hasWarnings()) {
+        const info = stats.toJson();
+        info.warnings.forEach(w => console.warn(w.message || w));
+      }
+      cb();
+    }
   );
 }
 

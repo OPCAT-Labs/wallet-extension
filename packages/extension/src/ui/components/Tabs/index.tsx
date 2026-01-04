@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { colors } from '@/ui/theme/colors';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Column } from '../Column';
 import { Row } from '../Row';
@@ -33,7 +34,7 @@ export function Tabs({ items, defaultActiveKey, activeKey, onTabClick }: TabsPro
           {items.map((item) => {
             const isActiveItem = item.key === activeTab;
             return (
-              <Row key={item.key} onClick={() => onTabClick(item.key)} mx="md">
+              <Row key={item.key} onClick={() => onTabClick(item.key)} mx="md" testid={`${TestIds.ASSET_TAB.PREFIX}-${item.key}`}>
                 <Column gap="zero" justifyCenter itemsCenter>
                   <Text text={item.label} color={isActiveItem ? 'gold' : 'textDim'} />
                   <Row

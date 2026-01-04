@@ -8,6 +8,7 @@ import './index.less';
 export interface LayoutProps {
   children?: React.ReactNode;
   style?: CSSProperties;
+  testid?: string;
 }
 export function Layout(props: LayoutProps) {
   const isBooted = useBooted();
@@ -21,10 +22,11 @@ export function Layout(props: LayoutProps) {
     }
   }, [isBooted, isUnlocked]);
 
-  const { children, style: $styleBase } = props;
+  const { children, style: $styleBase, testid } = props;
   return (
     <div
       className="layout"
+      data-testid={testid}
       style={Object.assign(
         {
           display: 'flex',

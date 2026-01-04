@@ -20,7 +20,8 @@ export function Step0({
             preset="default"
             onClick={() => {
               updateContextData({ tabType: TabType.STEP2, restoreWalletType: item.value });
-            }}>
+            }}
+            testid={`restore-wallet-option-${index}`}>
             <Text text={item.name} />
           </Button>
         );

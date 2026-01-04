@@ -58,14 +58,14 @@ async function configureSidePanelBehavior() {
     try {
       await chromeWithSidePanel.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
     } catch (error) {
-      console.error('[Background] Failed to set side panel behavior:', error);
+      log.error('[Background] Failed to set side panel behavior:', error);
     }
   } else {
     // User prefers popup mode - don't associate action with side panel
     try {
       await chromeWithSidePanel.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
     } catch (error) {
-      console.error('[Background] Failed to set side panel behavior:', error);
+      log.error('[Background] Failed to set side panel behavior:', error);
     }
   }
 }
@@ -90,7 +90,7 @@ async function restoreAppState() {
   try {
     phishingService.forceUpdate();
   } catch (error) {
-    console.error('[Background] Failed to initialize phishing service:', error);
+    log.error('[Background] Failed to initialize phishing service:', error);
     // Continue initialization even if phishing service fails
   }
 
@@ -119,27 +119,22 @@ browserRuntimeOnConnect((port) => {
             eventBus.emit(data.method, data.params);
             break;
           case 'openapi':
-            // todo console.log
-            console.log('openapi in background', data.method, data.params);
             if (walletController.openapi[data.method]) {
               try {
                 return walletController.openapi[data.method].apply(null, data.params);
               } catch (error) {
-                console.log('openapi error');
-                console.error( error);
+                log.error('openapi error:', error);
                 throw error
               }
             }
             break;
           case 'controller':
           default:
-            console.log('controller in background', data.method, data.params);
             if (data.method) {
               try {
                 return walletController[data.method].apply(null, data.params);
               } catch (error) {
-                console.log('controller error');
-                console.error( error);
+                log.error('controller error:', error);
                 throw error
               }
               // return walletController[data.method].apply(null, data.params);

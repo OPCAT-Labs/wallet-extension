@@ -2,6 +2,7 @@ import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { copyToClipboard, shortAddress } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { CopyOutlined } from '@ant-design/icons';
 
 import { useTools } from '../ActionComponent';
@@ -25,6 +26,7 @@ const AccountSelect = () => {
       py="md"
       bg="card"
       itemsCenter
+      testid={TestIds.ACCOUNT_SELECT.CONTAINER}
       style={{
         borderRadius: 8
       }}>
@@ -39,13 +41,14 @@ const AccountSelect = () => {
         style={{
           flex: 1
         }}
+        testid={TestIds.ACCOUNT_SELECT.COPY_ADDRESS_BUTTON}
         onClick={() => {
           copyToClipboard(address).then(() => {
             tools.toastSuccess(t('copied'));
           });
         }}>
         <Text text={shortAddress(currentAccount?.alianName, 8)} textCenter ellipsis />
-        <Row selfItemsCenter itemsCenter>
+        <Row selfItemsCenter itemsCenter testid={TestIds.ACCOUNT_SELECT.ADDRESS_DISPLAY} data-address={address}>
           <Text text={shortAddress(address)} color="textDim" />
           <CopyOutlined style={{ color: '#888', fontSize: 14 }} />
         </Row>
@@ -57,6 +60,7 @@ const AccountSelect = () => {
         py="md"
         justifyEnd
         itemsCenter
+        testid={TestIds.ACCOUNT_SELECT.SWITCH_ACCOUNT_BUTTON}
         onClick={() => {
           navigate('SwitchAccountScreen');
         }}>

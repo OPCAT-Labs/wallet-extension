@@ -29,10 +29,16 @@ class ContactBook {
 
   init = async () => {
     log.debug('Initializing contact store...');
-    this.store = await createPersistStore<ContactBookStore>({
-      name: 'contactBook',
-      template: {}
-    });
+
+    try {
+      this.store = await createPersistStore<ContactBookStore>({
+        name: 'contactBook',
+        template: {}
+      });
+    } catch (error) {
+      log.error('[ContactBook] createPersistStore failed:', error);
+      throw error;
+    }
 
     try {
       // Rebuild contact store with composite keys

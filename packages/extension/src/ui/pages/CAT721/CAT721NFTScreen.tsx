@@ -7,6 +7,7 @@ import { Line } from '@/ui/components/Line';
 import { Section } from '@/ui/components/Section';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
+import { TestIds } from '@/ui/utils/test-ids';
 
 export default function CAT721NFTScreen() {
   const { state } = useLocation();
@@ -22,7 +23,7 @@ export default function CAT721NFTScreen() {
   const navigate = useNavigate();
 
   return (
-    <Layout>
+    <Layout testid={TestIds.CAT721.NFT_SCREEN}>
       <Header
         onBack={() => {
           window.history.go(-1);
@@ -53,6 +54,7 @@ export default function CAT721NFTScreen() {
           preset="primary"
           text={t('send')}
           icon="send"
+          testid={TestIds.CAT721.SEND_BUTTON}
           onClick={() => {
             navigate('SendCAT721Screen', {
               collectionInfo: collectionInfo,

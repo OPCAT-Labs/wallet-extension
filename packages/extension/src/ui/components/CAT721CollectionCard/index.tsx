@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { CAT721Balance } from '@/shared/types';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useCAT721NFTContentBaseUrl } from '@/ui/state/settings/hooks';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Column } from '../Column';
 import Iframe from '../Iframe';
@@ -87,7 +88,10 @@ export function CAT721CollectionCard(props: CAT721CollectionCardProps) {
   );
 
   return (
-    <Column>
+    <Column
+      testid={TestIds.CAT721.COLLECTION_ITEM}
+      data-collection-name={cat721Balance.name}
+      data-collection-id={cat721Balance.collectionId}>
       {cat721Balance.previewLocalIds.length > 1 ? (
         <CardComponent onClick={onClick}>
           {previewLocalIds.map((localId, index) => {

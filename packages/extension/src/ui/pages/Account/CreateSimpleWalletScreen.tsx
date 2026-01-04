@@ -9,6 +9,7 @@ import { FooterButtonContainer } from '@/ui/components/FooterButtonContainer';
 import { TabBar } from '@/ui/components/TabBar';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { satoshisToAmount, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { useNavigate } from '../MainRoute';
 
@@ -62,6 +63,7 @@ function Step1({
 
       <Input
         placeholder={t('wif_private_key_or_hex_private_key')}
+        testid={TestIds.ACCOUNT_MANAGEMENT.PRIVATE_KEY_INPUT}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
           if ('Enter' == e.key) {
             btnClick();
@@ -71,7 +73,7 @@ function Step1({
         autoFocus={true}
       />
       <FooterButtonContainer>
-        <Button disabled={disabled} text={t('continue')} preset="primary" onClick={btnClick} />
+        <Button disabled={disabled} text={t('continue')} preset="primary" onClick={btnClick} testid={TestIds.ACCOUNT_MANAGEMENT.CONTINUE_BUTTON} />
       </FooterButtonContainer>
     </Column>
   );
@@ -174,13 +176,15 @@ function Step2({
           total_btc: '--',
           satoshis: 0,
         };
+        const isSelected = index == pathIndex;
         return (
           <AddressTypeCard
             key={index}
             label={`${item.label}`}
             address={address}
             assets={assets}
-            checked={index == pathIndex}
+            checked={isSelected}
+            addressCopyTestid={isSelected ? TestIds.ACCOUNT_MANAGEMENT.ADDRESS_COPY_BUTTON : undefined}
             onClick={() => {
               updateContextData({ addressType: item.addressType });
             }}
@@ -189,7 +193,7 @@ function Step2({
       })}
 
       <FooterButtonContainer>
-        <Button text={t('continue')} preset="primary" onClick={onNext} />
+        <Button text={t('continue')} preset="primary" onClick={onNext} testid={TestIds.ACCOUNT_MANAGEMENT.STEP2_CONTINUE_BUTTON} />
       </FooterButtonContainer>
     </Column>
   );

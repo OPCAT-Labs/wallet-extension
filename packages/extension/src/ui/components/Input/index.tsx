@@ -44,6 +44,7 @@ export interface InputProps {
   networkType?: ChainType;
   addressPlaceholder?: string;
   maxLength?: number;
+  testid?: string;
 }
 
 type Presets = keyof typeof $inputPresets;
@@ -95,7 +96,7 @@ const $baseTextareaStyle: CSSProperties = Object.assign({}, $baseInputStyle, {
 });
 
 function PasswordInput(props: InputProps) {
-  const { placeholder, containerStyle, style: $inputStyleOverride, ...rest } = props;
+  const { placeholder, containerStyle, style: $inputStyleOverride, testid, ...rest } = props;
   const { t } = useI18n();
   const [type, setType] = useState<'password' | 'text'>('password');
   return (
@@ -104,6 +105,7 @@ function PasswordInput(props: InputProps) {
         placeholder={isNull(placeholder) ? t('password') : placeholder}
         type={type}
         style={Object.assign({}, $baseInputStyle, $inputStyleOverride)}
+        data-testid={testid}
         {...rest}
       />
       {type === 'password' && (
@@ -125,6 +127,7 @@ function AmountInput(props: InputProps) {
     runesDecimal,
     enableMax,
     onMaxClick,
+    testid,
     ...rest
   } = props;
   const $style = Object.assign({}, $baseInputStyle, $inputStyleOverride, disabled ? { color: colors.textDim } : {});
@@ -169,6 +172,7 @@ function AmountInput(props: InputProps) {
         onChange={handleInputAmount}
         style={$style}
         disabled={disabled}
+        data-testid={testid}
         {...rest}
       />
       {enableMax ? (
@@ -193,6 +197,7 @@ export const AddressInput = (props: InputProps) => {
     style: $inputStyleOverride,
     networkType: propsNetworkType,
     recipientLabel,
+    testid,
     ...rest
   } = props;
 
@@ -337,6 +342,7 @@ export const AddressInput = (props: InputProps) => {
             onChange={handleInputAddress}
             value={inputVal}
             rows={inputVal && inputVal.length > 50 ? 2 : 1}
+            data-testid={testid}
             {...rest}
           />
         </Row>
@@ -447,7 +453,7 @@ function SearchInput(props: InputProps) {
 }
 
 function TextInput(props: InputProps) {
-  const { placeholder, containerStyle, style: $inputStyleOverride, disabled, autoFocus, maxLength, ...rest } = props;
+  const { placeholder, containerStyle, style: $inputStyleOverride, disabled, autoFocus, maxLength, testid, ...rest } = props;
   return (
     <div style={Object.assign({}, $baseContainerStyle, containerStyle)}>
       <input
@@ -456,6 +462,7 @@ function TextInput(props: InputProps) {
         disabled={disabled}
         autoFocus={autoFocus}
         maxLength={maxLength}
+        data-testid={testid}
         style={Object.assign({}, $baseInputStyle, $inputStyleOverride, disabled ? { color: colors.textDim } : {})}
         {...rest}
       />

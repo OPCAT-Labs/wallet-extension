@@ -22,6 +22,7 @@ import { useNavigate } from '@/ui/pages/MainRoute';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { colors } from '@/ui/theme/colors';
 import { isValidAddress, showLongNumber, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { SignPsbt } from '../Approval/components';
 
@@ -239,7 +240,7 @@ export default function SendCAT20Screen() {
   }
 
   return (
-    <Layout>
+    <Layout testid={TestIds.CAT20.SEND_SCREEN}>
       <Header
         onBack={() => {
           window.history.go(-1);
@@ -278,6 +279,7 @@ export default function SendCAT20Screen() {
             }}
             recipientLabel={<Text text={t('recipient')} preset="regular" color="textDim" />}
             autoFocus={true}
+            testid={TestIds.CAT20.SEND_RECIPIENT_INPUT}
           />
         </Column>
 
@@ -308,6 +310,7 @@ export default function SendCAT20Screen() {
             onAmountInputChange={(amount) => {
               setInputAmount(amount);
             }}
+            testid={TestIds.CAT20.SEND_AMOUNT_INPUT}
           />
 
           {shouldShowMerge && (
@@ -351,6 +354,7 @@ export default function SendCAT20Screen() {
           disabled={disabled}
           preset="primary"
           text={t('next')}
+          testid={TestIds.CAT20.SEND_NEXT_BUTTON}
           onClick={() => {
             onConfirm();
           }}></Button>

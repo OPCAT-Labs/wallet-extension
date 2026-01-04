@@ -12,6 +12,7 @@ import { ContextData, UpdateContextDataParams } from '@/ui/pages/Account/createH
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { useCreateAccountCallback } from '@/ui/state/global/hooks';
 import { satoshisToAmount, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { LoadingOutlined } from '@ant-design/icons';
 
 export function Step2({
@@ -108,7 +109,6 @@ export function Step2({
           addresses.push(v.address);
         });
       } catch (e) {
-        console.log(e);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setError((e as any).message);
         return;
@@ -237,7 +237,6 @@ export function Step2({
             address_arr.push(v.address);
           });
         } catch (e) {
-          console.log(e);
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           setError((e as any).message);
           return;
@@ -320,6 +319,7 @@ export function Step2({
           return (
             <AddressTypeCard2
               key={index}
+              testid={`${TestIds.CREATE_WALLET.ADDRESS_TYPE_OPTION}-${index}`}
               label={`${item.label}`}
               items={[
                 {
@@ -343,6 +343,7 @@ export function Step2({
 
       <Column>
         <Input
+          testid={TestIds.CREATE_WALLET.CUSTOM_HDPATH_INPUT}
           placeholder={t('custom_hdpath')}
           value={pathText}
           onChange={(e) => {
@@ -356,6 +357,7 @@ export function Step2({
       <Text text={t('phrase_optional')} preset="bold" mt="lg" />
 
       <Input
+        testid={TestIds.CREATE_WALLET.PASSPHRASE_INPUT}
         placeholder={t('passphrase')}
         defaultValue={contextData.passphrase}
         onChange={async (e) => {
@@ -366,7 +368,7 @@ export function Step2({
       />
 
       <FooterButtonContainer>
-        <Button text={t('continue')} preset="primary" onClick={onNext} disabled={disabled} />
+        <Button testid={TestIds.CREATE_WALLET.STEP2_CONTINUE_BUTTON} text={t('continue')} preset="primary" onClick={onNext} disabled={disabled} />
       </FooterButtonContainer>
 
       {loading && (

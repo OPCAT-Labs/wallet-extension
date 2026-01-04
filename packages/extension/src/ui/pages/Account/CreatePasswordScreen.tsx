@@ -6,6 +6,7 @@ import { useTools } from '@/ui/components/ActionComponent';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useWallet, useWalletRequest } from '@/ui/utils';
 import { getPasswordStrengthWord, MIN_PASSWORD_LENGTH } from '@/ui/utils/password-utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { useNavigate } from '../MainRoute';
 
@@ -113,6 +114,7 @@ export default function CreatePasswordScreen() {
                   setNewPassword(e.target.value);
                 }}
                 autoFocus={true}
+                testid={TestIds.PASSWORD.NEW_PASSWORD_INPUT}
               />
               {strongText}
             </Column>
@@ -125,11 +127,12 @@ export default function CreatePasswordScreen() {
                   setConfirmPassword(e.target.value);
                 }}
                 onKeyUp={(e) => handleOnKeyUp(e)}
+                testid={TestIds.PASSWORD.CONFIRM_PASSWORD_INPUT}
               />
               {matchText}
             </Column>
 
-            <Button disabled={disabled} text={t('continue')} preset="primary" onClick={btnClick} />
+            <Button disabled={disabled} text={t('continue')} preset="primary" onClick={btnClick} testid={TestIds.PASSWORD.CONTINUE_BUTTON} />
           </Column>
         </Column>
       </Content>

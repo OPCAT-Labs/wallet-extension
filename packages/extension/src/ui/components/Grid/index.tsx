@@ -8,6 +8,7 @@ export interface GridProps {
   gap?: Gap;
   onClick?: ReactEventHandler<HTMLDivElement>;
   columns?: number;
+  testid?: string;
 }
 
 const $gridStyle = {
@@ -18,7 +19,7 @@ const $gridStyle = {
 } as CSSProperties;
 
 export function Grid(props: GridProps) {
-  const { children, style: $styleOverride, gap, columns, onClick } = props;
+  const { children, style: $styleOverride, gap, columns, onClick, testid } = props;
   const $style = Object.assign(
     {},
     $gridStyle,
@@ -27,5 +28,5 @@ export function Grid(props: GridProps) {
     columns ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : {},
     onClick ? { cursor: 'pointer' } : {}
   );
-  return <div style={$style}>{children}</div>;
+  return <div style={$style} data-testid={testid}>{children}</div>;
 }

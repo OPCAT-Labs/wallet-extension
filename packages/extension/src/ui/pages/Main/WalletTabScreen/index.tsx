@@ -158,6 +158,7 @@ export default function WalletTabScreen() {
           <Card
             preset="style2"
             style={{ height: 28 }}
+            testid="wallet-switcher-button"
             onClick={() => {
               navigate('SwitchKeyringScreen');
             }}>

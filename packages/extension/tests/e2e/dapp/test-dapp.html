@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPCAT Wallet dApp Test</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #7d6ef9;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 30px;
+    }
+    .status-bar {
+      background: #252540;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .status-bar p {
+      margin: 5px 0;
+    }
+    .status-bar .label {
+      color: #888;
+      display: inline-block;
+      width: 120px;
+    }
+    .status-bar .value {
+      color: #7d6ef9;
+      font-family: monospace;
+    }
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .test-card {
+      background: #252540;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .test-card h3 {
+      color: #7d6ef9;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .test-card p {
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 15px;
+    }
+    .test-card button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #7d6ef9;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .test-card button:hover {
+      background: #6b5ce7;
+    }
+    .test-card button:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+    .psbt-section {
+      background: #252540;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .psbt-section h3 {
+      color: #7d6ef9;
+      margin-bottom: 10px;
+    }
+    .psbt-section textarea {
+      width: 100%;
+      height: 80px;
+      background: #1a1a2e;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #eee;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    .psbt-section button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #7d6ef9;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: #252540;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 {
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-header .status-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    .modal-header .status-icon.testing {
+      background: #f0ad4e;
+      animation: pulse 1s infinite;
+    }
+    .modal-header .status-icon.success {
+      background: #5cb85c;
+    }
+    .modal-header .status-icon.fail {
+      background: #d9534f;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .modal-header button {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .modal-body {
+      padding: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .modal-body pre {
+      background: #1a1a2e;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #eee;
+    }
+    .modal-body .error {
+      color: #d9534f;
+    }
+    .modal-body .success-text {
+      color: #5cb85c;
+    }
+
+    /* Test IDs for E2E */
+    [data-testid] {
+      /* Just for identification */
+    }
+  </style>
+</head>
+<body>
+  <h1>OPCAT Wallet dApp Test</h1>
+  <p class="subtitle">PageProvider API Testing</p>
+
+  <!-- Status Bar -->
+  <div class="status-bar" data-testid="status-bar">
+    <p><span class="label">Wallet Detected:</span> <span class="value" id="wallet-detected">Checking...</span></p>
+    <p><span class="label">Connected:</span> <span class="value" id="connection-status">No</span></p>
+    <p><span class="label">Address:</span> <span class="value" id="current-address">-</span></p>
+  </div>
+
+  <!-- Test Cards -->
+  <div class="test-grid">
+    <!-- Test 1: requestAccounts (Reject) -->
+    <div class="test-card">
+      <h3>Test 1: requestAccounts (Reject)</h3>
+      <p>Call requestAccounts and reject the connection. Should throw an error.</p>
+      <button data-testid="test-request-accounts-reject" onclick="testRequestAccountsReject()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 2: requestAccounts (Approve) -->
+    <div class="test-card">
+      <h3>Test 2: requestAccounts (Approve)</h3>
+      <p>Call requestAccounts and approve the connection. Should return address array.</p>
+      <button data-testid="test-request-accounts-approve" onclick="testRequestAccountsApprove()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 3: getAccounts (Connected) -->
+    <div class="test-card">
+      <h3>Test 3: getAccounts (Connected)</h3>
+      <p>Call getAccounts when connected. Should return address array.</p>
+      <button data-testid="test-get-accounts-connected" onclick="testGetAccountsConnected()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 4: disconnect -->
+    <div class="test-card">
+      <h3>Test 4: disconnect</h3>
+      <p>Call disconnect. After this, requestAccounts should show popup again.</p>
+      <button data-testid="test-disconnect" onclick="testDisconnect()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 5: getAccounts (Disconnected) -->
+    <div class="test-card">
+      <h3>Test 5: getAccounts (Disconnected)</h3>
+      <p>Call getAccounts when not connected. Should return empty array.</p>
+      <button data-testid="test-get-accounts-disconnected" onclick="testGetAccountsDisconnected()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 6: signPsbt -->
+    <div class="test-card">
+      <h3>Test 6: signPsbt</h3>
+      <p>Sign a PSBT. Enter PSBT hex in the input below first.</p>
+      <button data-testid="test-sign-psbt" onclick="testSignPsbt()">
+        Run Test
+      </button>
+    </div>
+  </div>
+
+  <!-- PSBT Input Section -->
+  <div class="psbt-section">
+    <h3>PSBT Input (for signPsbt test)</h3>
+    <textarea
+      id="psbt-input"
+      data-testid="psbt-input"
+      placeholder="Enter PSBT hex here..."
+    ></textarea>
+    <div>
+      <strong>Signed PSBT Output:</strong>
+      <textarea
+        id="psbt-output"
+        data-testid="psbt-output"
+        placeholder="Signed PSBT will appear here..."
+        readonly
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal-overlay" data-testid="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>
+          <span class="status-icon" id="modal-status-icon"></span>
+          <span id="modal-title">Testing...</span>
+        </h2>
+        <button onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <pre id="modal-content" data-testid="modal-content"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let isConnected = false;
+    let currentAddress = null;
+
+    // Check if wallet is available
+    function checkWallet() {
+      const detected = typeof window.opcat !== 'undefined';
+      document.getElementById('wallet-detected').textContent = detected ? 'Yes' : 'No';
+      return detected;
+    }
+
+    // Update connection status display
+    function updateStatus(connected, address) {
+      isConnected = connected;
+      currentAddress = address;
+      document.getElementById('connection-status').textContent = connected ? 'Yes' : 'No';
+      document.getElementById('current-address').textContent = address || '-';
+    }
+
+    // Modal functions
+    function showModal(status, title, content) {
+      const overlay = document.getElementById('modal-overlay');
+      const icon = document.getElementById('modal-status-icon');
+      const titleEl = document.getElementById('modal-title');
+      const contentEl = document.getElementById('modal-content');
+
+      icon.className = 'status-icon ' + status;
+      titleEl.textContent = title;
+
+      if (status === 'fail') {
+        contentEl.innerHTML = '<span class="error">' + escapeHtml(content) + '</span>';
+      } else if (status === 'success') {
+        contentEl.innerHTML = '<span class="success-text">' + escapeHtml(content) + '</span>';
+      } else {
+        contentEl.textContent = content;
+      }
+
+      overlay.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Test 1: requestAccounts (Reject)
+    async function testRequestAccountsReject() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Please REJECT the connection request in the wallet popup.');
+
+      try {
+        const accounts = await window.opcat.requestAccounts();
+        // If we get here, user approved instead of rejecting
+        showModal('fail', 'Failed', 'Expected rejection but got approval.\nAccounts: ' + JSON.stringify(accounts));
+      } catch (error) {
+        // Expected: should throw when rejected
+        showModal('success', 'Success', 'Correctly threw error on rejection:\n' + (error.message || String(error)));
+      }
+    }
+
+    // Test 2: requestAccounts (Approve)
+    async function testRequestAccountsApprove() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Please APPROVE the connection request in the wallet popup.');
+
+      try {
+        const accounts = await window.opcat.requestAccounts();
+
+        if (Array.isArray(accounts) && accounts.length > 0) {
+          updateStatus(true, accounts[0]);
+          showModal('success', 'Success', 'Connected successfully!\nAccounts: ' + JSON.stringify(accounts, null, 2));
+        } else {
+          showModal('fail', 'Failed', 'Expected non-empty accounts array.\nGot: ' + JSON.stringify(accounts));
+        }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 3: getAccounts (Connected)
+    async function testGetAccountsConnected() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling getAccounts...');
+
+      try {
+        const accounts = await window.opcat.getAccounts();
+
+        if (Array.isArray(accounts) && accounts.length > 0) {
+          updateStatus(true, accounts[0]);
+          showModal('success', 'Success', 'Got accounts:\n' + JSON.stringify(accounts, null, 2));
+        } else {
+          showModal('fail', 'Failed', 'Expected non-empty accounts array (are you connected?).\nGot: ' + JSON.stringify(accounts));
+        }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 4: disconnect
+    async function testDisconnect() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling disconnect...');
+
+      try {
+        await window.opcat.disconnect();
+        updateStatus(false, null);
+        showModal('success', 'Success', 'Disconnected successfully.\nNext requestAccounts should show popup again.');
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 5: getAccounts (Disconnected)
+    async function testGetAccountsDisconnected() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling getAccounts (expecting empty array)...');
+
+      try {
+        const accounts = await window.opcat.getAccounts();
+
+        if (Array.isArray(accounts) && accounts.length === 0) {
+          showModal('success', 'Success', 'Correctly returned empty array:\n' + JSON.stringify(accounts));
+        } else {
+          showModal('fail', 'Failed', 'Expected empty array.\nGot: ' + JSON.stringify(accounts));
+        }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 6: signPsbt
+    async function testSignPsbt() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      const psbtHex = document.getElementById('psbt-input').value.trim();
+      if (!psbtHex) {
+        showModal('fail', 'Failed', 'Please enter a PSBT hex in the input field first.');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Please SIGN the transaction in the wallet popup.');
+
+      try {
+        const signedPsbt = await window.opcat.signPsbt(psbtHex);
+
+        // Store the signed PSBT in output
+        document.getElementById('psbt-output').value = signedPsbt;
+
+        showModal('success', 'Success', 'PSBT signed successfully!\nSigned PSBT (first 100 chars):\n' + signedPsbt.substring(0, 100) + '...');
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Initialize
+    window.addEventListener('opcat#initialized', () => {
+      console.log('opcat initialized');
+      checkWallet();
+    });
+
+    window.addEventListener('load', () => {
+      // Check wallet on load
+      setTimeout(checkWallet, 500);
+
+    });
+  </script>
+</body>
+</html>

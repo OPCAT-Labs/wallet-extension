@@ -11,6 +11,7 @@ import { MergeBTCPopover } from '@/ui/components/MergeBTCPopover';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { isValidAddress, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { SignPsbt } from '../Approval/components';
 
@@ -182,7 +183,7 @@ export default function SendCAT721Screen() {
   }
 
   return (
-    <Layout>
+    <Layout testid={TestIds.CAT721.SEND_SCREEN}>
       <Header
         onBack={() => {
           window.history.go(-1);
@@ -210,6 +211,7 @@ export default function SendCAT721Screen() {
             }}
             autoFocus={true}
             recipientLabel={<Text text={t('recipient')} preset="regular" color="textDim" />}
+            testid={TestIds.CAT721.SEND_RECIPIENT_INPUT}
           />
         </Column>
 
@@ -229,6 +231,7 @@ export default function SendCAT721Screen() {
           disabled={disabled}
           preset="primary"
           text={t('next')}
+          testid={TestIds.CAT721.SEND_NEXT_BUTTON}
           onClick={() => {
             onConfirm();
           }}></Button>

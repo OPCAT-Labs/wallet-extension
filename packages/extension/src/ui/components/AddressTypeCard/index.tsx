@@ -19,10 +19,11 @@ interface AddressTypeCardProps {
   checked: boolean;
   assets: AddressAssets;
   onClick?: ReactEventHandler<HTMLDivElement>;
+  addressCopyTestid?: string;
 }
 export function AddressTypeCard(props: AddressTypeCardProps) {
   const btcUnit = useBTCUnit();
-  const { onClick, label, address, checked, assets } = props;
+  const { onClick, label, address, checked, assets, addressCopyTestid } = props;
   const hasVault = Boolean(assets.satoshis && assets.satoshis > 0);
 
   const chain = useChain();
@@ -35,7 +36,7 @@ export function AddressTypeCard(props: AddressTypeCardProps) {
           </Column>
         </Row>
         <Row justifyBetween px="md" pb="md">
-          <CopyableAddress address={address} />
+          <CopyableAddress address={address} testid={addressCopyTestid} />
           <Column justifyCenter>{checked && <Icon icon="check" />}</Column>
         </Row>
         {hasVault && (
@@ -60,13 +61,14 @@ interface AddressTypeCardProp2 {
   }[];
   checked: boolean;
   onClick?: ReactEventHandler<HTMLDivElement>;
+  testid?: string;
 }
 
 export function AddressTypeCard2(props: AddressTypeCardProp2) {
   const btcUnit = useBTCUnit();
-  const { onClick, label, items, checked } = props;
+  const { onClick, label, items, checked, testid } = props;
   return (
-    <Card px="zero" py="zero" gap="zero" rounded onClick={onClick}>
+    <Card px="zero" py="zero" gap="zero" rounded onClick={onClick} testid={testid}>
       <Column full>
         <Row justifyBetween px="md" pt="md">
           <Column justifyCenter>

@@ -7,15 +7,18 @@ import { Row } from '../Row';
 export const Popover = ({
   children,
   onClose,
-  contentStyle = {}
+  contentStyle = {},
+  testid
 }: {
   children: React.ReactNode;
   onClose?: () => void;
   contentStyle?: React.CSSProperties;
+  testid?: string;
 }) => {
   return (
     <div
       className="popover-container"
+      data-testid={testid}
       style={{
         backgroundColor: 'rgba(0,0,0,0.8)'
       }}>
