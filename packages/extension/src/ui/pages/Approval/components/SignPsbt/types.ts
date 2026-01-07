@@ -33,6 +33,8 @@ export interface Props {
   };
   handleCancel?: () => void;
   handleConfirm?: (rawTxInfo?: RawTxInfo) => void;
+  // View only mode - hide footer buttons
+  viewOnly?: boolean;
 }
 
 export interface InputInfo {

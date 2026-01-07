@@ -154,23 +154,6 @@ export default function CAT20TokenScreen() {
 
             <Row justifyBetween mt="lg">
               <Button
-                text={t('merge_utxos')}
-                preset="home"
-                icon="merge"
-                onClick={(_e) => {
-                  if (keyring.type === KEYRING_TYPE.KeystoneKeyring) {
-                    tools.toastError(t('merge_utxos_is_not_supported_for_keystone_yet'));
-                    return;
-                  }
-                  navigate('MergeCAT20Screen', {
-                    cat20Balance: tokenSummary.cat20Balance,
-                    cat20Info: tokenSummary.cat20Info
-                  });
-                }}
-                full
-              />
-
-              <Button
                 text={t('send')}
                 preset="home"
                 icon="send"
@@ -185,6 +168,16 @@ export default function CAT20TokenScreen() {
                     cat20Balance: tokenSummary.cat20Balance,
                     cat20Info: tokenSummary.cat20Info
                   });
+                }}
+                full
+              />
+
+              <Button
+                text={t('receive')}
+                preset="home"
+                icon="receive"
+                onClick={() => {
+                  navigate('ReceiveScreen');
                 }}
                 full
               />

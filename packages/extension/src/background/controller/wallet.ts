@@ -43,19 +43,22 @@ import { psbtFromString } from '@/ui/utils/psbt-utils';
 import { txHelpers } from '@opcat-labs/wallet-sdk';
 import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
 import { bitcoin, ECPair } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
+import { ExtPsbt, Signer, SignOptions, SupportedNetwork, UTXO as ExtUtxo, Transaction, MempoolProvider } from '@opcat-labs/scrypt-ts-opcat';
+import {mergeSendToken, singleSendNft, toTokenOwnerAddress} from '@opcat-labs/cat-sdk'
 import { KeystoneKeyring } from '@opcat-labs/wallet-sdk/lib/keyring';
 import {
   genPsbtOfBIP322Simple,
   getSignatureFromPsbtOfBIP322Simple,
   signMessageOfBIP322Simple
 } from '@opcat-labs/wallet-sdk/lib/message';
-import { toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/network';
+import { toOpcatNetwork, toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/network';
 
 import { ContactBookItem } from '../service/contactBook';
 import { OpenApiService } from '../service/openapi';
 import { ConnectedSite } from '../service/permission';
 import { psbtFromBase64 } from '../utils/psbt';
 import BaseController from './base';
+import { KeyringSigner } from '../utils/keyringSigner';
 
 const stashKeyrings: Record<string, Keyring> = {};
 export type AccountAsset = {
@@ -64,6 +67,7 @@ export type AccountAsset = {
   amount: string;
   value: string;
 };
+
 
 export class WalletController extends BaseController {
   openapi: OpenApiService = openapiService;
@@ -846,62 +850,82 @@ export class WalletController extends BaseController {
     return unavailableUtxos;
   };
 
+  /**
+   * Send BTC using @opcat-labs/scrypt-ts-opcat standard flow
+   * Uses ExtPsbt for transaction construction and WalletSigner for signing
+   */
   sendBTC = async ({
     to,
     amount,
     feeRate,
-    enableRBF,
-    btcUtxos,
-    memo,
-    memos
+    btcUtxos
   }: {
     to: string;
     amount: number;
     feeRate: number;
-    enableRBF: boolean;
     btcUtxos?: UTXO[];
-    memo?: string;
-    memos?: string[];
   }) => {
     const account = preferenceService.getCurrentAccount();
     if (!account) throw new Error('no current account');
 
     const networkType = this.getNetworkType();
+    
+    // Get keyring for signing
+    const keyring = await this.getCurrentKeyring();
+    if (!keyring) throw new Error('no current keyring');
+    const _keyring = keyringService.keyrings[keyring.index];
 
-    const chainType = this.getChainType();
-    const isOpcat = chainType == ChainType.OPCAT_MAINNET || chainType == ChainType.OPCAT_TESTNET
+    const signer = new KeyringSigner(
+      account,
+      _keyring,
+      toOpcatNetwork(networkType)
+    )
 
+    // Get UTXOs if not provided
     if (!btcUtxos) {
       btcUtxos = await this.getBTCUtxos();
     }
 
-    if (btcUtxos.length == 0) {
+    if (btcUtxos.length === 0) {
       throw new Error('Insufficient balance.');
     }
 
     if (!isValidAddress(to, networkType)) {
       throw new Error('Invalid address.');
     }
-    const res = await txHelpers.sendBTC({
-      btcUtxos: btcUtxos,
-      tos: [{ address: to, satoshis: amount }],
-      networkType,
-      changeAddress: account.address,
-      feeRate,
-      isOpcat,
-      enableRBF,
-      memo,
-      memos
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const psbt: any = res.psbt
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const toSignInputs: any = res.toSignInputs
+    // Convert wallet UTXOs to ExtUtxo format
+    const extUtxos: ExtUtxo[] = btcUtxos.map((utxo) => ({
+      txId: utxo.txid,
+      outputIndex: utxo.vout,
+      script: utxo.scriptPk,
+      satoshis: utxo.satoshis,
+      data: utxo.data || ''
+    }));
 
-    this.setPsbtSignNonSegwitEnable(psbt, true);
-    await this.signPsbt(psbt, toSignInputs, false);
-    psbt.finalizeAllInputs()
-    this.setPsbtSignNonSegwitEnable(psbt, false);
+    console.log('extUtxos', extUtxos)
+
+    // Build ExtPsbt
+    const psbt = new ExtPsbt({ network: toOpcatNetwork(networkType) });
+
+    // Add inputs
+    psbt.spendUTXO(extUtxos);
+
+    // Add output to recipient
+    psbt.addOutput({
+      address: to,
+      value: BigInt(amount),
+      data: new Uint8Array()
+    });
+
+    // Add change output
+    psbt.change(account.address, feeRate);
+
+    // Seal the PSBT
+    psbt.seal();
+
+    // Sign and finalize
+    await psbt.signAndFinalize(signer);
+
     return psbt.toHex();
   };
 
@@ -916,41 +940,68 @@ export class WalletController extends BaseController {
     enableRBF: boolean;
     btcUtxos?: UTXO[];
   }) => {
+    
     const account = preferenceService.getCurrentAccount();
     if (!account) throw new Error('no current account');
 
     const networkType = this.getNetworkType();
+    
+    // Get keyring for signing
+    const keyring = await this.getCurrentKeyring();
+    if (!keyring) throw new Error('no current keyring');
+    const _keyring = keyringService.keyrings[keyring.index];
 
+    const signer = new KeyringSigner(
+      account,
+      _keyring,
+      toOpcatNetwork(networkType)
+    )
+
+    // Get UTXOs if not provided
     if (!btcUtxos) {
       btcUtxos = await this.getBTCUtxos();
     }
 
-    if (btcUtxos.length == 0) {
+    if (btcUtxos.length === 0) {
       throw new Error('Insufficient balance.');
     }
 
-    const res = await txHelpers.sendAllBTC({
-      btcUtxos: btcUtxos,
-      toAddress: to,
-      networkType,
-      feeRate,
-      enableRBF
-    });
+    if (!isValidAddress(to, networkType)) {
+      throw new Error('Invalid address.');
+    }
+    // Convert wallet UTXOs to ExtUtxo format
+    const extUtxos: ExtUtxo[] = btcUtxos.map((utxo) => ({
+      txId: utxo.txid,
+      outputIndex: utxo.vout,
+      script: utxo.scriptPk,
+      satoshis: utxo.satoshis,
+      data: utxo.data || ''
+    }));
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const psbt: any = res.psbt
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const toSignInputs: any = res.toSignInputs
+    console.log('extUtxos', extUtxos)
 
-    this.setPsbtSignNonSegwitEnable(psbt, true);
-    await this.signPsbt(psbt, toSignInputs, true);
-    this.setPsbtSignNonSegwitEnable(psbt, false);
+    // Build ExtPsbt
+    const psbt = new ExtPsbt({ network: toOpcatNetwork(networkType) });
+
+    // Add inputs
+    psbt.spendUTXO(extUtxos);
+    // Add change output
+    psbt.change(to, feeRate);
+
+    // Seal the PSBT
+    psbt.seal();
+
+    // Sign and finalize
+    await psbt.signAndFinalize(signer);
+
     return psbt.toHex();
-  };
+
+  }
 
   pushTx = async (rawtx: string) => {
     const txid = await this.openapi.pushTx(rawtx);
-    return txid;
+    console.log('push tx ', txid)
+    return txid || new Transaction(rawtx).id
   };
 
   getAccounts = async () => {
@@ -1495,43 +1546,106 @@ export class WalletController extends BaseController {
     return tokenSummary;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transferCAT20Step1ByMerge = async (mergeData: any, batchIndex: number) => {
-    return await openapiService.transferCAT20Step1ByMerge(mergeData, batchIndex);
-  };
-
-  transferCAT20Step1 = async (to: string, tokenId: string, tokenAmount: string, feeRate: number) => {
+  transferCAT20 = async (to: string, tokenId: string, toAmount: string, feeRate: number) => {
     const currentAccount = await this.getCurrentAccount();
-    if (!currentAccount) {
-      return;
-    }
+    if (!currentAccount) return;
 
-    const _res = await openapiService.transferCAT20Step1(
+    const networkType = this.getNetworkType();
+
+    // Get keyring for signing
+    const keyring = await this.getCurrentKeyring();
+    if (!keyring) throw new Error('no current keyring');
+    const _keyring = keyringService.keyrings[keyring.index];
+
+    const signer = new KeyringSigner(
+      currentAccount,
+      _keyring,
+      toOpcatNetwork(networkType)
+    )
+    const provider = new MempoolProvider(toOpcatNetwork(networkType))
+
+    // Broadcast progress: preparing
+    eventBus.emit(EVENTS.broadcastToUI, {
+      method: EVENTS.transferCAT20Progress,
+      params: { progress: 10, message: 'Preparing transfer data...' }
+    });
+
+    const prepare = await openapiService.prepareTransferCAT20(
       currentAccount.address,
-      currentAccount.pubkey,
       to,
       tokenId,
-      tokenAmount,
-      feeRate
+      toAmount,
     );
-    return _res;
-  };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transferCAT20Step2 = async (transferData: any, commitTx: string, toSignInputs: ToSignInput[]) => {
-    const psbt = psbtFromBase64(commitTx);
-    await this.signPsbt(psbt, toSignInputs, psbt instanceof bitcoin.Psbt);
-    const _res = await openapiService.transferCAT20Step2(transferData, psbt.toBase64());
-    return _res;
-  };
+    console.log({prepare})
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transferCAT20Step3 = async (transferData: any, revealTx: string, toSignInputs: ToSignInput[]) => {
-    const psbt = psbtFromBase64(revealTx);
-    await this.signPsbt(psbt, toSignInputs, psbt instanceof bitcoin.Psbt);
-    const _res = await openapiService.transferCAT20Step3(transferData, psbt.toBase64());
-    return _res;
-  };
+    // Broadcast progress: building transactions
+    eventBus.emit(EVENTS.broadcastToUI, {
+      method: EVENTS.transferCAT20Progress,
+      params: { progress: 30, message: 'Building transactions...' }
+    });
+
+    const sendRes = await mergeSendToken.dryRun(
+      signer,
+      provider,
+      prepare.tokenInfo.minterScriptHash,
+      prepare.utxos,
+      [{address: toTokenOwnerAddress(to), amount: BigInt(toAmount)}],
+      toTokenOwnerAddress(currentAccount.address),
+      feeRate,
+      prepare.tokenInfo.hasAdmin,
+      prepare.tokenInfo.adminScriptHash || '',
+      undefined,
+      {
+        onTransferStart({currentIndex, totalTransfers}) {
+          const progress = 30 + Math.floor((currentIndex / totalTransfers) * 50);
+          eventBus.emit(EVENTS.broadcastToUI, {
+            method: EVENTS.transferCAT20Progress,
+            params: { progress, message: `Building transaction ${currentIndex + 1}/${totalTransfers}...` }
+          });
+        },
+        onTransferEnd({currentIndex, totalTransfers}) {
+          const progress = 30 + Math.floor(((currentIndex + 1) / totalTransfers) * 50);
+          eventBus.emit(EVENTS.broadcastToUI, {
+            method: EVENTS.transferCAT20Progress,
+            params: { progress, message: `Completed transaction ${currentIndex + 1}/${totalTransfers}` }
+          });
+        },
+      }
+    );
+    console.log({sendRes})
+
+    // Broadcast progress: finalizing
+    eventBus.emit(EVENTS.broadcastToUI, {
+      method: EVENTS.transferCAT20Progress,
+      params: { progress: 90, message: 'Finalizing...' }
+    });
+
+    // Collect all psbt hexes for UI display (Related Txns)
+    const allPsbtHexs: string[] = [];
+    const allTxHexs: string[] = [];
+    let networkFee = BigInt(0);
+    for (const merge of sendRes.merges) {
+      allPsbtHexs.push(merge.guardPsbt.toHex());
+      allPsbtHexs.push(merge.sendPsbt.toHex());
+      allTxHexs.push(merge.guardPsbt.extractTransaction().toHex());
+      allTxHexs.push(merge.sendPsbt.extractTransaction().toHex());
+      networkFee = networkFee + merge.guardPsbt.getFee() + merge.sendPsbt.getFee()
+    }
+    allPsbtHexs.push(sendRes.finalSend.guardPsbt.toHex());
+    allPsbtHexs.push(sendRes.finalSend.sendPsbt.toHex());
+    allTxHexs.push(sendRes.finalSend.guardPsbt.extractTransaction().toHex());
+    allTxHexs.push(sendRes.finalSend.sendPsbt.extractTransaction().toHex());
+    networkFee = networkFee + sendRes.finalSend.guardPsbt.getFee() + sendRes.finalSend.sendPsbt.getFee()
+
+    console.log({networkFee})
+
+    return {
+      networkFee: Number(networkFee),
+      allPsbtHexs,
+      allTxHexs,
+    }
+  }
 
   mergeCAT20Prepare = async (tokenId: string, utxoCount: number, feeRate: number) => {
     const currentAccount = await this.getCurrentAccount();
@@ -1581,38 +1695,67 @@ export class WalletController extends BaseController {
     return collectionSummary;
   };
 
-  transferCAT721Step1 = async (to: string, collectionId: string, localId: string, feeRate: number) => {
+  transferCAT721 = async (to: string, collectionId: string, localId: string, feeRate: number) => {
     const currentAccount = await this.getCurrentAccount();
-    if (!currentAccount) {
-      return;
-    }
+    if (!currentAccount) return;
 
-    const _res = await openapiService.transferCAT721Step1(
+    const networkType = this.getNetworkType();
+
+    // Get keyring for signing
+    const keyring = await this.getCurrentKeyring();
+    if (!keyring) throw new Error('no current keyring');
+    const _keyring = keyringService.keyrings[keyring.index];
+
+    const signer = new KeyringSigner(
+      currentAccount,
+      _keyring,
+      toOpcatNetwork(networkType)
+    )
+    const provider = new MempoolProvider(toOpcatNetwork(networkType))
+
+    // Broadcast progress: preparing
+    eventBus.emit(EVENTS.broadcastToUI, {
+      method: EVENTS.transferCAT721Progress,
+      params: { progress: 10, message: 'Preparing transfer data...' }
+    });
+
+    const prepare = await openapiService.prepareTransferCAT721(
       currentAccount.address,
-      currentAccount.pubkey,
       to,
       collectionId,
-      localId,
+      localId
+    );
+
+    // Broadcast progress: building transactions
+    eventBus.emit(EVENTS.broadcastToUI, {
+      method: EVENTS.transferCAT721Progress,
+      params: { progress: 30, message: 'Building transactions...' }
+    });
+
+    const sendRes = await singleSendNft.dryRun(
+      signer,
+      provider,
+      prepare.collectionInfo.minterScriptHash,
+      [prepare.utxo],
+      [toTokenOwnerAddress(to)],
       feeRate
     );
-    return _res;
-  };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transferCAT721Step2 = async (transferData: any, commitTx: string, toSignInputs: ToSignInput[]) => {
-    const psbt = psbtFromBase64(commitTx);
-    await this.signPsbt(psbt, toSignInputs, false);
-    const _res = await openapiService.transferCAT721Step2(transferData, psbt.toBase64());
-    return _res;
-  };
+    // Broadcast progress: finalizing
+    eventBus.emit(EVENTS.broadcastToUI, {
+      method: EVENTS.transferCAT721Progress,
+      params: { progress: 90, message: 'Finalizing...' }
+    });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transferCAT721Step3 = async (transferData: any, revealTx: string, toSignInputs: ToSignInput[]) => {
-    const psbt = psbtFromBase64(revealTx);
-    await this.signPsbt(psbt, toSignInputs, false);
-    const _res = await openapiService.transferCAT721Step3(transferData, psbt.toBase64());
-    return _res;
-  };
+    const networkFee = sendRes.guardPsbt.getFee() + sendRes.sendPsbt.getFee()
+    return {
+      networkFee: Number(networkFee),
+      guardPsbtHex: sendRes.guardPsbt.toHex(),
+      sendPsbtHex: sendRes.sendPsbt.toHex(),
+      guardTxHex: sendRes.guardPsbt.extractTransaction().toHex(),
+      sendTxHex: sendRes.sendPsbt.extractTransaction().toHex(),
+    }
+  }
 
   getBuyCoinChannelList = async (coin: 'FB' | 'BTC') => {
     return openapiService.getBuyCoinChannelList(coin);

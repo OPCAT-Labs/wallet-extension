@@ -86,15 +86,21 @@ async function transferCAT20(
     await nextButton.click();
   });
 
-  await test.step('Sign transaction (step 1/2)', async () => {
+  await test.step('Wait for preparing transactions', async () => {
+    // Wait for preparing progress to complete (up to 2 minutes for complex transfers)
+    // The preparing page shows progress percentage
+    console.log('Waiting for transaction preparation...');
+
+    // Wait for the confirmation page to appear (Sign button becomes visible)
     await page.waitForSelector(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`, {
-      timeout: 60000,
+      timeout: 120000,
     });
-    await page.click(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
+    console.log('Transaction preparation complete, confirmation page loaded');
   });
 
-  await test.step('Sign transaction (step 2/2)', async () => {
-    await waitForTestId(page, TestIds.SEND.SIGN_AND_PAY_BUTTON, 30000);
+  await test.step('Sign and broadcast transactions', async () => {
+    // On the new confirmation page, click the Sign button to broadcast all transactions
+    await page.waitForTimeout(500);
     await page.click(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
   });
 

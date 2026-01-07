@@ -100,25 +100,19 @@ async function transferCAT721(
   await nextButton.click();
   console.log('Step 3: ✓ Next button clicked');
 
-  // Step 4: Wait for signing step 1/2 and confirm
-  console.log('Step 4: Waiting for sign step 1/2...');
+  // Step 4: Wait for preparing transactions to complete
+  console.log('Step 4: Waiting for transaction preparation...');
+  // Wait for the confirmation page to appear (Sign button becomes visible)
   await page.waitForSelector(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`, {
-    timeout: 60000,
+    timeout: 120000,
   });
-  console.log('Step 4: Sign button visible, clicking...');
-  await page.waitForTimeout(500);
-  await clickTestId(page, TestIds.SEND.SIGN_AND_PAY_BUTTON);
-  console.log('Step 4: ✓ Sign step 1/2 completed');
+  console.log('Step 4: ✓ Transaction preparation complete, confirmation page loaded');
 
-  // Step 5: Wait for step 2/2 - need to wait for page transition
-  console.log('Step 5: Waiting for sign step 2/2...');
-  await page.waitForTimeout(2000);
-  await waitForTestId(page, TestIds.SEND.SIGN_AND_PAY_BUTTON, 30000);
-  console.log('Step 5: Sign button visible, clicking...');
+  // Step 5: Sign and broadcast transactions
+  console.log('Step 5: Signing and broadcasting transactions...');
   await page.waitForTimeout(500);
   await page.click(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
-  console.log('Step 5: ✓ Sign step 2/2 completed');
-
+  console.log('Step 5: ✓ Sign button clicked');
 
   // Step 6: Wait for either success page or failure
   console.log('Step 6: Waiting for transaction result...');

@@ -1,19 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { CAT721CollectionInfo, TxType, UserToSignInput } from '@/shared/types';
-import { Button, Column, Content, Header, Input, Layout, Row, Text } from '@/ui/components';
+import { EVENTS } from '@/shared/constant';
+import eventBus from '@/shared/eventBus';
+import { CAT721CollectionInfo, TxType } from '@/shared/types';
+import { Button, Card, Column, Content, Footer, Header, Icon, Input, Layout, Row, Text } from '@/ui/components';
 import { useTools } from '@/ui/components/ActionComponent';
-import { Loading } from '@/ui/components/ActionComponent/Loading';
 import CAT721Preview from '@/ui/components/CAT721Preview';
 import { FeeRateBar } from '@/ui/components/FeeRateBar';
 import { MergeBTCPopover } from '@/ui/components/MergeBTCPopover';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
-import { isValidAddress, useWallet } from '@/ui/utils';
+import { usePushBitcoinTxCallback } from '@/ui/state/transactions/hooks';
+import { colors } from '@/ui/theme/colors';
+import { isValidAddress, shortAddress, useWallet } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
+import { Transaction } from '@opcat-labs/scrypt-ts-opcat';
 
 import { SignPsbt } from '../Approval/components';
+
+// Step enum for clearer state management
+enum Step {
+  INPUT = 0,
+  PREPARING = 1,
+  CONFIRM = 2,
+  VIEW_TX_DETAIL = 3
+}
 
 export default function SendCAT721Screen() {
   const { state } = useLocation();
@@ -27,25 +39,54 @@ export default function SendCAT721Screen() {
 
   const wallet = useWallet();
   const { t } = useI18n();
-
   const navigate = useNavigate();
-  const [inputAmount] = useState('');
+  const tools = useTools();
+  const pushBitcoinTx = usePushBitcoinTxCallback();
+
+  // Input form state
   const [disabled, setDisabled] = useState(false);
-  const [toInfo, setToInfo] = useState<{
-    address: string;
-    domain: string;
-  }>({
+  const [toInfo, setToInfo] = useState<{ address: string; domain: string }>({
     address: '',
-    domain: '',
+    domain: ''
+  });
+  const [feeRate, setFeeRate] = useState(5);
+  const [error, setError] = useState('');
+  const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
+
+  // Transfer state
+  const [step, setStep] = useState<Step>(Step.INPUT);
+  const [preparingProgress, setPreparingProgress] = useState(0);
+  const [preparingMessage, setPreparingMessage] = useState('');
+  const [viewingTxIndex, setViewingTxIndex] = useState(-1);
+
+  // Store signed transaction data
+  const transferData = useRef<{
+    allTxHexs: string[];
+    allPsbtHexs: string[];
+    receiver: string;
+    networkFee: string;
+  }>({
+    allTxHexs: [],
+    allPsbtHexs: [],
+    receiver: '',
+    networkFee: '0'
   });
 
-  const [error, setError] = useState('');
+  // Listen for progress updates from background
+  useEffect(() => {
+    const handleProgress = (data: { progress: number; message: string }) => {
+      setPreparingProgress(data.progress);
+      setPreparingMessage(data.message);
+    };
 
-  const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
-  const tools = useTools();
+    eventBus.addEventListener(EVENTS.transferCAT721Progress, handleProgress);
 
-  const [feeRate, setFeeRate] = useState(5);
+    return () => {
+      eventBus.removeEventListener(EVENTS.transferCAT721Progress, handleProgress);
+    };
+  }, []);
 
+  // Validate input
   useEffect(() => {
     setError('');
     setDisabled(true);
@@ -55,133 +96,201 @@ export default function SendCAT721Screen() {
     }
 
     setDisabled(false);
-  }, [toInfo, inputAmount]);
+  }, [toInfo]);
 
-  const transferData = useRef<{
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transferData: any;
-    commitTx: string;
-    commitToSignInputs: UserToSignInput[];
-    revealTx: string;
-    revealToSignInputs: UserToSignInput[];
-  }>({
-    transferData: null,
-    commitTx: '',
-    commitToSignInputs: [],
-    revealTx: '',
-    revealToSignInputs: []
-  });
-  const [step, setStep] = useState(0);
+  // Handle confirm - start preparing transactions
   const onConfirm = async () => {
-    tools.showLoading(true);
+    setStep(Step.PREPARING);
+    setPreparingProgress(0);
+    setPreparingMessage('Preparing transfer data...');
+
     try {
-      const step1 = await wallet.transferCAT721Step1(toInfo.address, collectionInfo.collectionId, localId, feeRate);
-      if (step1) {
-        transferData.current.transferData = step1.transferData;
-        transferData.current.commitTx = step1.commitTx;
-        transferData.current.commitToSignInputs = step1.toSignInputs;
-        setStep(1);
+      const result = await wallet.transferCAT721(toInfo.address, collectionInfo.collectionId, localId, feeRate);
+
+      setPreparingProgress(100);
+      setPreparingMessage('Complete!');
+
+      if (result) {
+        transferData.current = {
+          allTxHexs: [result.guardTxHex, result.sendTxHex],
+          allPsbtHexs: [result.guardPsbtHex, result.sendPsbtHex],
+          receiver: toInfo.address,
+          networkFee: (Number(result.networkFee) / 1e8).toFixed(8)
+        };
+
+        setTimeout(() => {
+          setStep(Step.CONFIRM);
+        }, 300);
       }
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const msg = (e as any).message;
       if (msg.includes('-307')) {
         setShowMergeBTCUTXOPopover(true);
+        setStep(Step.INPUT);
         return;
       }
+      setError(msg);
+      setStep(Step.INPUT);
+    }
+  };
+
+  // Handle sign and broadcast
+  const onSign = async () => {
+    tools.showLoading(true);
+    try {
+      let lastTxid = '';
+      for (const txHex of transferData.current.allTxHexs) {
+        const result = await pushBitcoinTx(txHex);
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to broadcast transaction');
+        }
+        lastTxid = result.txid || '';
+      }
+      navigate('TxSuccessScreen', { txid: lastTxid });
+    } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setError((e as any).message);
+      navigate('TxFailScreen', { error: (e as any).message });
     } finally {
       tools.showLoading(false);
     }
   };
 
-  if (step == 1) {
+  // Preparing page with progress
+  if (step === Step.PREPARING) {
     return (
-      <SignPsbt
-        header=<Header
-          title={t('step_12')}
-          onBack={() => {
-            setStep(0);
-          }}
-        />
-        params={{
-          data: {
-            psbtHex: transferData.current.commitTx,
-            type: TxType.SIGN_TX,
-            options: { autoFinalized: false, toSignInputs: transferData.current.commitToSignInputs }
-          }
-        }}
-        handleCancel={() => {
-          setStep(0);
-        }}
-        handleConfirm={async () => {
-          try {
-            tools.showLoading(true);
-            const step2 = await wallet.transferCAT721Step2(
-              transferData.current.transferData,
-              transferData.current.commitTx,
-              transferData.current.commitToSignInputs
-            );
-
-            transferData.current.revealTx = step2.revealTx;
-            transferData.current.revealToSignInputs = step2.toSignInputs;
-            transferData.current.transferData = step2.transferData;
-
-            setStep(1.5);
-            setTimeout(() => {
-              setStep(2);
-            }, 100);
-          } catch (e) {
-            console.log(e);
-          } finally {
-            tools.showLoading(false);
-          }
-        }}
-      />
+      <Layout>
+        <Content style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Column style={{ alignItems: 'center', gap: 20 }}>
+            <Text text={preparingMessage || 'Preparing...'} textCenter />
+            <Text text={`${preparingProgress}%`} preset="bold" size="lg" textCenter />
+            <Row style={{ width: 200, height: 4, backgroundColor: colors.border, borderRadius: 2 }}>
+              <Row
+                style={{
+                  width: `${preparingProgress}%`,
+                  height: '100%',
+                  backgroundColor: colors.primary,
+                  borderRadius: 2
+                }}
+              />
+            </Row>
+          </Column>
+        </Content>
+      </Layout>
     );
-  } else if (step == 1.5) {
-    return <Loading />;
-  } else if (step == 2) {
+  }
+
+  // View transaction detail (view only, no buttons)
+  if (step === Step.VIEW_TX_DETAIL && viewingTxIndex >= 0) {
     return (
       <SignPsbt
-        header=<Header
-          title={t('step_22')}
-          onBack={() => {
-            setStep(0);
-          }}
-        />
+        header={
+          <Header
+            title={`Transaction ${viewingTxIndex + 1}`}
+            onBack={() => {
+              setViewingTxIndex(-1);
+              setStep(Step.CONFIRM);
+            }}
+          />
+        }
         params={{
           data: {
-            psbtHex: transferData.current.revealTx,
+            psbtHex: transferData.current.allPsbtHexs[viewingTxIndex],
             type: TxType.SIGN_TX,
-            options: { autoFinalized: false, toSignInputs: transferData.current.revealToSignInputs }
+            options: { autoFinalized: true }
           }
         }}
-        handleCancel={() => {
-          setStep(0);
-        }}
-        handleConfirm={async () => {
-          tools.showLoading(true);
-          try {
-            const step3 = await wallet.transferCAT721Step3(
-              transferData.current.transferData,
-              transferData.current.revealTx,
-              transferData.current.revealToSignInputs
-            );
-            navigate('TxSuccessScreen', { txid: step3.txid });
-          } catch (e) {
-            // tools.toastError((e as any).message);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            navigate('TxFailScreen', { error: (e as any).message });
-          } finally {
-            tools.showLoading(false);
-          }
-        }}
+        viewOnly={true}
       />
     );
   }
 
+  // Confirmation page with Related Txns
+  if (step === Step.CONFIRM) {
+    const txCount = transferData.current.allPsbtHexs.length;
+
+    return (
+      <Layout>
+        <Header
+          title={t('send_cat721')}
+          onBack={() => {
+            setStep(Step.INPUT);
+          }}
+        />
+        <Content>
+          {/* NFT info */}
+          <Card style={{ backgroundColor: colors.bg4, borderRadius: 10 }}>
+            <Column style={{ alignItems: 'center' }}>
+              <CAT721Preview
+                preset="medium"
+                collectionId={collectionInfo.collectionId}
+                contentType={collectionInfo.contentType}
+                localId={localId}
+              />
+              <Text text={collectionInfo.name} preset="bold" style={{ marginTop: 8 }} />
+              <Text text={`#${localId}`} color="textDim" size="sm" />
+            </Column>
+          </Card>
+
+          {/* Receiver */}
+          <Column mt="lg">
+            <Text text="Receiver:" color="textDim" />
+            <Card style={{ backgroundColor: colors.bg4, borderRadius: 10 }}>
+              <Text text={transferData.current.receiver} wrap style={{ wordBreak: 'break-all' }} />
+            </Card>
+          </Column>
+
+          {/* Network Fee */}
+          <Column mt="lg">
+            <Text text="Network Fee:" color="textDim" />
+            <Card style={{ backgroundColor: colors.bg4, borderRadius: 10 }}>
+              <Row justifyBetween itemsCenter full>
+                <Text text={transferData.current.networkFee} />
+                <Text text="BTC" color="textDim" />
+              </Row>
+            </Card>
+          </Column>
+
+          {/* Related Txns */}
+          <Column mt="lg">
+            <Text text={`Related Txns: (${txCount})`} color="textDim" />
+            <Column gap="sm">
+              {transferData.current.allTxHexs.map((txHex, index) => (
+                <Card
+                  key={index}
+                  style={{ backgroundColor: colors.bg4, borderRadius: 10, cursor: 'pointer' }}
+                  onClick={() => {
+                    setViewingTxIndex(index);
+                    setStep(Step.VIEW_TX_DETAIL);
+                  }}>
+                  <Row justifyBetween itemsCenter full>
+                    <Text text={`(${index + 1}) ${shortAddress(new Transaction(txHex).id, 10)}`} />
+                    <Icon icon="eye" size={16} color="textDim" />
+                  </Row>
+                </Card>
+              ))}
+            </Column>
+          </Column>
+        </Content>
+
+        <Footer>
+          <Row full gap="lg">
+            <Button
+              preset="default"
+              text={t('reject')}
+              onClick={() => {
+                setStep(Step.INPUT);
+              }}
+              full
+            />
+            <Button preset="primary" text={t('sign')} onClick={onSign} full testid={TestIds.SEND.SIGN_AND_PAY_BUTTON} />
+          </Row>
+        </Footer>
+      </Layout>
+    );
+  }
+
+  // Input page
   return (
     <Layout testid={TestIds.CAT721.SEND_SCREEN}>
       <Header

@@ -3,7 +3,7 @@ import { Header } from '@/ui/components';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { usePushBitcoinTxCallback } from '@/ui/state/transactions/hooks';
 import { useLocationState } from '@/ui/utils';
-import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
+import { ExtPsbt } from '@opcat-labs/scrypt-ts-opcat';
 
 import { SignPsbt } from '../Approval/components';
 import { useNavigate } from '../MainRoute';
@@ -35,7 +35,7 @@ export default function TxConfirmScreen() {
           let rawtx = '';
 
           if (res && res.psbtHex) {
-            const psbt = bitcoin.Psbt.fromHex(res.psbtHex);
+            const psbt = ExtPsbt.fromHex(res.psbtHex);
             try {
               psbt.finalizeAllInputs();
             } catch (e) {

@@ -16,11 +16,12 @@ import {
   DecodedPsbt,
   FeeSummary,
   TickPriceItem,
-  UTXO,
   VersionDetail,
-  WalletConfig
+  WalletConfig,
+  UTXO
 } from '@/shared/types';
 import { ToSignInput } from '@opcat-labs/wallet-sdk';
+import {UTXO as SDK_UTXO} from '@opcat-labs/scrypt-ts-opcat'
 
 import { preferenceService } from '.';
 
@@ -32,6 +33,32 @@ interface OpenApiStore {
 enum API_STATUS {
   FAILED = -1,
   SUCCESS = 0
+}
+
+
+type CAT20TokenInfo = {
+  tokenId: string;
+  genesisTxid: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  hasAdmin: boolean;
+  minterScriptHash: string;
+  tokenScriptHash: string;
+  adminScriptHash: string;
+  info: string;
+}
+
+type CAT721TokenInfo = {
+  collectionId: string;
+  name: string;
+  symbol: string;
+  max: string;
+  premine: string;
+  description: string;
+  contentType: string;
+  minterScriptHash: string
+  collectionScriptHash: string
 }
 
 export class OpenApiService {
@@ -393,39 +420,18 @@ export class OpenApiService {
     return this.httpGet(`/v5/cat20/utxo-summary?address=${address}&tokenId=${tokenId}`, {});
   }
 
-  async transferCAT20Step1(address: string, pubkey: string, to: string, tokenId: string, amount: string, feeRate: number) {
-    return this.httpPost('/v5/cat20/transfer-token-step1', {
+  async prepareTransferCAT20(
+    address: string,
+    to: string,
+    tokenId: string,
+    amount: string,
+  ): Promise<{tokenInfo: CAT20TokenInfo, utxos: SDK_UTXO[]}> {
+    return this.httpPost('/v5/cat20/prepare-transfer-token', {
       address,
-      pubkey,
       to,
       tokenId,
       amount,
-      feeRate
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async transferCAT20Step2(transferData: any, signedPsbt: string) {
-    return this.httpPost('/v5/cat20/transfer-token-step2', {
-      transferData,
-      psbt: signedPsbt
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async transferCAT20Step3(transferData: any, signedPsbt: string) {
-    return this.httpPost('/v5/cat20/transfer-token-step3', {
-      transferData,
-      psbt: signedPsbt
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async transferCAT20Step1ByMerge(mergeData: any, batchIndex: number) {
-    return this.httpPost('/v5/cat20/transfer-token-step1-by-merge', {
-      mergeData,
-      batchIndex
-    });
+    })
   }
 
   async mergeCAT20Prepare(address: string, pubkey: string, tokenId: string, utxoCount: number, feeRate: number) {
@@ -450,38 +456,13 @@ export class OpenApiService {
     return this.httpGet(`/v5/cat721/collection-summary?address=${address}&collectionId=${collectionId}`, {});
   }
 
-  async transferCAT721Step1(
+  async prepareTransferCAT721(
     address: string,
-    pubkey: string,
     to: string,
     collectionId: string,
     localId: string,
-    feeRate: number
-  ) {
-    return this.httpPost('/v5/cat721/transfer-nft-step1', {
-      address,
-      pubkey,
-      to,
-      collectionId,
-      localId,
-      feeRate
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async transferCAT721Step2(transferData: any, signedPsbt: string) {
-    return this.httpPost('/v5/cat721/transfer-nft-step2', {
-      transferData,
-      psbt: signedPsbt
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async transferCAT721Step3(transferData: any, signedPsbt: string) {
-    return this.httpPost('/v5/cat721/transfer-nft-step3', {
-      transferData,
-      psbt: signedPsbt
-    });
+  ): Promise<{collectionInfo: CAT721TokenInfo, utxo: SDK_UTXO}> {
+    return this.httpPost('/v5/cat721/prepare-transfer-nft', {address, to, collectionId, localId})
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

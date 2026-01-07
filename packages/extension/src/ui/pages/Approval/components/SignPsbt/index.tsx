@@ -44,7 +44,8 @@ export default function SignPsbt({
   },
   header,
   handleCancel,
-  handleConfirm
+  handleConfirm,
+  viewOnly = false
 }: Props) {
   const [_, resolveApproval, rejectApproval] = useApproval();
   const [txInfo, setTxInfo] = useState<TxInfo>(initTxInfo);
@@ -206,17 +207,19 @@ export default function SignPsbt({
       </Content>
 
       {/* footer buttons */}
-      <Footer>
-        <FooterActions
-          txInfo={txInfo}
-          type={type}
-          isValid={isValid}
-          t={t}
-          handleCancel={actualHandleCancel}
-          handleConfirm={finalHandleConfirm}
-          setIsPsbtRiskPopoverVisible={setIsPsbtRiskPopoverVisible}
-        />
-      </Footer>
+      {!viewOnly && (
+        <Footer>
+          <FooterActions
+            txInfo={txInfo}
+            type={type}
+            isValid={isValid}
+            t={t}
+            handleCancel={actualHandleCancel}
+            handleConfirm={finalHandleConfirm}
+            setIsPsbtRiskPopoverVisible={setIsPsbtRiskPopoverVisible}
+          />
+        </Footer>
+      )}
 
       {/* popup component */}
       {isPsbtRiskPopoverVisible && (
