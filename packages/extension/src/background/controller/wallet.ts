@@ -1601,14 +1601,14 @@ export class WalletController extends BaseController {
           const progress = 30 + Math.floor((currentIndex / totalTransfers) * 50);
           eventBus.emit(EVENTS.broadcastToUI, {
             method: EVENTS.transferCAT20Progress,
-            params: { progress, message: `Building transaction ${currentIndex + 1}/${totalTransfers}...` }
+            params: { progress, message: `Building transaction ${(currentIndex + 1) * 2}/${totalTransfers * 2}...` }
           });
         },
         onTransferEnd({currentIndex, totalTransfers}) {
           const progress = 30 + Math.floor(((currentIndex + 1) / totalTransfers) * 50);
           eventBus.emit(EVENTS.broadcastToUI, {
             method: EVENTS.transferCAT20Progress,
-            params: { progress, message: `Completed transaction ${currentIndex + 1}/${totalTransfers}` }
+            params: { progress, message: `Completed transaction ${(currentIndex + 1) * 2}/${totalTransfers * 2}` }
           });
         },
       }

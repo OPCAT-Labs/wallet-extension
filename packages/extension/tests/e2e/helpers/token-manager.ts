@@ -252,7 +252,7 @@ export async function deployTestNft(): Promise<string> {
 
   // Additional wait for UTXO to be fully confirmed
   console.log('Waiting for UTXO to be fully confirmed (30s)...');
-  await sleep(30000); // 30 seconds
+  await sleep(TIMEOUT_CONFIG.blockConfirmation); // 30 seconds
 
   return result.collectionId
 }

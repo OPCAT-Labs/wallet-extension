@@ -5,7 +5,7 @@ import { test, expect, Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
 import { restoreWallet, closeVersionPopupIfExists } from '../helpers/wallet-utils';
 import { ensureTestNft, findTestNft } from '../helpers/token-manager';
-import { getCAT721List, hasBTCBalance } from '../helpers/api-client';
+import { getCAT721List } from '../helpers/api-client';
 import { TEST_WALLET, TEST_CAT721, TEST_CAT20 } from '../test-constants';
 import { TestIds, clickTestId, waitForTestId } from '../helpers/test-utils';
 
@@ -144,17 +144,8 @@ test.describe('CAT721 NFT Operations', () => {
   let context: BrowserContext;
   let testCollectionId: string;
 
-  test.beforeAll(async () => {
-    // Step 0: Check BTC balance first
-    console.log('Checking BTC balance...');
-    const hasBTC = await hasBTCBalance(TEST_WALLET.address);
-    if (!hasBTC) {
-      console.log('⚠️ No BTC available for test wallet. Please fund the address:');
-      console.log(`   Address: ${TEST_WALLET.address}`);
-      console.log('   Skipping CAT721 test due to insufficient funds.');
-      // We'll still set up but test will be skipped
-    }
-
+  test.beforeAll(async ({ }, testInfo) => {
+    testInfo.setTimeout(180000); // 3 minutes
     // Step 1: Ensure testCat721 NFT is ready
     // This is done BEFORE loading the extension to avoid wallet state conflicts
     console.log('Setting up test NFT...');
@@ -167,6 +158,8 @@ test.describe('CAT721 NFT Operations', () => {
 
     // Step 3: Create page and restore wallet
     page = await context.newPage();
+    console.log('Setting up wallets for transfer tests...');
+    
     await restoreWallet(
       page,
       extensionInfo.extensionUrl,

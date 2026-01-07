@@ -467,7 +467,7 @@
     "message": "Please select a service provider below to buy"
   },
   "disclaimStr": {
-    "message": "Please note that you are about to buy Bitcoin through a third-party platform. Credit card payment services are provided by our partners. UniSat Wallet acts solely as an intermediary platform and assumes no liability for any potential losses or damages that may arise from using the credit card payment service."
+    "message": "Please note that you are about to buy Bitcoin through a third-party platform. Credit card payment services are provided by our partners. Opcat Wallet acts solely as an intermediary platform and assumes no liability for any potential losses or damages that may arise from using the credit card payment service."
   },
   "additional_transaction_fees": {
     "message": "Additional transaction fees apply when purchasing through third-party platforms. Rates vary by country and payment method. Please review each platform's fees before proceeding with transactions."
@@ -841,10 +841,10 @@
     "message": "Malicious behavior and suspicious activity have been detected."
   },
   "your_access_to_this_page_has_been_restricted_by_un": {
-    "message": "Your access to this page has been restricted by UniSat Wallet as it might be unsafe."
+    "message": "Your access to this page has been restricted by Opcat Wallet as it might be unsafe."
   },
   "reject_blocked_by_unisat_wallet": {
-    "message": "Reject (blocked by UniSat Wallet)"
+    "message": "Reject (blocked by Opcat Wallet)"
   },
   "warning": {
     "message": "Warning"
@@ -853,7 +853,7 @@
     "message": "I am aware of the risks"
   },
   "connect_with_unisat_wallet": {
-    "message": "Connect with UniSat Wallet"
+    "message": "Connect with Opcat Wallet"
   },
   "select_the_account_to_use_on_this_site": {
     "message": "Select the account to use on this site"
@@ -1358,7 +1358,7 @@
     "message": "Danger! Potential phishing website detected"
   },
   "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
-    "message": "This website has been identified as malicious by UniSat and may:"
+    "message": "This website has been identified as malicious by Opcat and may:"
   },
   "steal_your_private_keys_or_seed_phrases": {
     "message": "Steal your private keys or seed phrases"
@@ -1514,7 +1514,7 @@
     "message": "Date"
   },
   "view_on_unisat_explorer": {
-    "message": "View on UniSat Explorer"
+    "message": "View on Opcat Explorer"
   },
   "view_on_okx_explorer": {
     "message": "View on OKX Explorer"
@@ -2018,7 +2018,7 @@
     "message": "does not support account removal operations"
   },
   "disclaimStrFb": {
-    "message": "Please note that you are about to buy FB through a third-party platform. Credit card payment services are provided by our partners. UniSat Wallet acts solely as an intermediary platform and assumes no liability for any potential losses or damages that may arise from using the credit card payment service."
+    "message": "Please note that you are about to buy FB through a third-party platform. Credit card payment services are provided by our partners. Opcat Wallet acts solely as an intermediary platform and assumes no liability for any potential losses or damages that may arise from using the credit card payment service."
   },
   "seconds_ago": {
     "message": "sec ago"
@@ -2123,7 +2123,7 @@
     "message": "Open as SideBar"
   },
   "sign_all_transactions_at_once": {
-    "message": "You have the option to sign all transactions at once, but please note that UniSat Wallet will not verify each transaction individually. We strongly recommend using it only on trusted and familiar websites to minimize the risk of potential losses."
+    "message": "You have the option to sign all transactions at once, but please note that Opcat Wallet will not verify each transaction individually. We strongly recommend using it only on trusted and familiar websites to minimize the risk of potential losses."
   },
   "message": {
     "message": "message"

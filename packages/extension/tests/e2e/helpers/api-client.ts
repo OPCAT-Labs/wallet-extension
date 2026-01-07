@@ -139,21 +139,3 @@ export async function findCAT721ByName(
   const { list } = await getCAT721List(address, 1, 100);
   return list.find(collection => collection.name === name);
 }
-
-/**
- * Check if address has BTC balance (UTXOs available)
- * @param address - Wallet address
- * @returns true if has UTXOs, false otherwise
- */
-export async function hasBTCBalance(address: string): Promise<boolean> {
-  try {
-    const response = await fetch(
-      `https://mempool.space/testnet/api/address/${address}/utxo`
-    );
-    if (!response.ok) return false;
-    const utxos = await response.json();
-    return utxos.length > 0;
-  } catch {
-    return false;
-  }
-}

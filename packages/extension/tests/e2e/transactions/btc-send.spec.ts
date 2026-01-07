@@ -125,7 +125,8 @@ test.describe('Transfer BTC', () => {
   let mnemonicWalletAddress: string;
   let privateKeyWalletAddress: string;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ }, testInfo) => {
+    testInfo.setTimeout(180000); // 3 minutes
     // Load extension
     const extension = await loadExtension();
     context = extension.context;

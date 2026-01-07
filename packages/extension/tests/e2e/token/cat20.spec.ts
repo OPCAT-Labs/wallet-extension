@@ -118,7 +118,8 @@ test.describe('CAT20 Token', () => {
   let context: BrowserContext;
   let testTokenId: string;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ }, testInfo) => {
+    testInfo.setTimeout(180000); // 3 minutes
     // Step 1: Clean up tokens and ensure testCat20 is ready
     // This is done BEFORE loading the extension to avoid wallet state conflicts
     console.log('Setting up test token...');
