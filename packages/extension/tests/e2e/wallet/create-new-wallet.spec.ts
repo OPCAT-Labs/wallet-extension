@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import { loadExtension } from '../helpers/extension-loader';
 import { createWallet } from '../helpers/wallet-utils';
 import { log, locateTestId, TestIds } from '../helpers/test-utils';

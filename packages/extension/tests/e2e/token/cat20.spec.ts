@@ -1,7 +1,8 @@
 /**
  * CAT20 Token Transfer Test
  */
-import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
 import { restoreWallet, closeVersionPopupIfExists } from '../helpers/wallet-utils';
 import { ensureTestToken } from '../helpers/token-manager';

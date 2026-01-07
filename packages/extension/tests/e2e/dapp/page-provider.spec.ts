@@ -3,7 +3,8 @@
  *
  * Tests the window.opcat PageProvider API exposed to dApps
  */
-import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
 import { restoreWallet } from '../helpers/wallet-utils';
 import { TEST_WALLET } from '../test-constants';

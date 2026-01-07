@@ -97,3 +97,6 @@ export function generateTestPassword(): string {
 
 // Re-export TestIds for convenience
 export { TestIds };
+
+// Re-export console logging functions from extension-loader
+export { printConsoleErrors } from './extension-loader';

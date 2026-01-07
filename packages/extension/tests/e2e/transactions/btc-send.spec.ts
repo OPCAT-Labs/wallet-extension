@@ -1,4 +1,5 @@
-import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension } from '../helpers/extension-loader';
 import {
   restoreWallet,
