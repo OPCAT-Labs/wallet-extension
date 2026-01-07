@@ -1,4 +1,5 @@
 import { VersionDetail } from '@/shared/types';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Button } from '../Button';
 import { Column } from '../Column';
@@ -22,6 +23,7 @@ export const VersionNotice = ({ notice, onClose }: VersionNoticeProps) => {
 
   return (
     <Popover
+      testid={TestIds.VERSION_NOTICE.POPUP}
       contentStyle={{
         width: 270,
         height: 314,
@@ -105,7 +107,7 @@ export const VersionNotice = ({ notice, onClose }: VersionNoticeProps) => {
         </Column>
       </Column>
       <div style={{ padding: '0 16px 24px 16px', width: '100%' }}>
-        <Button text="Got it" full preset="defaultV2" onClick={onClose} />
+        <Button text="Got it" full preset="defaultV2" onClick={onClose} testid={TestIds.VERSION_NOTICE.GOT_IT_BUTTON} />
       </div>
     </Popover>
   );

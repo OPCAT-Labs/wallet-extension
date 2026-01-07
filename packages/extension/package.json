@@ -1,5 +1,5 @@
 {
-"name": "@opcat-labs/wallet-extension",
+  "name": "@opcat-labs/wallet-extension",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://github.com/OPCAT-Labs/wallet-extension#readme",
@@ -24,7 +24,11 @@
     "_prettier": "prettier --write .",
     "fix:modules": "node scripts/fix-modules.js",
     "format": "prettier --write \"src/**/*.{js,jsx,json,md,ts,tsx}\" --plugin-search-dir=./node_modules/ --plugin=./node_modules/@trivago/prettier-plugin-sort-imports/ ",
-    "prepare": "npm run fix:modules"
+    "prepare": "npm run fix:modules",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug --headed"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -46,6 +50,7 @@
     "@noble/curves": "^1.0.0",
     "@noble/hashes": "^1.7.1",
     "@noble/secp256k1": "1.7.1",
+    "@opcat-labs/cat-sdk": "2.0.2",
     "@opcat-labs/wallet-sdk": "^0.1.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@reduxjs/toolkit": "^1.9.2",
@@ -237,6 +242,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@notionhq/client": "^1.0.4",
+    "@playwright/test": "^1.57.0",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/less": "^3.0.3",
     "@types/lodash": "^4.14.182",
@@ -245,6 +251,7 @@
     "@types/stylus": "^0.48.38",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
+    "allure-playwright": "^2.15.0",
     "autoprefixer": "^10.4.7",
     "babel-plugin-import": "^1.13.5",
     "copy-webpack-plugin": "^13.0.0",
@@ -269,6 +276,7 @@
     "postinstall": "^0.11.0",
     "prettier": "^2.6.2",
     "sass-loader": "^12.6.0",
+    "serve": "^14.2.5",
     "stylus": "^0.57.0",
     "stylus-loader": "^6.2.0",
     "typed-css-modules-loader": "^0.0.18",

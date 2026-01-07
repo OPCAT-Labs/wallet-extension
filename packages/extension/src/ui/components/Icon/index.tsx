@@ -192,6 +192,11 @@ interface IconProps {
    */
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   children?: React.ReactNode;
+
+  /**
+   * Test ID for e2e testing
+   */
+  testid?: string;
 }
 
 export function Icon(props: IconProps) {
@@ -202,12 +207,14 @@ export function Icon(props: IconProps) {
     style: $imageStyleOverride,
     containerStyle: $containerStyleOverride,
     onClick,
-    children
+    children,
+    testid
   } = props;
   if (!icon) {
     return (
       <div
         onClick={onClick}
+        data-testid={testid}
         style={Object.assign(
           {},
           {

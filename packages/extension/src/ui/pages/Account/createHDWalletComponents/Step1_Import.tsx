@@ -162,6 +162,7 @@ export function Step1_Import({
                     autoFocus={index == curInputIndex}
                     preset={'password'}
                     placeholder=""
+                    testid={`import-wallet-mnemonic-word-${index}`}
                   />
                 </Card>
               </Row>
@@ -178,6 +179,7 @@ export function Step1_Import({
           onClick={() => {
             onNext();
           }}
+          testid="import-wallet-continue-button"
         />
       </FooterButtonContainer>
     </Column>

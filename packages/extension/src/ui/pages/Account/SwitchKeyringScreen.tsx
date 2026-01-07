@@ -13,6 +13,7 @@ import { useCurrentKeyring, useKeyrings } from '@/ui/state/keyrings/hooks';
 import { keyringsActions } from '@/ui/state/keyrings/reducer';
 import { colors } from '@/ui/theme/colors';
 import { shortAddress, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { DeleteOutlined, EditOutlined, KeyOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
 
 import { useNavigate } from '../MainRoute';
@@ -46,6 +47,8 @@ export function MyItem({ keyring, autoNav }: MyItemProps) {
     return <div style={{ height: ITEM_HEIGHT }} />;
   }
 
+  const walletItemTestId = TestIds.ACCOUNT_MANAGEMENT.WALLET_ITEM;
+
   const displayAddress = useMemo(() => {
     if (!keyring.accounts[0]) {
       return 'Invalid';
@@ -60,6 +63,7 @@ export function MyItem({ keyring, autoNav }: MyItemProps) {
   return (
     <Card
       justifyBetween
+      testid={walletItemTestId}
       style={{
         height: ITEM_HEIGHT - 8,
         marginTop: 8,
@@ -239,6 +243,7 @@ export default function SwitchKeyringScreen() {
         title={t('switch_wallet')}
         RightComponent={
           <Icon
+            testid={TestIds.ACCOUNT_MANAGEMENT.ADD_WALLET_BUTTON}
             onClick={() => {
               navigate('AddKeyringScreen');
             }}>
@@ -247,18 +252,20 @@ export default function SwitchKeyringScreen() {
         }
       />
       <Content style={{ padding: 5 }}>
-        <VirtualList
-          ref={refList}
-          data={items}
-          data-id="list"
-          height={layoutHeight}
-          itemHeight={ITEM_HEIGHT}
-          itemKey={(item) => item.key}
-          style={{
-            boxSizing: 'border-box'
-          }}>
-          {(item) => <ForwardMyItem keyring={item.keyring} autoNav={true} />}
-        </VirtualList>
+        <div data-testid={TestIds.ACCOUNT_MANAGEMENT.WALLET_LIST}>
+          <VirtualList
+            ref={refList}
+            data={items}
+            data-id="list"
+            height={layoutHeight}
+            itemHeight={ITEM_HEIGHT}
+            itemKey={(item) => item.key}
+            style={{
+              boxSizing: 'border-box'
+            }}>
+            {(item) => <ForwardMyItem keyring={item.keyring} autoNav={true} />}
+          </VirtualList>
+        </div>
       </Content>
     </Layout>
   );

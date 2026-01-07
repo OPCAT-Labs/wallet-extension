@@ -22,3 +22,21 @@ yarn-error.log*
 dist/
 .key.config.js
 .cursor
+
+# E2E test temporary files
+tests/e2e/.auth/
+tests/e2e/.cache/
+tests/e2e/.test-user-data*/
+tests/e2e/test-user-data
+test-results/
+playwright-report/
+tests/e2e/screenshots/
+*.png
+*.jpg
+
+# Playwright
+playwright/.cache/
+.playwright/
+
+# Test artifacts
+*.trace.zip

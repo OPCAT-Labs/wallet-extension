@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import { colors } from '@/ui/theme/colors';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Column } from '../Column';
 import { Row } from '../Row';
@@ -135,6 +136,7 @@ export function TabBar(props: TabBarProps) {
                 key={v.key}
                 style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#322D1F' }}
                 color={isSelected ? 'gold' : 'white_muted'}
+                testid={`${TestIds.ASSET_TAB.CAT_TAB_PREFIX}-${v.key}`}
                 onClick={() => {
                   setTabKey(v.key);
                 }}>

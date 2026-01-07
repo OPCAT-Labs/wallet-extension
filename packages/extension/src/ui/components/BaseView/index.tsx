@@ -37,6 +37,13 @@ export interface BaseViewProps {
   classname?: string;
   overflowX?: boolean;
   overflowY?: boolean;
+  testid?: string;
+  'data-address'?: string;
+  'data-token-symbol'?: string;
+  'data-token-name'?: string;
+  'data-collection-name'?: string;
+  'data-collection-id'?: string;
+  'data-local-id'?: string;
 }
 
 export function BaseView(props: BaseViewProps) {
@@ -71,7 +78,14 @@ export function BaseView(props: BaseViewProps) {
     fixed,
     classname,
     overflowX,
-    overflowY
+    overflowY,
+    testid,
+    'data-address': dataAddress,
+    'data-token-symbol': dataTokenSymbol,
+    'data-token-name': dataTokenName,
+    'data-collection-name': dataCollectionName,
+    'data-collection-id': dataCollectionId,
+    'data-local-id': dataLocalId
   } = props;
   const $baseViewStyle = Object.assign(
     {},
@@ -108,7 +122,17 @@ export function BaseView(props: BaseViewProps) {
   const $classname = [classname].join(' ').trim();
 
   return (
-    <div style={$style} onClick={onClick} className={$classname}>
+    <div
+      style={$style}
+      onClick={onClick}
+      className={$classname}
+      data-testid={testid}
+      data-address={dataAddress}
+      data-token-symbol={dataTokenSymbol}
+      data-token-name={dataTokenName}
+      data-collection-name={dataCollectionName}
+      data-collection-id={dataCollectionId}
+      data-local-id={dataLocalId}>
       {children}
     </div>
   );

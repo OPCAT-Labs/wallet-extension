@@ -16,6 +16,7 @@ import { accountActions } from '@/ui/state/accounts/reducer';
 import { useBTCUnit, useChain } from '@/ui/state/settings/hooks';
 import { uiActions } from '@/ui/state/ui/reducer';
 import { satoshisToAmount } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import styles from './BalanceCard.module.less';
 import { BalanceCardProps } from './interface';
@@ -143,7 +144,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
         </div>
       </div>
 
-      <div className={styles.balanceWrapper}>
+      <div className={styles.balanceWrapper} data-testid={TestIds.WALLET.BALANCE_DISPLAY}>
         <div className={styles.balanceContent}>
           <span className={styles.balanceNumber}>{isBalanceHidden ? '*****' : totalAmount.split('.')[0]}</span>
           {!isBalanceHidden && (

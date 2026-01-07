@@ -16,6 +16,10 @@ export interface ButtonProps {
   text?: string;
   subText?: string;
   /**
+   * Test ID for e2e testing
+   */
+  testid?: string;
+  /**
    * An optional style override useful for padding & margin.
    */
   style?: CSSProperties;
@@ -278,7 +282,8 @@ export function Button(props: ButtonProps) {
     icon,
     iconSize,
     disabled,
-    full
+    full,
+    testid
   } = props;
   const preset: Presets = props.preset || 'default';
   const [hover, setHover] = useState(false);
@@ -300,6 +305,7 @@ export function Button(props: ButtonProps) {
   if (preset === 'bar') {
     return (
       <div
+        data-testid={testid}
         style={$viewStyle}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
@@ -327,6 +333,7 @@ export function Button(props: ButtonProps) {
     const $textStyle = Object.assign({}, $textPresets[preset], { color: 'white' }, $textStyleOverride);
     return (
       <div
+        data-testid={testid}
         style={$viewStyle}
         onClick={disabled ? undefined : onClick}
         onMouseEnter={() => setHover(true)}
@@ -346,6 +353,7 @@ export function Button(props: ButtonProps) {
   if (preset === 'minimal' || preset === 'minimal2') {
     return (
       <div
+        data-testid={testid}
         style={$viewStyle}
         onClick={disabled ? undefined : onClick}
         onMouseEnter={() => setHover(true)}
@@ -357,6 +365,7 @@ export function Button(props: ButtonProps) {
 
   return (
     <div
+      data-testid={testid}
       style={$viewStyle}
       onClick={disabled ? undefined : onClick}
       onMouseEnter={() => setHover(true)}

@@ -18,6 +18,7 @@ import { useUiTxCreateScreen, useUpdateUiTxCreateScreen } from '@/ui/state/ui/ho
 import { colors } from '@/ui/theme/colors';
 import { fontSizes } from '@/ui/theme/font';
 import { amountToSatoshis, isValidAddress, satoshisToAmount } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 export default function TxCreateScreen() {
   const { t } = useI18n();
@@ -158,6 +159,7 @@ export default function TxCreateScreen() {
             }}
             autoFocus={true}
             networkType={chain.enum}
+            testid={TestIds.SEND.RECIPIENT_INPUT}
           />
         </Column>
 
@@ -181,6 +183,7 @@ export default function TxCreateScreen() {
               setAutoAdjust(true);
               setUiState({ inputAmount: availableAmount.toString() });
             }}
+            testid={TestIds.SEND.AMOUNT_INPUT}
           />
 
           <Card
@@ -280,6 +283,7 @@ export default function TxCreateScreen() {
           disabled={disabled}
           preset="primary"
           text={t('next')}
+          testid={TestIds.SEND.NEXT_BUTTON}
           onClick={(_e) => {
             navigate('TxConfirmScreen', { rawTxInfo });
           }}></Button>

@@ -5,7 +5,21 @@
         "packages/*"
     ],
     "scripts": {
-        "postinstall": "npx patch-package"
+        "postinstall": "npx patch-package",
+        "test:e2e": "cd packages/e2e && yarn test",
+        "test:e2e:headed": "cd packages/e2e && yarn test:headed",
+        "test:e2e:ui": "cd packages/e2e && yarn test:ui",
+        "test:e2e:debug": "cd packages/e2e && yarn test:debug",
+        "test:e2e:chrome": "cd packages/e2e && yarn test:chrome",
+        "test:e2e:firefox": "cd packages/e2e && yarn test:firefox",
+        "test:e2e:install": "cd packages/e2e && npx playwright install",
+        "test:e2e:report": "cd packages/e2e && yarn report"
     },
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+    "devDependencies": {
+        "@playwright/test": "^1.57.0"
+    },
+    "dependencies": {
+        "tiny-secp256k1": "^2.2.4"
+    }
 }

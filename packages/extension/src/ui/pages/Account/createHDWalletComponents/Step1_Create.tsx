@@ -9,6 +9,7 @@ import { useI18n } from '@/ui/hooks/useI18n';
 import { ContextData, TabType, UpdateContextDataParams } from '@/ui/pages/Account/createHDWalletComponents/types';
 import { fontSizes } from '@/ui/theme/font';
 import { copyToClipboard, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 export function Step1_Create({
   contextData,
@@ -68,10 +69,10 @@ export function Step1_Create({
       </Row>
 
       <Row justifyCenter>
-        <Grid columns={2}>
+        <Grid columns={2} testid={TestIds.CREATE_WALLET.MNEMONIC_DISPLAY}>
           {words.map((v, index) => {
             return (
-              <Row key={index}>
+              <Row key={index} testid={`${TestIds.CREATE_WALLET.MNEMONIC_WORD}-${index}`}>
                 <Text text={`${index + 1}. `} style={{ width: 40 }} />
                 <Card preset="style2" style={{ width: 200 }}>
                   <Text text={v} selectText disableTranslate />
@@ -83,13 +84,13 @@ export function Step1_Create({
       </Row>
 
       <Row justifyCenter>
-        <Checkbox onChange={onChange} checked={checked} style={{ fontSize: fontSizes.sm }}>
+        <Checkbox onChange={onChange} checked={checked} style={{ fontSize: fontSizes.sm }} data-testid={TestIds.CREATE_WALLET.MNEMONIC_SAVE_CHECKBOX}>
           <Text text={t('i_saved_my_secret_recovery_phrase')} />
         </Checkbox>
       </Row>
 
       <FooterButtonContainer>
-        <Button disabled={!checked} text={t('continue')} preset="primary" onClick={btnClick} />
+        <Button disabled={!checked} text={t('continue')} preset="primary" onClick={btnClick} testid={TestIds.CREATE_WALLET.CONTINUE_BUTTON} />
       </FooterButtonContainer>
     </Column>
   );

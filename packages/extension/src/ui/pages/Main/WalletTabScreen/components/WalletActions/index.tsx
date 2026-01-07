@@ -10,6 +10,7 @@ import { BuyBTCModal } from '@/ui/pages/BuyBTC/BuyBTCModal';
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { useAddressExplorerUrl, useChainType, useWalletConfig } from '@/ui/state/settings/hooks';
 import { useResetUiTxCreateScreen } from '@/ui/state/ui/hooks';
+import { TestIds } from '@/ui/utils/test-ids';
 
 interface WalletActionsProps {
   chain: TypeChain;
@@ -94,6 +95,7 @@ export const WalletActions = ({ chain, address }: WalletActionsProps) => {
             text={t('receive')}
             preset="home"
             icon="receive"
+            testid={TestIds.WALLET.RECEIVE_BUTTON}
             onClick={() => {
               navigate('ReceiveScreen');
             }}
@@ -103,6 +105,7 @@ export const WalletActions = ({ chain, address }: WalletActionsProps) => {
             text={t('send')}
             preset="home"
             icon="send"
+            testid={TestIds.WALLET.SEND_BUTTON}
             onClick={() => {
               resetUiTxCreateScreen();
               navigate('TxCreateScreen');
@@ -134,9 +137,9 @@ export const WalletActions = ({ chain, address }: WalletActionsProps) => {
       ) : (
         <>
           <Row justifyCenter mt="md">
-            <Button text={t('receive')} preset="home" icon="receive" onClick={onReceiveClick} />
+            <Button text={t('receive')} preset="home" icon="receive" testid={TestIds.WALLET.RECEIVE_BUTTON} onClick={onReceiveClick} />
 
-            <Button text={t('send')} preset="home" icon="send" onClick={onSendClick} />
+            <Button text={t('send')} preset="home" icon="send" testid={TestIds.WALLET.SEND_BUTTON} onClick={onSendClick} />
             <Button text={t('history')} preset="home" icon="history" onClick={onHistoryClick} />
             {/* Custom div used to avoid Button component's style merging issues with toggle states */}
             <div

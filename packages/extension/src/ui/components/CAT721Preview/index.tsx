@@ -1,4 +1,5 @@
 import { useCAT721NFTContentBaseUrl } from '@/ui/state/settings/hooks';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Column } from '../Column';
 import Iframe from '../Iframe';
@@ -64,7 +65,7 @@ export default function CAT721Preview({ collectionId, contentType, localId, onCl
 
   const contentBaseUrl = useCAT721NFTContentBaseUrl();
   return (
-    <Column gap="zero" onClick={onClick} style={{}}>
+    <Column gap="zero" onClick={onClick} style={{}} testid={TestIds.CAT721.NFT_ITEM} data-local-id={localId}>
       {contentType && contentType.includes('html') ? (
         <Iframe
           disableSandbox

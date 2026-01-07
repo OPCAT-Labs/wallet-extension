@@ -1,6 +1,7 @@
 const fs = require('fs');
+const path = require('path');
 const fixWindowError = () => {
-  const file = './node_modules/bitcore-lib/lib/crypto/random.js';
+  const file = path.resolve(__dirname, '../../../node_modules/bitcore-lib/lib/crypto/random.js');
   let fileData = fs.readFileSync(file).toString();
   fileData = fileData.replace(
     `Random.getRandomBufferBrowser = function(size) {
@@ -31,15 +32,15 @@ const fixWindowError = () => {
   fs.writeFileSync(file, fileData);
 };
 
-const fixWindowError2 = () => {
-  const file = './node_modules/tiny-secp256k1/lib/rand.browser.js';
-  let fileData = fs.readFileSync(file).toString();
-  fileData = fileData.replace('window.crypto', 'crypto');
-  fs.writeFileSync(file, fileData);
-};
+// const fixWindowError2 = () => {
+//   const file = path.resolve(__dirname, '../../../node_modules/tiny-secp256k1/lib/rand.browser.js');
+//   let fileData = fs.readFileSync(file).toString();
+//   fileData = fileData.replace('window.crypto', 'crypto');
+//   fs.writeFileSync(file, fileData);
+// };
 
 const fixWindowError3 = () => {
-  const file = './node_modules/bitcoinjs-lib/src/payments/p2tr.js';
+  const file = path.resolve(__dirname, '../../../node_modules/bitcoinjs-lib/src/payments/p2tr.js');
   let fileData = fs.readFileSync(file).toString();
   fileData = fileData.replace(
     'signature: types_1.typeforce.maybe(types_1.typeforce.BufferN(64))',
@@ -49,7 +50,7 @@ const fixWindowError3 = () => {
 };
 
 const fixBufferError = () => {
-  const file = './node_modules/bitcore-lib/lib/crypto/signature.js';
+  const file = path.resolve(__dirname, '../../../node_modules/bitcore-lib/lib/crypto/signature.js');
   let fileData = fs.readFileSync(file).toString();
   fileData = fileData.replace(
     `var Signature = function Signature(r, s) {
@@ -88,37 +89,40 @@ const fixBufferError = () => {
 };
 
 const fixWalletSdkError = () => {
-  const file = './node_modules/@opcatlabs/wallet-sdk/lib/bitcoin-core.js';
+  const file = path.resolve(__dirname, '../../../node_modules/@opcat-labs/wallet-sdk/lib/bitcoin-core.js');
   let fileData = fs.readFileSync(file).toString();
   fileData = `"use strict";
-  Object.defineProperty(exports, "__esModule", { value: true });
-  exports.ecc = exports.bitcoin = exports.ECPair = void 0;
-  
-  const bitcoin = require("bitcoinjs-lib");
-  const ecpair = require("ecpair");
-  
-  let eccPromise;
-  try {
-    // Attempt to import tiny-secp256k1
-    eccPromise = import("tiny-secp256k1");
-  } catch (error) {
-    // If import fails, fallback to a synchronous import
-    eccPromise = Promise.resolve(require("tiny-secp256k1"));
-  }
-  
-  eccPromise.then((ecc) => {
-    exports.bitcoin = bitcoin;
-    exports.ecc = ecc;
-    exports.ECPair = ecpair.default(ecc); // use .default if available, otherwise use the module directly
-    bitcoin.initEccLib(ecc);
-  });
-  `;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ecc = exports.bitcoin = exports.ECPair = void 0;
+
+const bitcoin = require("bitcoinjs-lib");
+const ecpair = require("ecpair");
+
+// Export bitcoin synchronously so it's available immediately
+exports.bitcoin = bitcoin;
+
+let eccPromise;
+try {
+  // Attempt to import tiny-secp256k1
+  eccPromise = import("tiny-secp256k1");
+} catch (error) {
+  // If import fails, fallback to a synchronous import
+  eccPromise = Promise.resolve(require("tiny-secp256k1"));
+}
+
+eccPromise.then((ecc) => {
+  const eccModule = ecc.default || ecc;
+  exports.ecc = eccModule;
+  exports.ECPair = ecpair.default ? ecpair.default(eccModule) : ecpair.ECPairFactory(eccModule);
+  bitcoin.initEccLib(eccModule);
+});
+`;
   fs.writeFileSync(file, fileData);
 };
 
 const fixBitcoinjsPsbt = () => {
   try {
-    const file = './node_modules/bitcoinjs-lib/src/psbt.js';
+    const file = path.resolve(__dirname, '../../../node_modules/bitcoinjs-lib/src/psbt.js');
     let fileData = fs.readFileSync(file).toString();
 
     fileData = fileData.replace(
@@ -147,13 +151,13 @@ const run = async () => {
   let success = true;
   try {
     fixWindowError();
-    fixWindowError2();
+    // fixWindowError2();
     fixWindowError3();
     fixBufferError();
     fixWalletSdkError();
     fixBitcoinjsPsbt();
   } catch (e) {
-    console.error('error:', e.message);
+    console.error('error:', e.message, e.stack);
     success = false;
   } finally {
     console.log('Fix modules result: ', success ? 'success' : 'failed');
