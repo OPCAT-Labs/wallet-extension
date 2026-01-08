@@ -9,6 +9,7 @@ const config = {
     maxAssetSize: 2500000
   },
   optimization: {
+    concatenateModules: false,  
     minimizer: [
       new TerserPlugin({
         terserOptions: {
