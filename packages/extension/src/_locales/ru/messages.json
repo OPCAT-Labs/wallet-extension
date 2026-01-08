@@ -868,7 +868,7 @@
     "message": "Задействованные активы:"
   },
   "satvb": {
-    "message": "sat/vB"
+    "message": "sats/byte"
   },
   "rbf": {
     "message": "RBF"
@@ -1210,7 +1210,7 @@
     "message": "Не поддерживается"
   },
   "satsvb": {
-    "message": "sats/vB"
+    "message": "sats/byte"
   },
   "precautions": {
     "message": "Меры предосторожности"
@@ -1663,10 +1663,10 @@
     "message": "Подробнее"
   },
   "address_or_name_fb": {
-    "message": "Адрес или имя (.fb)"
+    "message": "Адрес"
   },
   "address_or_name_sats_unisat_etc": {
-    "message": "Адрес или имя (.sats, .unisat, ...)"
+    "message": "Адрес"
   },
   "does_not_exist": {
     "message": "не существует"

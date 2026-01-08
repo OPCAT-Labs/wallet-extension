@@ -932,7 +932,7 @@
     "message": "涉及资产："
   },
   "satvb": {
-    "message": "sat/vB"
+    "message": "sats/byte"
   },
   "rbf": {
     "message": "RBF"
@@ -1257,7 +1257,7 @@
     "message": "（约 3 分钟）"
   },
   "satsvb": {
-    "message": "sats/vB"
+    "message": "sats/byte"
   },
   "precautions": {
     "message": "注意事项"
@@ -1641,10 +1641,10 @@
     "message": "更多详情"
   },
   "address_or_name_fb": {
-    "message": "地址或域名 (.fb)"
+    "message": "地址"
   },
   "address_or_name_sats_unisat_etc": {
-    "message": "地址或域名 (.sats, .unisat, ...)"
+    "message": "地址"
   },
   "does_not_exist": {
     "message": "不存在"

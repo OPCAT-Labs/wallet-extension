@@ -868,7 +868,7 @@
     "message": "関連アセット:"
   },
   "satvb": {
-    "message": "sat/vB"
+    "message": "sats/byte"
   },
   "rbf": {
     "message": "RBF"
@@ -1210,7 +1210,7 @@
     "message": "サポートされていません"
   },
   "satsvb": {
-    "message": "sats/vB"
+    "message": "sats/byte"
   },
   "precautions": {
     "message": "注意事項"
@@ -1663,10 +1663,10 @@
     "message": "詳細"
   },
   "address_or_name_fb": {
-    "message": "アドレスまたは名前 (.fb)"
+    "message": "アドレス"
   },
   "address_or_name_sats_unisat_etc": {
-    "message": "アドレスまたは名前 (.sats, .unisat, ...)"
+    "message": "アドレス"
   },
   "does_not_exist": {
     "message": "は存在しません"

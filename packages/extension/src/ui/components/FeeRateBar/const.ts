@@ -1,8 +1,7 @@
 enum FeeRateType {
   // SLOW,
   // AVG,
-  FAST,
-  CUSTOM
+  FAST
 }
 
 const translationKeys = {

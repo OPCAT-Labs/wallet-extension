@@ -58,7 +58,7 @@ export default function WelcomeScreen() {
                 }
               }}
             />
-            <Button
+            {/* <Button
               text={t('connect_to_hardware_wallet')}
               preset="default"
               testid={TestIds.WELCOME.CONNECT_HARDWARE_BUTTON}
@@ -73,7 +73,7 @@ export default function WelcomeScreen() {
                   setConnectHardwareModalVisible(false);
                 }}
               />
-            )}
+            )} */}
           </Column>
         </Column>
       </Content>

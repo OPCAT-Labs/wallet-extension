@@ -868,7 +868,7 @@
     "message": "Activos Involucrados:"
   },
   "satvb": {
-    "message": "sat/vB"
+    "message": "sats/byte"
   },
   "rbf": {
     "message": "RBF"
@@ -1211,7 +1211,7 @@
     "message": "No soportado"
   },
   "satsvb": {
-    "message": "sats/vB"
+    "message": "sats/byte"
   },
   "precautions": {
     "message": "Precauciones"
@@ -1664,10 +1664,10 @@
     "message": "Más detalles"
   },
   "address_or_name_fb": {
-    "message": "Dirección o nombre (.fb)"
+    "message": "Dirección"
   },
   "address_or_name_sats_unisat_etc": {
-    "message": "Dirección o nombre (.sats, .unisat, ...)"
+    "message": "Dirección"
   },
   "does_not_exist": {
     "message": "no existe"

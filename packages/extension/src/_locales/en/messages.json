@@ -871,7 +871,7 @@
     "message": "Involved Assets:"
   },
   "satvb": {
-    "message": "sat/vB"
+    "message": "sats/byte"
   },
   "rbf": {
     "message": "RBF"
@@ -1214,7 +1214,7 @@
     "message": "Not supported"
   },
   "satsvb": {
-    "message": "sats/vB"
+    "message": "sats/byte"
   },
   "precautions": {
     "message": "Precautions"
@@ -1667,10 +1667,10 @@
     "message": "More details"
   },
   "address_or_name_fb": {
-    "message": "Address or name (.fb)"
+    "message": "Address"
   },
   "address_or_name_sats_unisat_etc": {
-    "message": "Address or name (.sats, .unisat, ...)"
+    "message": "Address"
   },
   "does_not_exist": {
     "message": "does not exist"
