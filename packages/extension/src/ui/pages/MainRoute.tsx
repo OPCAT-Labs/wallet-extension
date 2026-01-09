@@ -430,7 +430,7 @@ const Main = () => {
   }
 
   return (
-    <HashRouter>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         {Object.keys(routes)
           .map((v) => routes[v])

@@ -5,12 +5,22 @@ import { Message } from '@/shared/utils';
 
 const channelName = nanoid();
 
+
+const chromeRuntimeSendMessage: typeof chrome.runtime.sendMessage = ((...args: any[]) => {
+  // avoid this error: https://stackoverflow.com/questions/53939205/how-to-avoid-extension-context-invalidated-errors-when-messaging-after-an-exte
+  if (!chrome.runtime?.id) {
+    console.log('the extension is reloaded, do not send message', ...args,)
+    return
+  }
+  return (chrome.runtime.sendMessage as any)(...args);
+}) as any;
+
 // Add phishing detection function
 async function checkPhishing() {
   try {
     const hostname = window.location.hostname;
     const isPhishing = await new Promise((resolve) => {
-      chrome.runtime.sendMessage(
+      chromeRuntimeSendMessage(
         {
           type: 'CHECK_PHISHING',
           hostname,
@@ -33,7 +43,7 @@ async function checkPhishing() {
     if (isPhishing) {
       try {
         // Send redirect message
-        chrome.runtime.sendMessage(
+        chromeRuntimeSendMessage(
           {
             type: 'REDIRECT_TO_PHISHING_PAGE',
             hostname
@@ -209,7 +219,7 @@ window.addEventListener(
     if (event.target instanceof HTMLImageElement) {
       const url = event.target.src;
       if (url) {
-        chrome.runtime.sendMessage({
+        chromeRuntimeSendMessage({
           type: 'REPORT_NETWORK_ERROR',
           url,
           error: 'Image load failed',
@@ -219,7 +229,7 @@ window.addEventListener(
     } else if (event.target instanceof HTMLAnchorElement) {
       const url = event.target.href;
       if (url) {
-        chrome.runtime.sendMessage({
+        chromeRuntimeSendMessage({
           type: 'REPORT_NETWORK_ERROR',
           url,
           error: 'Link load failed',
@@ -240,7 +250,7 @@ window.fetch = async function (...args) {
       const requestUrl =
         typeof args[0] === 'string' ? args[0] : args[0] instanceof URL ? args[0].href : (args[0] as Request).url;
 
-      chrome.runtime.sendMessage({
+      chromeRuntimeSendMessage({
         type: 'REPORT_NETWORK_ERROR',
         url: requestUrl,
         error: `HTTP ${response.status}`,
@@ -254,7 +264,7 @@ window.fetch = async function (...args) {
     const requestUrl =
       typeof args[0] === 'string' ? args[0] : args[0] instanceof URL ? args[0].href : (args[0] as Request).url;
 
-    chrome.runtime.sendMessage({
+    chromeRuntimeSendMessage({
       type: 'REPORT_NETWORK_ERROR',
       url: requestUrl,
       error: errorMessage,
@@ -274,7 +284,7 @@ XMLHttpRequest.prototype.open = function (
   password?: string | null
 ) {
   this.addEventListener('error', () => {
-    chrome.runtime.sendMessage({
+    chromeRuntimeSendMessage({
       type: 'REPORT_NETWORK_ERROR',
       url: url.toString(),
       error: 'XHR failed',
@@ -284,7 +294,7 @@ XMLHttpRequest.prototype.open = function (
 
   this.addEventListener('load', () => {
     if (this.status >= 400) {
-      chrome.runtime.sendMessage({
+      chromeRuntimeSendMessage({
         type: 'REPORT_NETWORK_ERROR',
         url: url.toString(),
         error: `HTTP ${this.status}`,
@@ -302,7 +312,7 @@ XMLHttpRequest.prototype.open = function (
 window.addEventListener('beforeunload', async (e) => {
   const url = window.location.href;
   const result = await new Promise((resolve) => {
-    chrome.runtime.sendMessage(
+    chromeRuntimeSendMessage(
       {
         type: 'CHECK_NAVIGATION',
         url
@@ -343,7 +353,7 @@ document.addEventListener(
     if (url) {
       try {
         const result = await new Promise((resolve) => {
-          chrome.runtime.sendMessage(
+          chromeRuntimeSendMessage(
             {
               type: 'CHECK_NAVIGATION',
               url
@@ -362,7 +372,7 @@ document.addEventListener(
           e.preventDefault();
         }
       } catch (e) {
-        console.error('[Navigation Check] Error:', e);
+        console.log('[Navigation Check] Error:', e);
       }
     }
   },

@@ -2162,6 +2162,9 @@
   "no_inputs": {
     "message": "Aucune entrée"
   },
+  "no_outputs": {
+    "message": "Aucune sortie"
+  },
   "scroll_to_top": {
     "message": "↑ Haut"
   },

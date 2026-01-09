@@ -2157,6 +2157,9 @@
   "no_inputs": {
     "message": "Нет входов"
   },
+  "no_outputs": {
+    "message": "Нет выходов"
+  },
   "scroll_to_top": {
     "message": "↑ Вверх"
   },

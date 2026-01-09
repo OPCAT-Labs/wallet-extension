@@ -2161,6 +2161,9 @@
   "no_inputs": {
     "message": "No inputs"
   },
+  "no_outputs": {
+    "message": "No outputs"
+  },
   "scroll_to_top": {
     "message": "↑ Top"
   },

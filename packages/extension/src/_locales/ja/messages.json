@@ -2157,6 +2157,9 @@
   "no_inputs": {
     "message": "入力なし"
   },
+  "no_outputs": {
+    "message": "出力なし"
+  },
   "scroll_to_top": {
     "message": "↑ トップ"
   },

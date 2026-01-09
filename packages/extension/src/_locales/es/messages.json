@@ -2149,6 +2149,9 @@
   "no_inputs": {
     "message": "No hay entradas"
   },
+  "no_outputs": {
+    "message": "No hay salidas"
+  },
   "scroll_to_top": {
     "message": "↑ Arriba"
   },

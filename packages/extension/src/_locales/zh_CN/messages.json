@@ -2135,6 +2135,9 @@
   "no_inputs": {
     "message": "无输入"
   },
+  "no_outputs": {
+    "message": "无输出"
+  },
   "scroll_to_top": {
     "message": "↑ 顶部"
   },
