@@ -1,93 +1,34 @@
-import { CSSProperties, useEffect, useMemo, useState } from 'react';
-import { getSpecialLocale, useI18n } from '@/ui/hooks/useI18n';
+import { CSSProperties, useEffect, useState } from 'react';
 import { colors } from '@/ui/theme/colors';
 import { useWallet } from '@/ui/utils';
 
 import { Column } from '../Column';
-import { Input } from '../Input';
 import { Row } from '../Row';
 import { Text } from '../Text';
-import { FeeRateType, MAX_FEE_RATE, translationKeys } from './const';
+import { FeeRateType } from './const';
 
 export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChange?: (val: number) => void }) {
   const wallet = useWallet();
-  const [feeOptions, setFeeOptions] = useState<{ title: string; desc?: string; feeRate: number }[]>([]);
-  const { t } = useI18n();
-
-  const [isSpecialLocale, setIsSpecialLocale] = useState(false);
-  useEffect(() => {
-    getSpecialLocale().then(({ isSpecialLocale }) => {
-      setIsSpecialLocale(isSpecialLocale);
-    });
-  }, []);
-
-  const fontSize = useMemo(() => (isSpecialLocale ? 'xxxs' : 'xxs'), [isSpecialLocale]);
+  const [feeOptions, setFeeOptions] = useState<{ feeRate: number }[]>([]);
 
   useEffect(() => {
     wallet.getFeeSummary().then((v) => {
-      // Fee rate display rules:
-      // if (Fast = Avg = Slow) -> show Fast time (30s) for all
-      // if (Fast = Avg) -> show Fast time (30s) for both
-      // if (Avg = Slow) -> show Avg time (1.5m) for both
-      const { FAST,} = FeeRateType;
-      const fastRate = v.list[FAST].feeRate;
-      // const slowRate = v.list[SLOW].feeRate;
-
-      const translatedList = v.list.map((option, index) => {
-        const keys = translationKeys[index];
-        if (keys) {
-          const desc = t(keys.desc);
-          return {
-            ...option,
-            title: t(keys.title),
-            desc: desc
-          };
-        }
-        return option;
-      });
-
-      if (readonly) {
-        setFeeOptions(translatedList);
-      } else {
-        setFeeOptions([...translatedList, { title: t('custom'), feeRate: 0 }]);
-      }
+      setFeeOptions(v.list);
     });
   }, []);
 
   const [feeOptionIndex, setFeeOptionIndex] = useState(FeeRateType.FAST);
-  const [feeRateInputVal, setFeeRateInputVal] = useState('');
 
   useEffect(() => {
     const defaultOption = feeOptions[1];
     const defaultVal = defaultOption ? defaultOption.feeRate : 1;
 
     let val = defaultVal;
-    if (feeOptionIndex === FeeRateType.CUSTOM) {
-      val = parseFloat(feeRateInputVal) || 0;
-    } else if (feeOptions.length > 0) {
+    if (feeOptions.length > 0) {
       val = feeOptions[feeOptionIndex].feeRate;
     }
     onChange && onChange(val);
-  }, [feeOptions, feeOptionIndex, feeRateInputVal]);
-
-  const adjustFeeRateInput = (inputVal: string) => {
-    const val = parseFloat(inputVal);
-    if (!val) {
-      setFeeRateInputVal('');
-      return;
-    }
-    const defaultOption = feeOptions[1];
-    const defaultVal = defaultOption ? defaultOption.feeRate : 1;
-    if (val <= 0) {
-      setFeeRateInputVal(defaultVal.toString());
-    } else if (val > MAX_FEE_RATE) {
-      setFeeRateInputVal(MAX_FEE_RATE.toString());
-    } else {
-      setFeeRateInputVal(inputVal);
-    }
-  };
-
-  const isCustomOption = (title: string) => title === t('custom');
+  }, [feeOptions, feeOptionIndex]);
 
   return (
     <Column>
@@ -100,7 +41,7 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
 
           return (
             <div
-              key={v.title}
+              key={index}
               onClick={() => {
                 if (readonly) {
                   return;
@@ -125,49 +66,14 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
                 selected ? { backgroundColor: colors.primary } : {}
               )}>
               <Text
-                text={v.title}
+                text={`${v.feeRate} sats/byte`}
                 textCenter
-                style={{
-                  color: selected ? colors.black : colors.white,
-                  fontSize: isSpecialLocale ? (isCustomOption(v.title) ? '7px' : '12px') : '14px'
-                }}
+                style={{ color: selected ? colors.black : colors.white }}
               />
-              {!isCustomOption(v.title) && (
-                <Text
-                  text={`${v.feeRate} sat/vB`}
-                  size={fontSize}
-                  textCenter
-                  style={{ color: selected ? colors.black : colors.white }}
-                />
-              )}
-              {!isCustomOption(v.title) && (
-                <Text
-                  text={`${v.desc}`}
-                  size={fontSize}
-                  textCenter
-                  style={{ color: selected ? colors.black : colors.white_muted }}
-                />
-              )}
             </div>
           );
         })}
       </Row>
-      {feeOptionIndex === FeeRateType.CUSTOM && (
-        <Input
-          preset="amount"
-          placeholder={'sat/vB'}
-          value={feeRateInputVal}
-          runesDecimal={1}
-          onAmountInputChange={(amount) => {
-            adjustFeeRateInput(amount);
-          }}
-          // onBlur={() => {
-          //   const val = parseInt(feeRateInputVal) + '';
-          //   setFeeRateInputVal(val);
-          // }}
-          autoFocus={true}
-        />
-      )}
     </Column>
   );
 }

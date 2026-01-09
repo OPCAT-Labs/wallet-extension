@@ -1,7 +1,8 @@
 /**
  * CAT20 Token Transfer Test
  */
-import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
 import { restoreWallet, closeVersionPopupIfExists } from '../helpers/wallet-utils';
 import { ensureTestToken } from '../helpers/token-manager';
@@ -86,15 +87,21 @@ async function transferCAT20(
     await nextButton.click();
   });
 
-  await test.step('Sign transaction (step 1/2)', async () => {
+  await test.step('Wait for preparing transactions', async () => {
+    // Wait for preparing progress to complete (up to 2 minutes for complex transfers)
+    // The preparing page shows progress percentage
+    console.log('Waiting for transaction preparation...');
+
+    // Wait for the confirmation page to appear (Sign button becomes visible)
     await page.waitForSelector(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`, {
-      timeout: 60000,
+      timeout: 120000,
     });
-    await page.click(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
+    console.log('Transaction preparation complete, confirmation page loaded');
   });
 
-  await test.step('Sign transaction (step 2/2)', async () => {
-    await waitForTestId(page, TestIds.SEND.SIGN_AND_PAY_BUTTON, 30000);
+  await test.step('Sign and broadcast transactions', async () => {
+    // On the new confirmation page, click the Sign button to broadcast all transactions
+    await page.waitForTimeout(500);
     await page.click(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
   });
 
@@ -112,7 +119,8 @@ test.describe('CAT20 Token', () => {
   let context: BrowserContext;
   let testTokenId: string;
 
-  test.beforeAll(async () => {
+  test.beforeAll(async ({ }, testInfo) => {
+    testInfo.setTimeout(180000); // 3 minutes
     // Step 1: Clean up tokens and ensure testCat20 is ready
     // This is done BEFORE loading the extension to avoid wallet state conflicts
     console.log('Setting up test token...');

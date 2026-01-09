@@ -1,4 +1,4 @@
-import { chromium, BrowserContext } from '@playwright/test';
+import { chromium, BrowserContext, Page, ConsoleMessage } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -8,10 +8,72 @@ export interface ExtensionInfo {
   extensionUrl: string;
 }
 
+// Store console messages for debugging
+const consoleMessages: { type: string; text: string; location: string }[] = [];
+
+/**
+ * Setup console listener on a page to capture all console messages
+ */
+export function setupConsoleListener(page: Page): void {
+  page.on('console', (msg: ConsoleMessage) => {
+    const location = msg.location();
+    const locationStr = location.url ? `${location.url}:${location.lineNumber}` : '';
+    consoleMessages.push({
+      type: msg.type(),
+      text: msg.text(),
+      location: locationStr
+    });
+  });
+
+  page.on('pageerror', (error: Error) => {
+    consoleMessages.push({
+      type: 'pageerror',
+      text: error.message + '\n' + error.stack,
+      location: ''
+    });
+  });
+}
+
+
+/**
+ * Clear captured console messages
+ */
+export function clearConsoleMessages(): void {
+  consoleMessages.length = 0;
+}
+
+/**
+ * Print console errors and warnings (useful for debugging test failures)
+ */
+export function printConsoleErrors(): void {
+  const errors = consoleMessages.filter(m =>
+    m.type === 'error' || m.type === 'pageerror' || m.type === 'warning' ||
+    m.type === 'sw-error' || m.type === 'sw-warning'
+  );
+
+  if (errors.length > 0) {
+    console.log('\n========== Console Errors/Warnings ==========');
+    errors.forEach((msg, index) => {
+      console.log(`[${index + 1}] [${msg.type.toUpperCase()}] ${msg.text}`);
+      if (msg.location) {
+        console.log(`    at ${msg.location}`);
+      }
+    });
+    console.log('==============================================\n');
+  } else {
+    console.log('\n========== Console Errors/Warnings ==========');
+    console.log('no log error')
+    console.log('==============================================\n');
+  }
+}
+
 /**
  * Load Chrome extension and return extension info
  */
 export async function loadExtension(): Promise<ExtensionInfo> {
+  // Clear previous console messages
+  clearConsoleMessages();
+
   // Path to the unpacked extension
   const extensionPath = path.resolve(__dirname, '../../../dist/chrome');
 
@@ -33,22 +95,39 @@ export async function loadExtension(): Promise<ExtensionInfo> {
     ],
   });
 
+  // Helper to setup service worker console listener
+  const setupWorkerListener = (worker: any) => {
+    worker.on('console', (msg: ConsoleMessage) => {
+      const location = msg.location();
+      const locationStr = location.url ? `${location.url}:${location.lineNumber}` : '';
+      consoleMessages.push({
+        type: `sw-${msg.type()}`,
+        text: msg.text(),
+        location: locationStr
+      });
+    });
+  };
+
+  // Listen for new pages and automatically setup console listener
+  context.on('page', (page: Page) => {
+    setupConsoleListener(page);
+  });
+
+  // Listen for new service workers
+  context.on('serviceworker', (worker: any) => {
+    setupWorkerListener(worker);
+  });
+
   // Wait for extension to initialize
   await new Promise(resolve => setTimeout(resolve, 5000));
-
-  // Wait for background script to be ready by checking service worker
-  // console.log('Waiting for background script to initialize...');
 
   // Find extension ID from service workers
   let extensionId: string | undefined;
   const serviceWorkers = context.serviceWorkers();
 
-  // Listen to service worker console
+  // Setup listeners for existing service workers
   for (const worker of serviceWorkers) {
-    // console.log('Service Worker found:', worker.url());
-    worker.on('console', msg => {
-      // console.log(`[Service Worker Log] ${msg.type()}: ${msg.text()}`);
-    });
+    setupWorkerListener(worker);
   }
 
   for (const worker of serviceWorkers) {

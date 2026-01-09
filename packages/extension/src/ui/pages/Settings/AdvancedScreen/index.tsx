@@ -7,7 +7,7 @@ import { useI18n } from '@/ui/hooks/useI18n';
 import { EnableSignDataCard } from './EnableSignData';
 import { LanguageCard } from './Language';
 import { SecurityCard } from './SecurityCard';
-import { UnconfirmedBalanceCard } from './UnconfirmBalance';
+// import { UnconfirmedBalanceCard } from './UnconfirmBalance';
 
 export default function AdvancedScreen() {
   const { t } = useI18n();
@@ -35,7 +35,7 @@ export default function AdvancedScreen() {
 
         <SecurityCard />
 
-        <UnconfirmedBalanceCard />
+        {/* <UnconfirmedBalanceCard /> */}
 
         <EnableSignDataCard />
       </Content>

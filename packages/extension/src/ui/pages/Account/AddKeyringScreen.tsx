@@ -55,7 +55,7 @@ export default function AddKeyringScreen() {
             </Column>
           </Card>
 
-          <Text text={t('connect_to_hardware_wallet')} preset="regular-bold" mt="lg" />
+          {/* <Text text={t('connect_to_hardware_wallet')} preset="regular-bold" mt="lg" />
 
           <Card
             justifyCenter
@@ -69,7 +69,7 @@ export default function AddKeyringScreen() {
             <Column full justifyCenter>
               <Text text={t('keystone_wallet')} size="sm" />
             </Column>
-          </Card>
+          </Card> */}
         </Column>
       </Content>
     </Layout>

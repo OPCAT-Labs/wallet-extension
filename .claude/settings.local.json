@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:chrome:mv3:dev:*)",
+      "Bash(npm run build:chrome:mv3:*)",
       "Bash(npx playwright install chrome)"
     ],
     "deny": [],

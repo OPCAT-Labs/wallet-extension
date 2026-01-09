@@ -142,6 +142,6 @@ exports.build = gulp.series(
   task_merge_manifest,
   task_clean_tmps,
   task_webpack,
-  task_uglify,
+  // task_uglify,
   task_package
 );

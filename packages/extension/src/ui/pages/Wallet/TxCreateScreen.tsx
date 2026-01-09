@@ -268,14 +268,14 @@ export default function TxCreateScreen() {
           />
         </Column>
 
-        <Column mt="lg">
+        {/* <Column mt="lg">
           <RBFBar
             defaultValue={enableRBF}
             onChange={(val) => {
               setUiState({ enableRBF: val });
             }}
           />
-        </Column>
+        </Column> */}
 
         {error && <Text text={error} color="error" />}
 

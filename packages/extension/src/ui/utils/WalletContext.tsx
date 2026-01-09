@@ -26,7 +26,6 @@ import {
   SignPsbtOptions,
   TickPriceItem,
   TxHistoryItem,
-  UserToSignInput,
   UTXO,
   VersionDetail,
   WalletConfig,
@@ -252,34 +251,18 @@ export interface WalletController {
 
   getAddressCAT20UtxoSummary(address: string, tokenId: string): Promise<AddressCAT20UtxoSummary>;
 
-  transferCAT20Step1(
+  transferCAT20(
     to: string,
     tokenId: string,
-    tokenAmount: string,
+    toAmount: string,
     feeRate: number
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
-  transferCAT20Step2(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transferData: any,
-    commitTx: string,
-    toSignInputs: UserToSignInput[]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[], transferData: any }>;
-  transferCAT20Step3(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transferData: any,
-    revealTx: string,
-    toSignInputs: UserToSignInput[],
-  ): Promise<{ txid: string }>;
+  ): Promise<{
+    networkFee: number;
+    allPsbtHexs: string[];
+    allTxHexs: string[];
+  }>;
 
   mergeCAT20Prepare(tokenId: string, utxoCount: number, feeRate: number): Promise<CAT20MergeOrder>;
-  transferCAT20Step1ByMerge(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mergeData: any,
-    batchIndex: number,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
 
   getAppList(): Promise<{ tab: string; items: AppInfo[] }[]>;
   getBannerList(): Promise<{ id: string; img: string; link: string }[]>;
@@ -293,26 +276,18 @@ export interface WalletController {
 
   getAddressCAT721CollectionSummary(address: string, collectionId: string): Promise<AddressCAT721CollectionSummary>;
 
-  transferCAT721Step1(
+  transferCAT721(
     to: string,
     collectionId: string,
     localId: string,
     feeRate: number
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ id: string; commitTx: string; toSignInputs: UserToSignInput[]; feeRate: number, transferData: any }>;
-  transferCAT721Step2(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transferData: any, 
-    commitTx: string,
-    toSignInputs: UserToSignInput[]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ revealTx: string; toSignInputs: UserToSignInput[], transferData: any }>;
-  transferCAT721Step3(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transferData: any, 
-    revealTx: string, 
-    toSignInputs: UserToSignInput[]
-  ): Promise<{ txid: string }>;
+  ): Promise<{
+    networkFee: number;
+    guardPsbtHex: string;
+    sendPsbtHex: string;
+    guardTxHex: string;
+    sendTxHex: string;
+  }>;
 
   getBuyCoinChannelList(coin: string): Promise<BtcChannelItem[]>;
   createBuyCoinPaymentUrl(coin: string, address: string, channel: string): Promise<string>;

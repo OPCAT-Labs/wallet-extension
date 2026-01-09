@@ -1,11 +1,12 @@
 /**
  * CAT721 NFT Transfer Test
  */
-import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
 import { restoreWallet, closeVersionPopupIfExists } from '../helpers/wallet-utils';
 import { ensureTestNft, findTestNft } from '../helpers/token-manager';
-import { getCAT721List, hasBTCBalance } from '../helpers/api-client';
+import { getCAT721List } from '../helpers/api-client';
 import { TEST_WALLET, TEST_CAT721, TEST_CAT20 } from '../test-constants';
 import { TestIds, clickTestId, waitForTestId } from '../helpers/test-utils';
 
@@ -100,25 +101,19 @@ async function transferCAT721(
   await nextButton.click();
   console.log('Step 3: ✓ Next button clicked');
 
-  // Step 4: Wait for signing step 1/2 and confirm
-  console.log('Step 4: Waiting for sign step 1/2...');
+  // Step 4: Wait for preparing transactions to complete
+  console.log('Step 4: Waiting for transaction preparation...');
+  // Wait for the confirmation page to appear (Sign button becomes visible)
   await page.waitForSelector(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`, {
-    timeout: 60000,
+    timeout: 120000,
   });
-  console.log('Step 4: Sign button visible, clicking...');
-  await page.waitForTimeout(500);
-  await clickTestId(page, TestIds.SEND.SIGN_AND_PAY_BUTTON);
-  console.log('Step 4: ✓ Sign step 1/2 completed');
+  console.log('Step 4: ✓ Transaction preparation complete, confirmation page loaded');
 
-  // Step 5: Wait for step 2/2 - need to wait for page transition
-  console.log('Step 5: Waiting for sign step 2/2...');
-  await page.waitForTimeout(2000);
-  await waitForTestId(page, TestIds.SEND.SIGN_AND_PAY_BUTTON, 30000);
-  console.log('Step 5: Sign button visible, clicking...');
+  // Step 5: Sign and broadcast transactions
+  console.log('Step 5: Signing and broadcasting transactions...');
   await page.waitForTimeout(500);
   await page.click(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
-  console.log('Step 5: ✓ Sign step 2/2 completed');
-
+  console.log('Step 5: ✓ Sign button clicked');
 
   // Step 6: Wait for either success page or failure
   console.log('Step 6: Waiting for transaction result...');
@@ -150,17 +145,8 @@ test.describe('CAT721 NFT Operations', () => {
   let context: BrowserContext;
   let testCollectionId: string;
 
-  test.beforeAll(async () => {
-    // Step 0: Check BTC balance first
-    console.log('Checking BTC balance...');
-    const hasBTC = await hasBTCBalance(TEST_WALLET.address);
-    if (!hasBTC) {
-      console.log('⚠️ No BTC available for test wallet. Please fund the address:');
-      console.log(`   Address: ${TEST_WALLET.address}`);
-      console.log('   Skipping CAT721 test due to insufficient funds.');
-      // We'll still set up but test will be skipped
-    }
-
+  test.beforeAll(async ({ }, testInfo) => {
+    testInfo.setTimeout(180000); // 3 minutes
     // Step 1: Ensure testCat721 NFT is ready
     // This is done BEFORE loading the extension to avoid wallet state conflicts
     console.log('Setting up test NFT...');
@@ -173,6 +159,8 @@ test.describe('CAT721 NFT Operations', () => {
 
     // Step 3: Create page and restore wallet
     page = await context.newPage();
+    console.log('Setting up wallets for transfer tests...');
+    
     await restoreWallet(
       page,
       extensionInfo.extensionUrl,

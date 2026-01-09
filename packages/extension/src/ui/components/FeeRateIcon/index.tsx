@@ -107,7 +107,7 @@ function FeeOptionsPopover({ feeOptions, onClose }: { feeOptions: FeeOption[]; o
 
               <Row>
                 <Text color={'white'} size="sm" text={feeOptions[0].feeRate}></Text>
-                <Text color={'textDim'} size="sm" text="sats/vB"></Text>
+                <Text color={'textDim'} size="sm" text="sats/byte"></Text>
               </Row>
             </Row>
           </Card>

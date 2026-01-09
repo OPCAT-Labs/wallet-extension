@@ -66,7 +66,7 @@ export const ConnectHardwareModal = ({ onClose }: { onClose: () => void }) => {
             text={t('hardware_wallet_feature_is_experimental_use_it_with_caution_as_potential_issues_may_arise')}
           />
 
-          <WalletItem
+          {/* <WalletItem
             walletType={HardwareWalletType.Keystone}
             onClick={async () => {
               const isBooted = await wallet.isBooted();
@@ -84,7 +84,7 @@ export const ConnectHardwareModal = ({ onClose }: { onClose: () => void }) => {
                 navigate('CreatePasswordScreen', { isKeystone: true });
               }
             }}
-          />
+          /> */}
 
           <WalletItem walletType={HardwareWalletType.Ledger} disabled />
           <WalletItem walletType={HardwareWalletType.Trezor} disabled />

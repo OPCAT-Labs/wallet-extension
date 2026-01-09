@@ -165,7 +165,7 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
     label: 'OPCAT Layer Mainnet',
     iconLabel: 'OPCAT',
     icon: './images/artifacts/opcat-mainnet.svg',
-    unit: 'cBTC',
+    unit: 'BTC',
     networkType: NetworkType.MAINNET,
     endpoints: [],
     mempoolSpaceUrl: '',
@@ -183,10 +183,10 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
     label: 'OPCAT Layer Testnet',
     iconLabel: 'OPCAT',
     icon: './images/artifacts/opcat-testnet.svg',
-    unit: 'tcBTC',
+    unit: 'tBTC',
     networkType: NetworkType.TESTNET,
     endpoints: ['https://wallet-api-testnet.opcatlabs.io'],
-    // endpoints: ['http://localhost:3000'],
+    // endpoints: ['http://127.0.0.1:3000'],
     mempoolSpaceUrl: 'https://testnet.opcatlabs.io',
     unisatUrl: '',
     unisatExplorerUrl: '',
@@ -250,7 +250,9 @@ export const EVENTS = {
     STATUS_CHANGED: 'WALLETCONNECT_STATUS_CHANGED',
     INIT: 'WALLETCONNECT_INIT',
     INITED: 'WALLETCONNECT_INITED'
-  }
+  },
+  transferCAT20Progress: 'transferCAT20Progress',
+  transferCAT721Progress: 'transferCAT721Progress'
 };
 
 export const SORT_WEIGHT = {
