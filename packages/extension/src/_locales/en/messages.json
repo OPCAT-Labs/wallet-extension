@@ -1250,7 +1250,7 @@
     "message": "Advanced"
   },
   "advanced_settings": {
-    "message": "Language, Security & Permissions Settings"
+    "message": "Theme, Language, Security & Permissions Settings"
   },
   "automatic_lock_time": {
     "message": "Automatic Lock Time"
@@ -1842,6 +1842,15 @@
   },
   "language_description": {
     "message": "Change the language of the application"
+  },
+  "theme": {
+    "message": "Theme"
+  },
+  "theme_light": {
+    "message": "Light"
+  },
+  "theme_dark": {
+    "message": "Dark"
   },
   "more": {
     "message": "More"

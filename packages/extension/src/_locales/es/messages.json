@@ -1247,7 +1247,7 @@
     "message": "Avanzado"
   },
   "advanced_settings": {
-    "message": "Configuración de Idioma, Seguridad y Permisos"
+    "message": "Configuración de Tema, Idioma, Seguridad y Permisos"
   },
   "automatic_lock_time": {
     "message": "Tiempo de Bloqueo Automático"
@@ -1839,6 +1839,15 @@
   },
   "language_description": {
     "message": "Cambiar el idioma de la aplicación"
+  },
+  "theme": {
+    "message": "Tema"
+  },
+  "theme_light": {
+    "message": "Claro"
+  },
+  "theme_dark": {
+    "message": "Oscuro"
   },
   "more": {
     "message": "Más"

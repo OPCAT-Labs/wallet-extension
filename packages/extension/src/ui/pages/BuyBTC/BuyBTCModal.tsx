@@ -39,7 +39,7 @@ function PaymentItem({ channel, onClick }: { channel: BtcChannelItem; onClick: (
   const channelInfo = PAYMENT_CHANNELS[channel.channel];
   if (!channelInfo) return <></>;
   return (
-    <Card style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10 }} mt="lg" onClick={onClick}>
+    <Card style={{ backgroundColor: 'rgba(var(--color-background-rgb),0.06)', borderRadius: 10 }} mt="lg" onClick={onClick}>
       <Column fullX gap={'md'}>
         <Row fullX justifyBetween>
           <Row itemsCenter>

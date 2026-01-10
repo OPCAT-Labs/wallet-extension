@@ -300,7 +300,7 @@ export default function SendCAT721Screen() {
         title={t('send_cat721')}
       />
       <Content>
-        <Text text={collectionInfo.name} preset="title-bold" textCenter size="xxl" color="gold" />
+        <Text text={collectionInfo.name} preset="title-bold" textCenter size="xxl" color="primary" />
 
         <Row justifyCenter>
           <CAT721Preview

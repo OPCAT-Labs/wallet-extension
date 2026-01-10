@@ -16,7 +16,7 @@ export interface LoadingProps {
 const $baseViewStyle: CSSProperties = {
   width: '100vw',
   height: '100vh',
-  backgroundColor: 'rgba(0,0,0,0.8)',
+  backgroundColor: 'rgba(var(--color-background-rgb), 0.8)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -32,10 +32,10 @@ export function Loading(props: LoadingProps) {
         <LoadingOutlined
           style={{
             fontSize: fontSizes.icon,
-            color: colors.orange
+            color: colors.primary,
           }}
         />
-        {text && <Text text={text} preset="title" color="orange" />}
+        {text && <Text text={text} preset="title" color="primary" />}
       </div>
     </div>
   );

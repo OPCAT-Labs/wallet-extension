@@ -23,7 +23,7 @@ interface HeaderProps {
 
 function HeaderContainer(props: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'block', backgroundColor: '#070606' }}>
+    <div style={{ display: 'block', backgroundColor: 'var(--color-background)' }}>
       <img
         src={'./images/artifacts/top-linear-gradient.png'}
         alt=""

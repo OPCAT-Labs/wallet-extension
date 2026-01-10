@@ -21,8 +21,8 @@ function CardComponent(props: { children: React.ReactNode; onClick?: () => void 
   return (
     <Row
       style={{
-        backgroundColor: '#141414',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'var(--color-card)',
+        borderColor: 'rgba(var(--color-background-rgb),0.1)',
         borderWidth: 1,
         width: 158,
         height: 158,
@@ -104,7 +104,7 @@ export function CAT721CollectionCard(props: CAT721CollectionCardProps) {
                     height: 68,
                     borderRadius: 8,
                     margin: 4,
-                    backgroundColor: '#201F1F'
+                    backgroundColor: 'var(--color-bg-tertiary)'
                   }}
                 />
               );

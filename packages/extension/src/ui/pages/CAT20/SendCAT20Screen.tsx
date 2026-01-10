@@ -356,7 +356,7 @@ export default function SendCAT20Screen() {
         title={t('send_cat20')}
       />
       <Content>
-        <Text text={cat20Info.name} preset="title-bold" textCenter size="xxl" color="gold" />
+        <Text text={cat20Info.name} preset="title-bold" textCenter size="xxl" color="text" />
         <Row itemsCenter fullX justifyCenter>
           <Text
             text={`${runesUtils.toDecimalAmount(cat20Balance.amount, cat20Balance.decimals)}`}
@@ -422,7 +422,7 @@ export default function SendCAT20Screen() {
           />
 
           {shouldShowMerge && (
-            <Column style={{ borderWidth: 1, borderRadius: 10, borderColor: 'rgba(255,255,255,0.3)' }}>
+            <Column style={{ borderWidth: 1, borderRadius: 10, borderColor: 'rgba(var(--color-background-rgb),0.2)' }}>
               <Column mx="md" my="md">
                 <Text
                   text={t('to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance')}
@@ -433,7 +433,7 @@ export default function SendCAT20Screen() {
                 <Text
                   text={t('merge_utxos_to_increase_the_available_balance')}
                   size="xs"
-                  color="gold"
+                  color="primary"
                   onClick={() => {
                     navigate('MergeCAT20Screen', {
                       cat20Balance: cat20Balance,

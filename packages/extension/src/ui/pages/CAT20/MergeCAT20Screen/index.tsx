@@ -369,7 +369,7 @@ export default function MergeCAT20Screen() {
                 <Text text={maxUtxoCount} preset="sub" />
               </Row>
 
-              <Divider style={{ borderColor: '#FFFFFF26', borderWidth: 1 }} dashed></Divider>
+              <Divider style={{ borderColor: 'rgba(var(--color-background-rgb), 0.15)', borderWidth: 1 }} dashed></Divider>
 
               <Row justifyBetween>
                 <Text text={`${t('selected')} ${cat20Balance.symbol}`} color="textDim" size="sm" />

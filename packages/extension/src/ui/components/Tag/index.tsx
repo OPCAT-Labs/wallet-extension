@@ -19,14 +19,14 @@ export default function Tag(props: AssetTagProps) {
 
   if (type === 'bool-bridge') {
     return (
-      <Row style={{ padding: '2px 4px', borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
-        <Text text={'Bool Bridge'} size={small ? 'xxs' : 'xs'} style={{ color: '#ddd' }} />
+      <Row style={{ padding: '2px 4px', borderRadius: 4, backgroundColor: 'rgba(var(--color-background-rgb),0.08)' }}>
+        <Text text={'Bool Bridge'} size={small ? 'xxs' : 'xs'} style={{ color: '#666' }} />
       </Row>
     );
   } else if (type === 'simple-bridge') {
     return (
-      <Row style={{ padding: '2px 4px', borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
-        <Text text={'Simple Bridge'} size={small ? 'xxs' : 'xs'} style={{ color: '#ddd' }} />
+      <Row style={{ padding: '2px 4px', borderRadius: 4, backgroundColor: 'rgba(var(--color-background-rgb),0.08)' }}>
+        <Text text={'Simple Bridge'} size={small ? 'xxs' : 'xs'} style={{ color: '#666' }} />
       </Row>
     );
   }

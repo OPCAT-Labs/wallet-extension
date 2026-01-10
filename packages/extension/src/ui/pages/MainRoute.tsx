@@ -48,6 +48,7 @@ import EditWalletNameScreen from './Settings/EditWalletNameScreen';
 import ExportMnemonicsScreen from './Settings/ExportMnemonicsScreen';
 import ExportPrivateKeyScreen from './Settings/ExportPrivateKeyScreen';
 import LanguageScreen from './Settings/LanguageScreen';
+import ThemeScreen from './Settings/ThemeScreen';
 import NetworkTypeScreen from './Settings/NetworkTypeScreen';
 import UpgradeNoticeScreen from './Settings/UpgradeNoticeScreen';
 import TestScreen from './Test/TestScreen';
@@ -150,6 +151,10 @@ export const routes = {
   LanguageScreen: {
     path: '/settings/language',
     element: <LanguageScreen />
+  },
+  ThemeScreen: {
+    path: '/settings/theme',
+    element: <ThemeScreen />
   },
   LockTimePage: {
     path: '/settings/lock-time',

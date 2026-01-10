@@ -1246,7 +1246,7 @@
     "message": "Расширенные"
   },
   "advanced_settings": {
-    "message": "Настройки языка, безопасности и разрешений"
+    "message": "Настройки темы, языка, безопасности и разрешений"
   },
   "automatic_lock_time": {
     "message": "Время автоматической блокировки"
@@ -1838,6 +1838,15 @@
   },
   "language_description": {
     "message": "Изменить язык приложения"
+  },
+  "theme": {
+    "message": "Тема"
+  },
+  "theme_light": {
+    "message": "Светлая"
+  },
+  "theme_dark": {
+    "message": "Тёмная"
   },
   "more": {
     "message": "Ещё"

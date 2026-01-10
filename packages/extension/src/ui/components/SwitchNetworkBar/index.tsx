@@ -18,7 +18,7 @@ export function SwitchNetworkBar() {
     <Card
       preset="style2"
       style={{
-        backgroundColor: 'rgba(255,255,255,0.12)',
+        backgroundColor: 'rgba(var(--color-background-rgb),0.08)',
         height: 28,
         borderRadius: 8,
         padding: '2px 4px',

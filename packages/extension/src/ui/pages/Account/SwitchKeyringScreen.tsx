@@ -89,7 +89,7 @@ export function MyItem({ keyring, autoNav }: MyItemProps) {
           if (autoNav) navigate('MainScreen');
         }}>
         <Column style={{ width: 20 }} selfItemsCenter>
-          {selected ? <Icon icon="circle-check" color="gold" /> : <Icon icon="circle-check" color="white_muted2" />}
+          {selected ? <Icon icon="circle-check" color="primary" /> : <Icon icon="circle-check" color="white_muted2" />}
         </Column>
 
         <Column justifyCenter style={{ height: 40 }}>

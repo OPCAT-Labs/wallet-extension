@@ -96,7 +96,7 @@ export default function SignTxDetails({
               pt="md"
               pb="md"
               style={{
-                backgroundColor: '#1e1a1e',
+                backgroundColor: 'rgba(var(--color-background-rgb), 0.04)',
                 borderRadius: 10,
                 borderWidth: 1,
                 borderColor: colors.border
@@ -123,7 +123,7 @@ export default function SignTxDetails({
           <Text text={t('sign_transaction')} preset="title-bold" textCenter />
         </Row>
         <Row justifyCenter fullX>
-          <Card style={{ backgroundColor: '#272626', flex: '1' }}>
+          <Card style={{ backgroundColor: 'rgba(0, 0, 0, 0.04)', flex: '1' }}>
             <Column fullX itemsCenter>
               <Row itemsCenter>
                 <Image src={chain.icon} size={24} />
@@ -137,7 +137,7 @@ export default function SignTxDetails({
                 <Row itemsCenter>
                   <Text
                     text={(receivingSatoshis > sendingSatoshis ? '+' : '') + balanceChangedAmount}
-                    color={receivingSatoshis > sendingSatoshis ? 'white' : 'white'}
+                    color={receivingSatoshis > sendingSatoshis ? 'text' : 'text'}
                     preset="bold"
                     textCenter
                     size="xxl"
@@ -164,7 +164,7 @@ export default function SignTxDetails({
         <Text text={t('sign_transaction')} preset="title-bold" textCenter />
       </Row>
       <Row justifyCenter>
-        <Card style={{ backgroundColor: '#272626', flex: '1' }}>
+        <Card style={{ backgroundColor: 'rgba(0, 0, 0, 0.04)', flex: '1' }}>
           <Column fullX itemsCenter>
             <Row itemsCenter justifyCenter>
               <Image src={chain.icon} size={24} />
@@ -193,7 +193,7 @@ export default function SignTxDetails({
 
               <Column justifyCenter>
                 <Row itemsCenter>
-                  <Text text={spendAmount + ' ' + btcUnit} color="white" preset="bold" textCenter size="xxl" />
+                  <Text text={spendAmount + ' ' + btcUnit} color="text" preset="bold" textCenter size="xxl" />
                 </Row>
                 <BtcUsd sats={spendSatoshis} textCenter bracket style={{ marginTop: -8 }} />
                 {isCurrentToPayFee && (

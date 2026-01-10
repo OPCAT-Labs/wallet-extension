@@ -80,7 +80,7 @@ function MyItem({ group, index, onItemClick }: MyItemProps) {
       <Text
         text={group.date}
         color="textDim"
-        style={{ position: 'sticky', top: 0, backgroundColor: '#070606', marginLeft: 16 }}
+        style={{ position: 'sticky', top: 0, backgroundColor: 'var(--color-background)', marginLeft: 16 }}
         py={'md'}
       />
       <Column gap={'zero'}>
@@ -93,7 +93,7 @@ function MyItem({ group, index, onItemClick }: MyItemProps) {
               full
               key={`item_${index}`}
               style={{
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
+                borderBottom: '1px solid rgba(var(--color-background-rgb),0.1)',
                 padding: '12px 16px'
                 // marginTop:
               }}

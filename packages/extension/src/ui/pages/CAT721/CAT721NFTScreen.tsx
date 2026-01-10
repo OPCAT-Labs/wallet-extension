@@ -30,7 +30,7 @@ export default function CAT721NFTScreen() {
         }}>
         <Row>
           <Text text={`${collectionInfo.name} `} />
-          <Text text={`#${localId}`} color="gold" />
+          <Text text={`#${localId}`} color="primary" />
         </Row>
       </Header>
       <Content>

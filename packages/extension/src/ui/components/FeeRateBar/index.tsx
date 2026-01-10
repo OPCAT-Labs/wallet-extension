@@ -52,7 +52,7 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
                 {},
                 {
                   borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.3)',
+                  borderColor: 'rgba(var(--color-text-rgb),0.4)',
                   height: 75,
                   width: 75,
                   textAlign: 'center',
@@ -63,12 +63,12 @@ export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChang
                   justifyContent: 'center',
                   cursor: 'pointer'
                 } as CSSProperties,
-                selected ? { backgroundColor: colors.primary } : {}
+                selected ? { backgroundColor: colors.background } : {}
               )}>
               <Text
                 text={`${v.feeRate} sats/byte`}
                 textCenter
-                style={{ color: selected ? colors.black : colors.white }}
+                style={{ color: selected ? colors.text : colors.textDim }}
               />
             </div>
           );

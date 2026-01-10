@@ -154,7 +154,7 @@ export function SettingsList() {
             : groupBottom
             ? '0 0 12px 12px'
             : '0',
-        background: 'rgba(255, 255, 255, 0.06)',
+        background: 'rgba(var(--color-background-rgb), 0.04)',
         padding: '0 16px',
         margin: 0
       }}>
@@ -163,7 +163,7 @@ export function SettingsList() {
           <Icon icon={item.icon} size={fontSizes.logo} color="textDim" />
           <Column style={{ gap: spacing.tiny, minWidth: 0, flex: 1, marginLeft: spacing.tiny }}>
             <Row justifyBetween>
-              <Text text={item.label || item.desc} preset="regular" size="sm" style={{ color: 'white' }} />
+              <Text text={item.label || item.desc} preset="regular" size="sm" />
               {item.badge && (
                 <Text
                   text={item.badge}
@@ -185,7 +185,7 @@ export function SettingsList() {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  backgroundColor: connected ? '#4CD9AC' : 'rgba(255, 255, 255, 0.3)'
+                  backgroundColor: connected ? '#4CD9AC' : 'rgba(var(--color-background-rgb), 0.2)'
                 }}
               />
               <Text text={connected ? t('connected') : t('not_connected')} preset="sub" size="xs" />
@@ -201,7 +201,7 @@ export function SettingsList() {
     <div
       style={{
         height: '1px',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgba(var(--color-background-rgb), 0.08)',
         margin: '0'
       }}
     />
@@ -246,11 +246,11 @@ export function SettingsList() {
             key={item.action}
             style={{
               height: 50,
-              backgroundColor: 'rgba(20, 20, 20, 0.8)',
+              backgroundColor: 'rgba(var(--color-background-rgb), 0.06)',
               width: '328px',
               margin: '0 auto',
               borderRadius: 8,
-              border: '1px solid rgba(255, 255, 255, 0.45)'
+              border: '1px solid rgba(var(--color-background-rgb), 0.15)'
             }}
             text={item.desc}
             onClick={() => onClick(item)}

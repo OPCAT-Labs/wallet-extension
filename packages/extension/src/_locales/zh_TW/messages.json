@@ -1250,7 +1250,7 @@
     "message": "進階"
   },
   "advanced_settings": {
-    "message": "語言、安全性與權限設定"
+    "message": "主題、語言、安全性與權限設定"
   },
   "automatic_lock_time": {
     "message": "自動鎖定時間"
@@ -1839,6 +1839,15 @@
   },
   "language_description": {
     "message": "更改應用程式語言"
+  },
+  "theme": {
+    "message": "主題"
+  },
+  "theme_light": {
+    "message": "淺色"
+  },
+  "theme_dark": {
+    "message": "深色"
   },
   "no_inscriptions_found": {
     "message": "找不到銘文"

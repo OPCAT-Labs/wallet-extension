@@ -1476,7 +1476,7 @@
     "message": "网络"
   },
   "advanced_settings": {
-    "message": "语言、安全、权限设置"
+    "message": "主题、语言、安全、权限设置"
   },
   "invalid_transaction_data": {
     "message": "无效的交易数据"
@@ -1819,6 +1819,15 @@
   },
   "language_description": {
     "message": "更改应用程序语言"
+  },
+  "theme": {
+    "message": "主题"
+  },
+  "theme_light": {
+    "message": "浅色"
+  },
+  "theme_dark": {
+    "message": "深色"
   },
   "more": {
     "message": "更多"

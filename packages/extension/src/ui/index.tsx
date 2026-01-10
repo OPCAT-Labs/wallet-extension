@@ -9,9 +9,13 @@ import browser from '@/background/webapi/browser';
 import { EVENTS } from '@/shared/constant';
 import eventBus from '@/shared/eventBus';
 import { Message } from '@/shared/utils';
+import { applyTheme, getStoredTheme } from '@/ui/utils/theme';
 import { PriceProvider } from '@/ui/provider/PriceProvider';
 import AccountUpdater from '@/ui/state/accounts/updater';
 import '@/ui/styles/global.less';
+
+// Apply stored theme on startup
+applyTheme(getStoredTheme());
 
 import { I18nProvider } from './app/contexts/I18nContext';
 import { ActionComponentProvider } from './components/ActionComponent';

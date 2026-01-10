@@ -61,7 +61,7 @@ function SortableContactItem({ contact, index }: { contact: ContactBookItem; ind
       <Card
         mt="md"
         style={{
-          backgroundColor: '#1A1A1A',
+          backgroundColor: 'rgba(0, 0, 0, 0.04)',
           borderRadius: 12,
           padding: '12px 16px',
           userSelect: 'none',
@@ -139,7 +139,7 @@ function SortableContactItem({ contact, index }: { contact: ContactBookItem; ind
                 alignItems: 'center',
                 justifyContent: 'center',
                 touchAction: 'none',
-                backgroundColor: isDragging ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.06)' : 'transparent',
                 borderRadius: '4px'
               }}>
               <Icon icon="sortDrag" size={20} color="textDim" />
@@ -419,7 +419,7 @@ export default function ContactsScreen() {
         <Card
           mt="md"
           style={{
-            backgroundColor: '#1A1A1A',
+            backgroundColor: 'rgba(0, 0, 0, 0.04)',
             borderRadius: 12,
             padding: '12px 16px'
           }}>
@@ -483,8 +483,8 @@ export default function ContactsScreen() {
           onClick={isSortingMode ? undefined : () => setShowNetworkModal(true)}
           itemsCenter>
           <Image src={CHAINS_MAP[selectedNetworkFilter].icon} size={20} style={{ marginRight: 8 }} />
-          <Text text={CHAINS_MAP[selectedNetworkFilter].label} color="gold" size="sm" />
-          <Icon icon="down" size={14} color="gold" style={{ marginLeft: 8 }} />
+          <Text text={CHAINS_MAP[selectedNetworkFilter].label} color="primary" size="sm" />
+          <Icon icon="down" size={14} color="primary" style={{ marginLeft: 8 }} />
         </Row>
 
         {!showEmptyState && !showEmptyFilteredState && !isSortingMode ? (
@@ -497,7 +497,7 @@ export default function ContactsScreen() {
               justifyContent: 'center',
               alignItems: 'center',
               cursor: 'pointer',
-              backgroundColor: 'rgba(255, 255, 255, 0.06)'
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
             }}
             onClick={toggleSortDirection}>
             <Icon icon="sortAddress" size={16} color="textDim" />
@@ -511,7 +511,7 @@ export default function ContactsScreen() {
             <Text
               text={t('cancel')}
               style={{
-                color: '#F55454',
+                color: 'var(--color-error)',
                 textAlign: 'right',
                 fontSize: 14,
                 fontStyle: 'normal',
@@ -539,8 +539,8 @@ export default function ContactsScreen() {
           <Column gap="lg" style={{ flex: filteredContacts.length === 0 ? 1 : 'unset' }}>
             <div
               style={{
-                backgroundColor: '#2a2626',
-                border: '1px solid #2a2626',
+                backgroundColor: 'var(--color-card)',
+                border: '1px solid var(--color-bg-tertiary)',
                 borderRadius: 8,
                 padding: '0 16px',
                 display: 'flex',
@@ -559,7 +559,7 @@ export default function ContactsScreen() {
                   backgroundColor: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#fff',
+                  color: 'var(--color-text)',
                   fontSize: 16,
                   width: '100%',
                   height: '100%',

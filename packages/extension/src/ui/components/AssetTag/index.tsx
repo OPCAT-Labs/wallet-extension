@@ -9,8 +9,8 @@ export interface AssetTagProps {
 }
 
 const colors = {
-  Unconfirmed: '#BC9238',
-  CAT20: '#8B5A2B'
+  Unconfirmed: 'var(--color-bg-tertiary)',
+  CAT20: 'var(--color-bg-tertiary)'
 };
 
 export default function AssetTag(props: AssetTagProps) {

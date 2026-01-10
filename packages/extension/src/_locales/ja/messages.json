@@ -1246,7 +1246,7 @@
     "message": "詳細設定"
   },
   "advanced_settings": {
-    "message": "言語、セキュリティ、権限設定"
+    "message": "テーマ、言語、セキュリティ、権限設定"
   },
   "automatic_lock_time": {
     "message": "自動ロック時間"
@@ -1838,6 +1838,15 @@
   },
   "language_description": {
     "message": "アプリケーションの言語を変更します"
+  },
+  "theme": {
+    "message": "テーマ"
+  },
+  "theme_light": {
+    "message": "ライト"
+  },
+  "theme_dark": {
+    "message": "ダーク"
   },
   "more": {
     "message": "もっと"

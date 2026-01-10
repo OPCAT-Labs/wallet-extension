@@ -58,7 +58,7 @@ const $presets = {
     width: '86px',
     height: '18px',
     padding: '1px 6px',
-    background: '#431A1A',
+    background: '#fee2e2',
     color: '#FF6765',
     borderRadius: '4px',
     display: 'flex',

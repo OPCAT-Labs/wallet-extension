@@ -1251,7 +1251,7 @@
     "message": "Avancé"
   },
   "advanced_settings": {
-    "message": "Paramètres de Langue, Sécurité et Permissions"
+    "message": "Paramètres de Thème, Langue, Sécurité et Permissions"
   },
   "automatic_lock_time": {
     "message": "Délai de Verrouillage Automatique"
@@ -1843,6 +1843,15 @@
   },
   "language_description": {
     "message": "Changer la langue de l'application"
+  },
+  "theme": {
+    "message": "Thème"
+  },
+  "theme_light": {
+    "message": "Clair"
+  },
+  "theme_dark": {
+    "message": "Sombre"
   },
   "more": {
     "message": "Plus"

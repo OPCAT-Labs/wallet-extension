@@ -20,11 +20,11 @@ export const Popover = ({
       className="popover-container"
       data-testid={testid}
       style={{
-        backgroundColor: 'rgba(0,0,0,0.8)'
+        backgroundColor: 'rgba(var(--color-background-rgb),0.8)'
       }}>
       <div
         style={{
-          backgroundColor: 'rgba(36, 40, 47, 1)',
+          backgroundColor: 'var(--color-card)',
           width: 340,
           padding: 20,
           borderRadius: 15,
