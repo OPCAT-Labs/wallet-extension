@@ -29,20 +29,20 @@ export function Tabs({ items, defaultActiveKey, activeKey, onTabClick }: TabsPro
 
   return (
     <Column>
-      <Column gap="zero" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#070606' }}>
+      <Column gap="zero" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--color-background)' }}>
         <Row style={{ padding: 0, height: 50 }}>
           {items.map((item) => {
             const isActiveItem = item.key === activeTab;
             return (
               <Row key={item.key} onClick={() => onTabClick(item.key)} mx="md" testid={`${TestIds.ASSET_TAB.PREFIX}-${item.key}`}>
                 <Column gap="zero" justifyCenter itemsCenter>
-                  <Text text={item.label} color={isActiveItem ? 'gold' : 'textDim'} />
+                  <Text text={item.label} color={isActiveItem ? 'text' : 'textDim'} />
                   <Row
                     style={{
                       width: 40,
                       borderBottomWidth: 2,
                       paddingBottom: 10,
-                      borderColor: isActiveItem ? colors.gold : colors.transparent
+                      borderColor: isActiveItem ? colors.text : colors.transparent
                     }}
                   />
                 </Column>

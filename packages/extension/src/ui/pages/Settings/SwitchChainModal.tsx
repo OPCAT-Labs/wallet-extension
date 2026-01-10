@@ -31,7 +31,7 @@ function ChainItem(props: { chainType: ChainType; inGroup?: boolean; onClose: ()
         props.inGroup
           ? { backgroundColor: 'opacity', marginTop: 6 }
           : {
-              backgroundColor: chain.disable ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.1)',
+              backgroundColor: chain.disable ? 'rgba(var(--color-background-rgb),0.03)' : 'rgba(var(--color-background-rgb),0.06)',
               marginTop: 12
             }
       )}
@@ -81,7 +81,7 @@ function ChainGroup(props: { group: TypeChainGroup; onClose: () => void }) {
       <Column>
         <Card
           style={{
-            backgroundColor: 'rgba(255,255,255,0.1)',
+            backgroundColor: 'rgba(var(--color-background-rgb),0.06)',
             borderRadius: 10,
             borderColor: colors.gold,
             borderWidth: 0
@@ -100,7 +100,7 @@ function ChainGroup(props: { group: TypeChainGroup; onClose: () => void }) {
             </Row>
             {!folded ? (
               <Row
-                style={{ borderTopWidth: 1, borderColor: '#FFFFFF1F', alignSelf: 'stretch', width: '100%' }}
+                style={{ borderTopWidth: 1, borderColor: 'rgba(var(--color-background-rgb),0.1)', alignSelf: 'stretch', width: '100%' }}
                 my="md"
               />
             ) : null}

@@ -27,7 +27,7 @@ export default function CAT20PreviewCard({ balance, onClick, price }: CAT20Previ
     <Column
       style={{
         position: 'relative',
-        backgroundColor: '#8B5A2B',
+        backgroundColor: 'rgba(var(--color-primary-rgb), 0.7)',
         width: 80,
         height: 90,
         minWidth: 80,
@@ -46,7 +46,7 @@ export default function CAT20PreviewCard({ balance, onClick, price }: CAT20Previ
       >
         <Row
           style={{
-            backgroundColor: 'rgba(255,255,255,0.2)',
+            backgroundColor: 'rgba(var(--color-background-rgb),0.2)',
             borderBottomRightRadius: 5,
             borderTopLeftRadius: 5,
             width: 70

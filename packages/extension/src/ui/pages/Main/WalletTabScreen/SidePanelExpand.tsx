@@ -61,7 +61,7 @@ export function SidePanelExpand() {
             size={20}
             containerStyle={{
               opacity: isHovered ? 1 : 0.65,
-              color: isHovered ? '#ffffff' : 'inherit'
+              color: isHovered ? 'var(--color-background)' : 'inherit'
             }}
           />
         </div>

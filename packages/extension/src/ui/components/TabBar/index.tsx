@@ -58,7 +58,7 @@ export function TabBar(props: TabBarProps) {
                 { width: 20, height: 20 },
                 reach
                   ? {
-                      backgroundColor: colors.gold
+                      backgroundColor: colors.background
                     }
                   : {
                       backgroundColor: colors.bg2
@@ -100,13 +100,13 @@ export function TabBar(props: TabBarProps) {
                   text={v.label}
                   size={'md'}
                   preset={isSelected ? 'bold' : 'regular'}
-                  color={isSelected ? 'gold' : 'textDim'}
+                  color={isSelected ? 'text' : 'textDim'}
                 />
                 <Row
                   style={{
                     width: 40,
                     height: 2,
-                    backgroundColor: isSelected ? 'gold' : 'transparent'
+                    backgroundColor: isSelected ? 'var(--color-background)' : 'transparent'
                   }}
                 />
               </Column>
@@ -134,13 +134,13 @@ export function TabBar(props: TabBarProps) {
             return (
               <Column
                 key={v.key}
-                style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#322D1F' }}
-                color={isSelected ? 'gold' : 'white_muted'}
+                style={{ borderWidth: 1, borderRadius: 20, backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
+                color={isSelected ? 'text' : 'textDim'}
                 testid={`${TestIds.ASSET_TAB.CAT_TAB_PREFIX}-${v.key}`}
                 onClick={() => {
                   setTabKey(v.key);
                 }}>
-                <Text text={v.label} size="xxs" color={isSelected ? 'gold' : 'white_muted'} mx="md" my="sm" />
+                <Text text={v.label} size="xxs" color={isSelected ? 'text' : 'textDim'} mx="md" my="sm" />
               </Column>
             );
           }
@@ -166,7 +166,7 @@ export function TabBar(props: TabBarProps) {
               onClick={() => {
                 setTabKey(v.key);
               }}>
-              <Text text={v.label} color={isSelected ? 'gold' : 'white'} />
+              <Text text={v.label} color={isSelected ? 'text' : 'textDim'} />
             </Column>
           );
         }

@@ -41,7 +41,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
   const { t } = useI18n();
   const btcUnit = useBTCUnit();
   const chain = useChain();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const dispatch = useDispatch();
   const isBalanceHidden = useSelector((state: AppState) => state.ui.isBalanceHidden);
   const isBtcMainnet = chain.enum === ChainType.OPCAT_MAINNET;
@@ -67,7 +67,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
   const unconfirmedAmount = satoshisToAmount(+accountBalance.pending_btc_amount * 1e8);
 
   const handleExpandToggle = () => {
-    setIsExpanded(!isExpanded);
+    // setIsExpanded(!isExpanded);
   };
 
   const toggleBalanceVisibility = (e: React.MouseEvent) => {
@@ -133,7 +133,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       style={{ margin: '0 auto' }}>
       <div className={styles.decorativeLineOne} />
       <div className={styles.decorativeLineTwo} />
-      <img className={styles.decorativeImage} src={backgroundImage} alt="Balance background" />
+      {/* <img className={styles.decorativeImage} src={backgroundImage} alt="Balance background" /> */}
 
       <div className={styles.header}>
         {t('total_balance')}
@@ -149,7 +149,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
           <span className={styles.balanceNumber}>{isBalanceHidden ? '*****' : totalAmount.split('.')[0]}</span>
           {!isBalanceHidden && (
             <>
-              <span className={styles.decimal} style={{ color: isBtcMainnet ? '#000' : 'rgba(0, 0, 0, 0.45)' }}>
+              <span className={styles.decimal} style={{ color: isBtcMainnet ? '#000' : 'rgba(var(--color-text-rgb), 0.45)' }}>
                 .{totalAmount.split('.')[1]}
               </span>
               <span className={styles.unit}>{btcUnit}</span>
@@ -157,7 +157,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
           )}
           {isBalanceHidden && <span className={styles.unit}>{btcUnit}</span>}
         </div>
-        <Icon icon="balance-right" size={10} containerStyle={{ transform: `rotate(${isExpanded ? 270 : 90}deg)` }} />
+        {/* <Icon icon="balance-right" size={10} containerStyle={{ transform: `rotate(${isExpanded ? 270 : 90}deg)` }} /> */}
       </div>
 
       <div className={styles.usdValue}>
@@ -165,7 +165,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       </div>
 
       {/* Expandable details */}
-      <div className={styles.detailsWrapper}>
+      {/* <div className={styles.detailsWrapper}>
         <Row itemsCenter fullY mx="md" justifyCenter={disableUtxoTools}>
           <div className={styles.column}>
             <span className={styles.label}>{t('confirmed')}</span>
@@ -181,7 +181,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
           <Row itemsCenter gap="zero">
             {disableUtxoTools == false ? <div className={styles.divider} /> : null}
             <div className={styles.column}>
-              {/* <Tooltip
+              <Tooltip
                 overlayStyle={{
                   maxWidth: '328px',
                   padding: 0
@@ -207,7 +207,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
                     <Icon icon="balance-question" style={{ width: 16, height: 16, cursor: 'pointer' }} />
                   </span>
                 </div>
-              </Tooltip> */}
+              </Tooltip>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
                   <span className={styles.label}>{t('unconfirmed')}</span>
@@ -237,7 +237,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
             )}
           </Row>
         </Row>
-      </div>
+      </div> */}
     </div>
   );
 }

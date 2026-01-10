@@ -18,17 +18,17 @@ module.exports = {
         footer: '0px -10px 20px rgba(0, 0, 0, 0.2)'
       },
       colors: {
-        primary: 'rgb(234,202,68)',
-        'primary-active': '#383535',
-        'hard-black': '#070606',
-        'soft-black': '#2A2626',
-        'soft-white': '#AAAAAA',
-        'custom-green': '#4BB21A',
-        'custom-green-rgba': 'rgba(75, 178, 26, 0.05)',
-        warn: '#FA701A',
-        warning: '#FA701A',
-        error: '#CC3333',
-        'dark-error': '#BB3333'
+        primary: 'var(--color-primary)',
+        'primary-active': 'var(--color-primary-dark)',
+        'hard-black': 'var(--color-background)',
+        'soft-black': 'var(--color-card)',
+        'soft-white': 'var(--color-text-dim)',
+        'custom-green': 'var(--color-success)',
+        'custom-green-rgba': 'rgba(var(--color-success-rgb), 0.05)',
+        warn: 'var(--color-warning)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
+        'dark-error': 'var(--color-red-dark)'
       },
       fontSize: {
         '4_5': '1.125rem',

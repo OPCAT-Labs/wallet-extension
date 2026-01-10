@@ -198,9 +198,9 @@ export default function TxCreateScreen() {
               style={{
                 minHeight: 30
               }}>
-              <Text text={t('available')} color="gold" />
+              <Text text={t('available')} color="primary" />
               <Row>
-                <Text text={`${availableAmount}`} size="sm" color="gold" />
+                <Text text={`${availableAmount}`} size="sm" color="primary" />
                 <Text text={btcUnit} size="sm" color="textDim" />
               </Row>
             </Row>

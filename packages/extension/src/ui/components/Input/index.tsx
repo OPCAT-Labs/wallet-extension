@@ -77,7 +77,7 @@ const $baseInputStyle: CSSProperties = Object.assign({}, $textPresets.regular, {
   flex: 1,
   borderWidth: 0,
   outlineWidth: 0,
-  backgroundColor: 'rgba(0,0,0,0)',
+  backgroundColor: 'rgba(var(--color-background-rgb),0)',
   alignSelf: 'stretch'
 });
 
@@ -181,7 +181,7 @@ function AmountInput(props: InputProps) {
             if (onMaxClick) onMaxClick();
           }}
           text={t('max')}
-          color={'yellow'}
+          color={'primary'}
           size="sm"
         />
       ) : null}
@@ -324,8 +324,8 @@ export const AddressInput = (props: InputProps) => {
       <Row justifyBetween itemsCenter style={{ marginTop: 20, marginBottom: 12 }}>
         {recipientLabel || <Text text={t('recipient')} preset="regular" />}
         <Row itemsCenter clickable onClick={() => setShowContactsModal(true)} style={{ cursor: 'pointer', gap: 0 }}>
-          <Text text={t('address_book_placeholder')} color="yellow" style={{ fontSize: '14px' }} />
-          <Icon icon="right" color="yellow" size={16} style={{ marginLeft: 4 }} />
+          <Text text={t('address_book_placeholder')} color="text" style={{ fontSize: '14px' }} />
+          <Icon icon="right" color="primary" size={16} style={{ marginLeft: 4 }} />
         </Row>
       </Row>
       <div
@@ -359,7 +359,7 @@ export const AddressInput = (props: InputProps) => {
           <Text preset="sub" size="sm" text={t('name_recognized_and_resolved')} />
           <Text
             preset="link"
-            color="yellow"
+            color="primary"
             text={t('more_details')}
             onClick={() => {
               window.open('https://docs.unisat.io/unisat-wallet/name-recognized-and-resolved');
@@ -416,8 +416,8 @@ function SearchInput(props: InputProps) {
         {},
         $baseContainerStyle,
         {
-          backgroundColor: '#2a2626',
-          border: '1px solid #C08F23',
+          backgroundColor: 'var(--color-card)',
+          border: '1px solid var(--color-primary)',
           borderRadius: 8,
           padding: 0,
           alignSelf: 'stretch'
@@ -444,9 +444,9 @@ function SearchInput(props: InputProps) {
           cursor: 'pointer',
           height: 42.5,
           width: 42.5,
-          borderLeft: '1px solid #C08F23'
+          borderLeft: '1px solid var(--color-primary)'
         }}>
-        <ArrowRightOutlined style={{ color: 'rgba(255,255,255,.85)' }} />
+        <ArrowRightOutlined style={{ color: 'rgba(rgba(var(--color-background-rgb),.85)' }} />
       </Row>
     </Row>
   );

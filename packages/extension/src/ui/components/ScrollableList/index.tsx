@@ -174,7 +174,7 @@ export function ScrollableList({
               right: 0,
               width: '20px',
               height: '100%',
-              background: 'linear-gradient(to right, transparent, rgba(0,0,0,0.3))',
+              background: 'linear-gradient(to right, transparent, rgba(var(--color-background-rgb),0.3))',
               pointerEvents: 'none',
               zIndex: 1
             }}

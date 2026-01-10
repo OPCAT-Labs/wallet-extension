@@ -30,8 +30,8 @@ const InputsList = ({ txInfo, t, address, btcUnit, cat20PriceMap, setContractPop
                   color={isToSign ? 'white' : 'textDim'}
                 />
                 {isToSign && (
-                  <Row style={{ borderWidth: 1, borderColor: 'gold', borderRadius: 5, padding: 2 }}>
-                    <Text text={t('to_sign')} color="gold" size="xs" />
+                  <Row style={{ borderWidth: 1, borderColor: 'var(--color-primary)', borderRadius: 5, padding: 2 }}>
+                    <Text text={t('to_sign')} color="primary" size="xs" />
                   </Row>
                 )}
               </Row>

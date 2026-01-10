@@ -46,7 +46,7 @@ export default function SwitchChain({ params: { data, session } }: Props) {
           <Column justifyBetween itemsCenter mt="lg">
             <Card
               style={{
-                backgroundColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(var(--color-background-rgb),0.06)',
                 borderRadius: 10
               }}
               mt="lg">
@@ -61,7 +61,7 @@ export default function SwitchChain({ params: { data, session } }: Props) {
             <Icon icon="down" />
             <Card
               style={{
-                backgroundColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(var(--color-background-rgb),0.06)',
                 borderRadius: 10
               }}
               mt="lg">

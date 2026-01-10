@@ -1,8 +1,8 @@
 // Colors
-@black: #000;
-@black-muted: rgba(0, 0, 0, 0.45);
-@black-muted-55: rgba(0, 0, 0, 0.55);
-@black-muted-65: rgba(0, 0, 0, 0.65);
+@black: var(--color-text);
+@black-muted: rgba(var(--color-text-rgb), 0.45);
+@black-muted-55: rgba(var(--color-text), 0.55);
+@black-muted-65: rgba(var(--color-text), 0.65);
 @white: #fff;
 @divider: rgba(109, 65, 0, 0.15);
 @container-bg: linear-gradient(117deg, #FFDA8D 1.38%, #BF630F 94.19%);
@@ -22,12 +22,12 @@
   flex-direction: column;
   cursor: pointer;
   position: relative;
-  background: @container-bg;
+  // background: @container-bg;
   overflow: hidden;
   transition: height 0.3s ease-in-out;
 
   &.collapsed {
-    height: 110px;
+    // height: 110px;
   }
 
   &.expanded {
@@ -99,7 +99,7 @@
   margin-bottom: 0;
   margin-left: 8px;
   white-space: nowrap;
-  min-height: 20px;
+  // min-height: 20px;
 }
 
 .detailsWrapper {

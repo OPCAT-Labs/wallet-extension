@@ -54,7 +54,7 @@ export function FeeRateIcon() {
     <Card
       preset="style2"
       style={{
-        backgroundColor: 'rgba(255,255,255,0.12)',
+        backgroundColor: 'rgba(var(--color-background-rgb),0.08)',
         height: 28,
         borderRadius: 8,
         padding: '2px 4px',
@@ -96,7 +96,7 @@ function FeeOptionsPopover({ feeOptions, onClose }: { feeOptions: FeeOption[]; o
             style={{
               height: 50,
               minHeight: 50,
-              backgroundColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'rgba(var(--color-background-rgb),0.04)',
               borderBottomColor: colors.transparent,
               borderBottomWidth: 0.2
             }}>

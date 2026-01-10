@@ -12,9 +12,9 @@ export const DisableUnconfirmedsPopover = ({ onClose }: { onClose: () => void })
     <Popover>
       <Column justifyCenter itemsCenter>
         <Image src="./images/artifacts/security.png" size={80} />
-        <Text text={t('security_notice')} color="gold" textCenter size="lg" />
+        <Text text={t('security_notice')} color="primary" textCenter size="lg" />
 
-        <Text text={t('unconfirmed_balance_not_spendable')} color="gold" textCenter size="md" />
+        <Text text={t('unconfirmed_balance_not_spendable')} color="primary" textCenter size="md" />
 
         <Column gap="zero" mt="sm">
           <Text

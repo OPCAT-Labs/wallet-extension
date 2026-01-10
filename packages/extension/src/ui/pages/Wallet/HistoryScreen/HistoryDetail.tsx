@@ -59,7 +59,7 @@ export function HistoryDetail({ detail, close }: HistoryDetailProps) {
             <div
               style={{
                 alignSelf: 'stretch',
-                borderBottom: '1px dashed rgba(255, 255, 255, 0.10)'
+                borderBottom: '1px dashed rgba(0, 0, 0, 0.10)'
               }}
             />
             <Column gap={'xl'} style={{ alignSelf: 'stretch' }}>

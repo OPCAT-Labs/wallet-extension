@@ -149,8 +149,8 @@ export const WalletActions = ({ chain, address }: WalletActionsProps) => {
                 minHeight: 64,
                 flexDirection: 'column',
                 borderRadius: 16,
-                border: moreExpanded ? '1px solid rgba(244, 182, 44, 0.25)' : '1px solid #FFFFFF4D',
-                background: moreExpanded ? 'rgba(244, 182, 44, 0.10)' : '#2a2626',
+                border: moreExpanded ? '1px solid rgba(59, 130, 246, 0.25)' : '1px solid rgba(0, 0, 0, 0.2)',
+                background: moreExpanded ? 'rgba(59, 130, 246, 0.10)' : 'rgba(0, 0, 0, 0.04)',
                 padding: 5,
                 marginRight: 5,
                 marginLeft: 5,
@@ -176,7 +176,7 @@ export const WalletActions = ({ chain, address }: WalletActionsProps) => {
                 </>
               )}
               <Icon icon="more" />
-              <Text text={t('more')} color="white" size="xs" style={{ marginTop: 4 }} />
+              <Text text={t('more')} size="xs" style={{ marginTop: 4 }} />
             </div>
           </Row>
 

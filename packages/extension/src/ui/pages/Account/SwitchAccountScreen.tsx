@@ -60,7 +60,7 @@ export function MyItem({ account, autoNav }: MyItemProps) {
       }}>
       <Row>
         <Column style={{ width: 20 }} selfItemsCenter>
-          {selected ? <Icon icon="circle-check" color="gold" /> : <Icon icon="circle-check" color="white_muted2" />}
+          {selected ? <Icon icon="circle-check" color="primary" /> : <Icon icon="circle-check" color="white_muted2" />}
         </Column>
         <Column
           onClick={async () => {

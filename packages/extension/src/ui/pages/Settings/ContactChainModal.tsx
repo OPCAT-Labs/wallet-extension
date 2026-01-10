@@ -29,7 +29,7 @@ function ChainItem(props: {
         props.inGroup
           ? { backgroundColor: 'opacity', marginTop: 6 }
           : {
-              backgroundColor: chain.disable ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.1)',
+              backgroundColor: chain.disable ? 'rgba(var(--color-background-rgb),0.03)' : 'rgba(var(--color-background-rgb),0.06)',
               marginTop: 12
             }
       )}
@@ -73,7 +73,7 @@ function ChainGroup(props: {
       <Column>
         <Card
           style={{
-            backgroundColor: 'rgba(255,255,255,0.1)',
+            backgroundColor: 'rgba(var(--color-background-rgb),0.06)',
             borderRadius: 10,
             borderColor: colors.gold,
             borderWidth: 0
@@ -92,7 +92,7 @@ function ChainGroup(props: {
             </Row>
             {!folded ? (
               <Row
-                style={{ borderTopWidth: 1, borderColor: '#FFFFFF1F', alignSelf: 'stretch', width: '100%' }}
+                style={{ borderTopWidth: 1, borderColor: 'rgba(var(--color-background-rgb),0.1)', alignSelf: 'stretch', width: '100%' }}
                 my="md"
               />
             ) : null}
@@ -165,13 +165,13 @@ export const ContactChainModal = ({
                 borderRadius: 10,
                 borderColor: colors.gold,
                 borderWidth: selectedChainType === null ? 1 : 0,
-                backgroundColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(var(--color-background-rgb),0.06)',
                 marginTop: 12
               }}
               onClick={handleSelectAll}>
               <Row fullX justifyBetween itemsCenter>
                 <Row itemsCenter>
-                  <Icon icon="bitcoin" size={30} color="gold" />
+                  <Icon icon="bitcoin" size={30} color="primary" />
                   <Text text={t('all_networks')} color="text" />
                 </Row>
               </Row>

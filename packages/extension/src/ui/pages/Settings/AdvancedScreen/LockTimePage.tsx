@@ -63,7 +63,7 @@ export function LockTimePage() {
             style={{
               width: '328px',
               borderRadius: '12px',
-              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
               padding: 0
             }}>
             <div
@@ -78,7 +78,7 @@ export function LockTimePage() {
                   const check = option.id === autoLockTimeId;
                   return (
                     <Column key={index} fullX>
-                      {index > 0 && <Row style={{ height: 1, backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />}
+                      {index > 0 && <Row style={{ height: 1, backgroundColor: 'rgba(0, 0, 0, 0.08)' }} />}
                       <Row
                         onClick={() => handleSelectOption(option)}
                         itemsCenter
@@ -90,7 +90,7 @@ export function LockTimePage() {
                         }}
                         full>
                         <Text color={check ? 'white' : 'textDim'} size="sm" text={option.label} />
-                        {check && !loading && <Icon icon="checked" color="gold" size={20} />}
+                        {check && !loading && <Icon icon="checked" color="primary" size={20} />}
                         {check && loading && <Loading />}
                       </Row>
                     </Column>

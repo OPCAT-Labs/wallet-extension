@@ -7,6 +7,7 @@ import { useI18n } from '@/ui/hooks/useI18n';
 import { EnableSignDataCard } from './EnableSignData';
 import { LanguageCard } from './Language';
 import { SecurityCard } from './SecurityCard';
+import { ThemeCard } from './Theme';
 // import { UnconfirmedBalanceCard } from './UnconfirmBalance';
 
 export default function AdvancedScreen() {
@@ -32,6 +33,8 @@ export default function AdvancedScreen() {
       />
       <Content>
         <LanguageCard />
+
+        <ThemeCard />
 
         <SecurityCard />
 

@@ -24,8 +24,8 @@ export function CAT20BalanceCard(props: CAT20BalanceCardProps) {
   return (
     <Card
       style={{
-        backgroundColor: '#1E1F24',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'var(--color-card)',
+        borderColor: 'rgba(var(--color-background-rgb),0.1)',
         borderRadius: 12
       }}
       fullX

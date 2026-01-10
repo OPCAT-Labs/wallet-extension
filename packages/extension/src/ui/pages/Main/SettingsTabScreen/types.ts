@@ -25,4 +25,5 @@ export interface SettingsItemType {
   right: boolean;
   icon?: IconTypes;
   badge?: string;
+  iconColorReverse?: boolean
 }

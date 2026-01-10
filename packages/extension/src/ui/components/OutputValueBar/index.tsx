@@ -92,7 +92,7 @@ export function OutputValueBar({
                 {},
                 {
                   borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.3)',
+                  borderColor: 'rgba(var(--color-background-rgb),0.2)',
                   height: 75,
                   width: 120,
                   textAlign: 'center',

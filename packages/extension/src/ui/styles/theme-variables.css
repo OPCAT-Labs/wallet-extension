@@ -1,0 +1,174 @@
+/**
+ * Theme Color Variables
+ * Single source of truth for all colors in the application.
+ * All other files (tailwind.config.js, colors.ts, components) should reference these variables.
+ *
+ * Usage:
+ * - Light theme (default): just use var(--color-xxx)
+ * - Dark theme: add data-theme="dark" to <html> element
+ * - For rgba with opacity: use rgba(var(--color-xxx-rgb), 0.5)
+ */
+
+/* ===================================================
+   LIGHT THEME (Default)
+   =================================================== */
+:root {
+  /* ========== Primary Colors ========== */
+  --color-primary: #01356e;
+  --color-primary-rgb: 1, 53, 110;
+  --color-primary-dark: #012850;
+  --color-primary-light: #1a5a9e;
+  --color-primary-lighter: #4a8ac8;
+
+  /* ========== Accent Colors ========== */
+  --color-accent: #22d3ee;
+  --color-accent-rgb: 34, 211, 238;
+
+  /* ========== Text Colors ========== */
+  --color-text: #1a1a2e;
+  --color-text-rgb: 26, 26, 46;
+  --color-text-dim: rgba(0, 0, 0, 0.5);
+  --color-text-muted: rgba(0, 0, 0, 0.2);
+  --color-text-strong: rgba(0, 0, 0, 0.8);
+
+  /* ========== Background Colors ========== */
+  --color-background: #ffffff;
+  --color-background-rgb: 255, 255, 255;
+  --color-card: #f1f5f9;
+  --color-card-rgb: 241, 245, 249;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: #e2e8f0;
+  --color-bg-quaternary: #cbd5e1;
+  --color-primary-button-bg-image: linear-gradient(103.92deg, var(--color-primary-lighter) 0%, var(--color-primary) 100%);
+
+  /* ========== Border Colors ========== */
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
+  --color-line: rgba(0, 0, 0, 0.1);
+  --color-line-strong: rgba(0, 0, 0, 0.2);
+
+  /* ========== Status Colors ========== */
+  /* Success / Green */
+  --color-success: #16a34a;
+  --color-success-rgb: 22, 163, 74;
+  --color-green: #41B530;
+  --color-green-dark: #379a29;
+  --color-green-light: #5ec04f;
+
+  /* Error / Red */
+  --color-error: #dc2626;
+  --color-error-rgb: 220, 38, 38;
+  --color-red: #ED334B;
+  --color-red-dark: #c92b40;
+  --color-red-light: #f05266;
+
+  /* Warning / Orange */
+  --color-warning: #FF7B21;
+  --color-warning-rgb: 255, 123, 33;
+  --color-warning-content: #ea580c;
+  --color-warning-bg: rgba(234, 88, 12, 0.15);
+  --color-orange: #FF7B21;
+  --color-orange-dark: #d9691c;
+  --color-orange-light: #ff8f42;
+
+  /* ========== Special Colors ========== */
+  --color-value-up: #16a34a;
+  --color-value-down: #dc2626;
+  --color-ticker: var(--color-text);
+  --color-txid: #1a5a9e;
+  --color-cat20: #01356e;
+  --color-icon-accent: #1a5a9e;
+
+  /* ========== Legacy Palette ========== */
+  --color-dark: #1E283C;
+  --color-grey: #495361;
+  --color-light: #A2A4AA;
+  --color-blue: #01356e;
+  --color-blue-dark: #012850;
+  --color-blue-light: #4a8ac8;
+  --color-yellow: #e3bb5f;
+  --color-yellow-dark: #d5ac00;
+  --color-yellow-light: #fcd226;
+}
+
+/* ===================================================
+   DARK THEME
+   =================================================== */
+:root[data-theme="dark"] {
+  /* ========== Primary Colors (Gold) ========== */
+  --color-primary: #eac249;
+  --color-primary-rgb: 234, 194, 73;
+  --color-primary-dark: #d5ac00;
+  --color-primary-light: #fcd226;
+  --color-primary-lighter: #ffe066;
+
+  /* ========== Accent Colors ========== */
+  --color-accent: #FFBA33;
+  --color-accent-rgb: 255, 186, 51;
+
+  /* ========== Text Colors ========== */
+  --color-text: #ffffff;
+  --color-text-rgb: 255, 255, 255;
+  --color-text-dim: rgba(255, 255, 255, 0.5);
+  --color-text-muted: rgba(255, 255, 255, 0.2);
+  --color-text-strong: rgba(255, 255, 255, 0.8);
+
+  /* ========== Background Colors ========== */
+  --color-background: #070606;
+  --color-background-rgb: 7, 6, 6;
+  --color-card: #262222;
+  --color-card-rgb: 38, 34, 34;
+  --color-bg-secondary: #2a2a2a;
+  --color-bg-tertiary: #434242;
+  --color-bg-quaternary: #383535;
+  --color-primary-button-bg-image: linear-gradient(103.92deg, #EBB94C 0%, #E97E00 100%);
+
+  /* ========== Border Colors ========== */
+  --color-border: rgba(255, 255, 255, 0.04);
+  --color-border-strong: rgba(255, 255, 255, 0.1);
+  --color-line: rgba(255, 255, 255, 0.15);
+  --color-line-strong: rgba(255, 255, 255, 0.3);
+
+  /* ========== Status Colors ========== */
+  /* Success / Green */
+  --color-success: #7BE098;
+  --color-success-rgb: 123, 224, 152;
+  --color-green: #41B530;
+  --color-green-dark: #379a29;
+  --color-green-light: #5ec04f;
+
+  /* Error / Red */
+  --color-error: #e52937;
+  --color-error-rgb: 229, 41, 55;
+  --color-red: #ED334B;
+  --color-red-dark: #c92b40;
+  --color-red-light: #f05266;
+
+  /* Warning / Orange */
+  --color-warning: #FF7B21;
+  --color-warning-rgb: 255, 123, 33;
+  --color-warning-content: #F4B62C;
+  --color-warning-bg: rgba(244, 182, 44, 0.35);
+  --color-orange: #FF7B21;
+  --color-orange-dark: #d9691c;
+  --color-orange-light: #ff8f42;
+
+  /* ========== Special Colors ========== */
+  --color-value-up: #4DA474;
+  --color-value-down: #BF3F4D;
+  --color-ticker: var(--color-text);
+  --color-txid: #2AB2F8;
+  --color-cat20: #77A1F2;
+  --color-icon-accent: #FFBA33;
+
+  /* ========== Legacy Palette ========== */
+  --color-dark: #1E283C;
+  --color-grey: #495361;
+  --color-light: #A2A4AA;
+  --color-blue: #1872F6;
+  --color-blue-dark: #1461d1;
+  --color-blue-light: #c6dcfd;
+  --color-yellow: #e3bb5f;
+  --color-yellow-dark: #d5ac00;
+  --color-yellow-light: #fcd226;
+}

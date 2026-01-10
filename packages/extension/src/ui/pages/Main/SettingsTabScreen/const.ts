@@ -49,7 +49,7 @@ export const getSettingsList = (): SettingsItemType[] => [
     icon: 'addressType'
   },
   {
-    label: t('settings'),
+    label: t('advanced'),
     value: t('advanced_settings'),
     desc: '',
     action: SettingsAction.ADVANCED,
@@ -91,8 +91,8 @@ export const getSettingsList = (): SettingsItemType[] => [
     action: SettingsAction.ABOUT_US,
     route: '/settings/about-us',
     right: true,
-    icon: 'aboutUsLogo',
-    badge: t('new_version')
+    icon: 'aboutus',
+    badge: t('new_version'),
   },
   // 5. Bottom Buttons (unchanged)
   {

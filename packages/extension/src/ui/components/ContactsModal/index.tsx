@@ -55,7 +55,7 @@ export const ContactsModal: React.FC<ContactsModalProps> = ({ onClose, onSelect,
 
   return (
     <BottomModal onClose={onClose}>
-      <div style={{ backgroundColor: '#181A1F', margin: -20, padding: 20, borderRadius: '15px 15px 0 0' }}>
+      <div style={{ backgroundColor: 'var(--color-background)', margin: -20, padding: 20, borderRadius: '15px 15px 0 0' }}>
         <Column gap="lg" style={{ height: '70vh' }}>
           <Row itemsCenter style={{ position: 'relative', width: '100%' }}>
             <Text text={t('address_book')} size="md" />
@@ -71,7 +71,7 @@ export const ContactsModal: React.FC<ContactsModalProps> = ({ onClose, onSelect,
             style={{
               width: '100%',
               height: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'rgba(0, 0, 0, 0.06)',
               marginTop: 5,
               marginBottom: 10
             }}
@@ -79,8 +79,8 @@ export const ContactsModal: React.FC<ContactsModalProps> = ({ onClose, onSelect,
 
           <div
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: 8,
               padding: '0 16px',
               display: 'flex',
@@ -98,7 +98,7 @@ export const ContactsModal: React.FC<ContactsModalProps> = ({ onClose, onSelect,
                 backgroundColor: 'transparent',
                 border: 'none',
                 outline: 'none',
-                color: '#fff',
+                color: 'var(--color-text)',
                 fontSize: 16,
                 width: '100%',
                 height: '100%'
@@ -135,7 +135,7 @@ export const ContactsModal: React.FC<ContactsModalProps> = ({ onClose, onSelect,
                   key={contact.address}
                   mt="md"
                   style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
                     borderRadius: 12,
                     padding: '12px 16px',
                     cursor: 'pointer'

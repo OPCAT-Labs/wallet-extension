@@ -1,90 +1,93 @@
-// TODO: write documentation for colors and palette in own markdown file and add links from here
+/**
+ * Theme Colors
+ * All colors reference CSS variables defined in theme-variables.css
+ * This ensures a single source of truth for colors across the application.
+ */
 
-const palette = {
-  white: '#ffffff',
-  white_muted: 'rgba(255, 255, 255, 0.5)',
-  white_muted2: 'rgba(255, 255, 255, 0.2)',
-  white_muted3: 'rgba(255, 255, 255, 0.8)',
-  black: '#000000',
-  black_muted: 'rgba(0, 0, 0, 0.5)',
-  black_muted2: 'rgba(0, 0, 0, 0.)',
+export const colors = {
+  // Transparent
+  transparent: 'transparent',
 
-  dark: '#1E283C',
-  grey: '#495361',
-  light: '#A2A4AA',
+  // Primary colors
+  primary: 'var(--color-primary)',
+  primary_dark: 'var(--color-primary-dark)',
+  primary_light: 'var(--color-primary-light)',
+  primary_lighter: 'var(--color-primary-lighter)',
 
-  black_dark: '#2a2626',
+  // Accent colors
+  accent: 'var(--color-accent)',
+  accent_muted: 'rgba(var(--color-accent-rgb), 0.2)',
 
-  green_dark2: '#2D7E24',
-  green_dark: '#379a29',
-  green: '#41B530',
-  green_light: '#5ec04f',
+  // Text colors
+  text: 'var(--color-text)',
+  textDim: 'var(--color-text-dim)',
+  textWhite: 'var(--color-text-muted)',
+  white: 'var(--color-text)',
+  white_muted: 'var(--color-text-dim)',
+  white_muted2: 'var(--color-text-muted)',
+  white_muted3: 'var(--color-text-strong)',
 
-  yellow_dark: '#d5ac00',
-  yellow: '#e3bb5f',
-  yellow_light: '#fcd226',
+  // Background colors
+  background: 'var(--color-background)',
+  black: 'var(--color-background)',
+  black_muted: 'rgba(var(--color-background-rgb), 0.5)',
+  black_muted2: 'rgba(var(--color-background-rgb), 0.2)',
+  black_dark: 'var(--color-card)',
+  card: 'var(--color-card)',
+  bg2: 'var(--color-bg-secondary)',
+  bg3: 'var(--color-bg-tertiary)',
+  bg4: 'var(--color-bg-quaternary)',
+  search_bar_bg: 'var(--color-card)',
 
-  red_dark: '#c92b40',
-  red: '#ED334B',
-  red_light: '#f05266',
-  red_light2: '#f55454',
+  // Border colors
+  border: 'var(--color-border)',
+  border2: 'var(--color-border-strong)',
+  line: 'var(--color-line)',
+  line2: 'var(--color-line-strong)',
 
-  blue_dark: '#1461d1',
-  blue: '#1872F6',
-  blue_light: '#c6dcfd',
+  // Status colors - Success / Green
+  success: 'var(--color-success)',
+  green: 'var(--color-green)',
+  green_dark: 'var(--color-green-dark)',
+  green_dark2: 'var(--color-green-dark)',
+  green_light: 'var(--color-green-light)',
 
-  orange_dark: '#d9691c',
-  orange: '#FF7B21',
-  orange_light: '#ff8f42',
-  orange_light2: '#FF7C2A',
+  // Status colors - Error / Red
+  error: 'var(--color-error)',
+  danger: 'rgba(var(--color-error-rgb), 0.9)',
+  red: 'var(--color-red)',
+  red_dark: 'var(--color-red-dark)',
+  red_light: 'var(--color-red-light)',
+  red_light2: 'var(--color-red-light)',
 
-  gold: '#eac249'
+  // Status colors - Warning / Orange
+  warning: 'var(--color-warning)',
+  warning_content: 'var(--color-warning-content)',
+  warning_bg: 'var(--color-warning-bg)',
+  orange: 'var(--color-orange)',
+  orange_dark: 'var(--color-orange-dark)',
+  orange_light: 'var(--color-orange-light)',
+  orange_light2: 'var(--color-orange-light)',
+
+  // Special colors
+  value_up_color: 'var(--color-value-up)',
+  value_down_color: 'var(--color-value-down)',
+  ticker_color: 'var(--color-ticker)',
+  txid_color: 'var(--color-txid)',
+  cat20_color: 'var(--color-cat20)',
+  icon_yellow: 'var(--color-icon-accent)',
+
+  // Legacy colors (mapped to new system)
+  gold: 'var(--color-primary)',
+  yellow: 'var(--color-yellow)',
+  yellow_dark: 'var(--color-yellow-dark)',
+  yellow_light: 'var(--color-yellow-light)',
+  blue: 'var(--color-blue)',
+  blue_dark: 'var(--color-blue-dark)',
+  blue_light: 'var(--color-blue-light)',
+  dark: 'var(--color-dark)',
+  grey: 'var(--color-grey)',
+  light: 'var(--color-light)',
 };
-
-export const colors = Object.assign({}, palette, {
-  transparent: 'rgba(0, 0, 0, 0)',
-
-  text: palette.white,
-  textWhite: palette.white_muted2,
-
-  textDim: palette.white_muted,
-
-  background: '#070606',
-
-  error: '#e52937',
-
-  danger: 'rgba(245, 84, 84, 0.90)',
-
-  card: '#262222',
-  warning: palette.orange,
-  primary: palette.yellow,
-
-  bg2: '#2a2a2a',
-  bg3: '#434242',
-  bg4: '#383535',
-  search_bar_bg: '#1E1F24',
-
-  border: 'rgba(255,255,255,0.04)',
-  border2: 'rgba(255, 255, 255, 0.1)',
-
-  icon_yellow: '#FFBA33',
-
-  value_up_color: '#4DA474',
-  value_down_color: '#BF3F4D',
-
-  ticker_color: '#eac249',
-
-  success: '#7BE098',
-
-  txid_color: '#2AB2F8',
-
-  cat20_color: '#77A1F2',
-
-  warning_content: '#F4B62CD9',
-
-  warning_bg: '#F4B62C59',
-  line: 'rgba(255,255,255,0.15)',
-  line2: 'rgba(255,255,255,0.3)'
-});
 
 export type ColorTypes = keyof typeof colors;

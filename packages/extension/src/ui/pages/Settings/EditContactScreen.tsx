@@ -10,11 +10,11 @@ import { useWallet } from '@/ui/utils/WalletContext';
 import { isValidAddress } from '@opcat-labs/wallet-sdk/lib/address';
 
 const inputStyle = {
-  backgroundColor: colors.black_muted,
+  backgroundColor: 'rgba(0, 0, 0, 0.04)',
   height: 48,
   padding: '12px 12px',
   borderRadius: 8,
-  border: '1px solid rgba(255, 255, 255, 0.12)',
+  border: '1px solid rgba(0, 0, 0, 0.12)',
   display: 'inline-flex',
   alignItems: 'center',
   flexShrink: 0
@@ -180,7 +180,7 @@ function EditContactScreen() {
               onChange={handleNameChange}
               placeholder={t('please_enter_name')}
               containerStyle={inputStyle}
-              style={{ color: 'white' }}
+              style={{ color: colors.text }}
             />
           </Column>
 
@@ -192,7 +192,7 @@ function EditContactScreen() {
               onChange={handleAddressChange}
               placeholder={t('please_enter_address')}
               containerStyle={inputStyle}
-              style={{ color: 'white' }}
+              style={{ color: colors.text }}
             />
           </Column>
 
