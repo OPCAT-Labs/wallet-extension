@@ -95,16 +95,16 @@
    DARK THEME
    =================================================== */
 :root[data-theme="dark"] {
-  /* ========== Primary Colors (Gold) ========== */
-  --color-primary: #eac249;
-  --color-primary-rgb: 234, 194, 73;
-  --color-primary-dark: #d5ac00;
-  --color-primary-light: #fcd226;
-  --color-primary-lighter: #ffe066;
+  /* ========== Primary Colors (Cyan) ========== */
+  --color-primary: #22d3ee;
+  --color-primary-rgb: 34, 211, 238;
+  --color-primary-dark: #0891b2;
+  --color-primary-light: #67e8f9;
+  --color-primary-lighter: #a5f3fc;
 
   /* ========== Accent Colors ========== */
-  --color-accent: #FFBA33;
-  --color-accent-rgb: 255, 186, 51;
+  --color-accent: #22d3ee;
+  --color-accent-rgb: 34, 211, 238;
 
   /* ========== Text Colors ========== */
   --color-text: #ffffff;
@@ -121,7 +121,7 @@
   --color-bg-secondary: #2a2a2a;
   --color-bg-tertiary: #434242;
   --color-bg-quaternary: #383535;
-  --color-primary-button-bg-image: linear-gradient(103.92deg, #EBB94C 0%, #E97E00 100%);
+  --color-primary-button-bg-image: linear-gradient(103.92deg, #22d3ee 0%, #0891b2 100%);
 
   /* ========== Border Colors ========== */
   --color-border: rgba(255, 255, 255, 0.04);

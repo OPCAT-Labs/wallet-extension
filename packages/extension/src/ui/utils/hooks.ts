@@ -4,6 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { getUiType } from '.';
 import { useWallet } from './WalletContext';
 
+export const useFeeRate = () => {
+  const wallet = useWallet()
+  const [feeRate, setFeeRate] = useState(0)
+  useEffect(() => {
+    wallet.getFeeSummary().then(v => {
+      setFeeRate(v.list[0]?.feeRate || 0)
+    })
+  })
+  return feeRate;
+}
+
 export const useApproval = () => {
   const wallet = useWallet();
   const navigate = useNavigate();

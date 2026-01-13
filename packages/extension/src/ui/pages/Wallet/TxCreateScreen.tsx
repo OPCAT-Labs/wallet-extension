@@ -6,8 +6,6 @@ import { RawTxInfo } from '@/shared/types';
 import { Button, Card, Column, Content, Header, Icon, Image, Input, Layout, Row, Text } from '@/ui/components';
 import { useTools } from '@/ui/components/ActionComponent';
 import { BtcUsd } from '@/ui/components/BtcUsd';
-import { FeeRateBar } from '@/ui/components/FeeRateBar';
-import { RBFBar } from '@/ui/components/RBFBar';
 import { getSpecialLocale, useI18n } from '@/ui/hooks/useI18n';
 import { useUtxoTools } from '@/ui/hooks/useUtxoTools';
 import { useNavigate } from '@/ui/pages/MainRoute';
@@ -17,7 +15,7 @@ import { useBitcoinTx, useFetchUtxosCallback, usePrepareSendBTCCallback } from '
 import { useUiTxCreateScreen, useUpdateUiTxCreateScreen } from '@/ui/state/ui/hooks';
 import { colors } from '@/ui/theme/colors';
 import { fontSizes } from '@/ui/theme/font';
-import { amountToSatoshis, isValidAddress, satoshisToAmount } from '@/ui/utils';
+import { amountToSatoshis, isValidAddress, satoshisToAmount, useFeeRate } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
 
 export default function TxCreateScreen() {
@@ -40,7 +38,10 @@ export default function TxCreateScreen() {
   const toInfo = uiState.toInfo;
   const inputAmount = uiState.inputAmount;
   const enableRBF = uiState.enableRBF;
-  const feeRate = uiState.feeRate;
+  const feeRate = useFeeRate()
+  useEffect(() => {
+    setUiState({feeRate})
+  }, [feeRate])
 
   const [error, setError] = useState('');
 
@@ -258,15 +259,11 @@ export default function TxCreateScreen() {
           </Card>
         </Column>
 
-        <Column mt="lg">
-          <Text text={t('fee')} />
-
-          <FeeRateBar
-            onChange={(val) => {
-              setUiState({ feeRate: val });
-            }}
-          />
-        </Column>
+        
+        <Row mt="lg" justifyBetween>
+          <Text text={t('fee')} color="textDim" />
+          <Text text={`${feeRate} sats/byte`} />
+        </Row>
 
         {/* <Column mt="lg">
           <RBFBar

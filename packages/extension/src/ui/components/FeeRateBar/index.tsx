@@ -7,6 +7,7 @@ import { Row } from '../Row';
 import { Text } from '../Text';
 import { FeeRateType } from './const';
 
+// deprecated
 export function FeeRateBar({ readonly, onChange }: { readonly?: boolean; onChange?: (val: number) => void }) {
   const wallet = useWallet();
   const [feeOptions, setFeeOptions] = useState<{ feeRate: number }[]>([]);

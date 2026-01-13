@@ -10,7 +10,7 @@ import {
   useSafeBalance,
   useUtxos
 } from '@/ui/state/transactions/hooks';
-import { amountToSatoshis } from '@/ui/utils';
+import { amountToSatoshis, useFeeRate } from '@/ui/utils';
 
 import { useTools } from '../ActionComponent';
 import { Button } from '../Button';
@@ -40,8 +40,8 @@ export const MergeBTCPopover = ({ onClose }: { onClose: () => void }) => {
     });
   }, []);
 
-  const [feeRate, setFeeRate] = useState(0);
-
+  const feeRate = useFeeRate()
+  
   const chain = useChain();
   const navigate = useNavigate();
   const onConfirm = async () => {
@@ -74,11 +74,10 @@ export const MergeBTCPopover = ({ onClose }: { onClose: () => void }) => {
           <Text preset="regular" text={`${t('merging_amount')}: ${safeBalance} ${chain.unit} `} />
         </Column>
 
-        <FeeRateBar
-          onChange={(val) => {
-            setFeeRate(val);
-          }}
-        />
+        <Row mt="lg" justifyBetween>
+          <Text text={t('fee')} color="textDim" />
+          <Text text={`${feeRate} sats/byte`} />
+        </Row>
 
         <Row full mt="lg">
           <Button

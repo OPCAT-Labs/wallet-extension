@@ -22,7 +22,7 @@ import { useNavigate } from '@/ui/pages/MainRoute';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { usePushBitcoinTxCallback } from '@/ui/state/transactions/hooks';
 import { colors } from '@/ui/theme/colors';
-import { isValidAddress, shortAddress, showLongNumber, useWallet } from '@/ui/utils';
+import { isValidAddress, shortAddress, showLongNumber, useFeeRate, useWallet } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
 import {Transaction} from '@opcat-labs/scrypt-ts-opcat'
 
@@ -62,7 +62,7 @@ export default function SendCAT20Screen() {
     address: '',
     domain: ''
   });
-  const [feeRate, setFeeRate] = useState(5);
+  const feeRate = useFeeRate()
   const [error, setError] = useState('');
   const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
 
@@ -446,15 +446,10 @@ export default function SendCAT20Screen() {
           )}
         </Column>
 
-        <Column mt="lg">
+        <Row mt="lg" justifyBetween>
           <Text text={t('fee')} color="textDim" />
-
-          <FeeRateBar
-            onChange={(val) => {
-              setFeeRate(val);
-            }}
-          />
-        </Column>
+          <Text text={`${feeRate} sats/byte`} />
+        </Row>
 
         {error && <Text text={error} color="error" />}
 

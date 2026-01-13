@@ -163,7 +163,7 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
   [ChainType.OPCAT_MAINNET]: {
     enum: ChainType.OPCAT_MAINNET,
     label: 'OPCAT Layer Mainnet',
-    iconLabel: 'OPCAT',
+    iconLabel: 'Mainnet',
     icon: './images/artifacts/opcat-mainnet.svg',
     unit: 'BTC',
     networkType: NetworkType.MAINNET,
@@ -181,7 +181,7 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
   [ChainType.OPCAT_TESTNET]: {
     enum: ChainType.OPCAT_TESTNET,
     label: 'OPCAT Layer Testnet',
-    iconLabel: 'OPCAT',
+    iconLabel: 'Testnet',
     icon: './images/artifacts/opcat-testnet.svg',
     unit: 'tBTC',
     networkType: NetworkType.TESTNET,
