@@ -12,7 +12,7 @@ export const THEME_NAMES: Record<ThemeType, string> = {
 
 export function getStoredTheme(): ThemeType {
   const stored = localStorage.getItem('theme');
-  return (stored as ThemeType) || 'light';
+  return (stored as ThemeType) || 'dark';
 }
 
 export function applyTheme(theme: ThemeType) {
