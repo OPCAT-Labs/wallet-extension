@@ -9,13 +9,12 @@ import { Button, Card, Column, Content, Header, Input, Layout, Row, Text } from 
 import { useTools } from '@/ui/components/ActionComponent';
 import { BRC20Ticker } from '@/ui/components/BRC20Ticker';
 import { BtcUsd } from '@/ui/components/BtcUsd';
-import { FeeRateBar } from '@/ui/components/FeeRateBar';
 import { MergeBTCPopover } from '@/ui/components/MergeBTCPopover';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { useBTCUnit } from '@/ui/state/settings/hooks';
 import { colors } from '@/ui/theme/colors';
-import { satoshisToAmount, showLongNumber, sleep, useWallet } from '@/ui/utils';
+import { satoshisToAmount, showLongNumber, sleep, useFeeRate, useWallet } from '@/ui/utils';
 
 import { MergeProgressLayout } from './MergeProgressLayout';
 import { ItemStatus, MergeItem, MergeState } from './MergingItem';
@@ -93,7 +92,7 @@ export default function MergeCAT20Screen() {
     init();
   }, []);
 
-  const [feeRate, setFeeRate] = useState(5);
+  const feeRate = useFeeRate()
 
   const [inputUtxoCount, setInputUtxoCount] = useState(2);
 
@@ -369,7 +368,7 @@ export default function MergeCAT20Screen() {
                 <Text text={maxUtxoCount} preset="sub" />
               </Row>
 
-              <Divider style={{ borderColor: '#FFFFFF26', borderWidth: 1 }} dashed></Divider>
+              <Divider style={{ borderColor: 'rgba(var(--color-background-rgb), 0.15)', borderWidth: 1 }} dashed></Divider>
 
               <Row justifyBetween>
                 <Text text={`${t('selected')} ${cat20Balance.symbol}`} color="textDim" size="sm" />
@@ -386,15 +385,11 @@ export default function MergeCAT20Screen() {
           </Card>
         </Column>
 
-        <Column>
+        
+        <Row mt="lg" justifyBetween>
           <Text text={t('fee')} color="textDim" />
-
-          <FeeRateBar
-            onChange={(val) => {
-              setFeeRate(val);
-            }}
-          />
-        </Column>
+          <Text text={`${feeRate} sats/byte`} />
+        </Row>
 
         {error && <Text text={error} color="error" />}
 

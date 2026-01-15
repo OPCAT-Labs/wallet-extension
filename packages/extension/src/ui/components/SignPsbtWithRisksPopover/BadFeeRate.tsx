@@ -8,6 +8,7 @@ import { Icon } from '../Icon';
 import { Popover } from '../Popover';
 import { Row } from '../Row';
 import { Text } from '../Text';
+import { useFeeRate } from '@/ui/utils';
 
 export const BadFeeRate = ({
   decodedPsbt,
@@ -19,6 +20,7 @@ export const BadFeeRate = ({
   onClose: () => void;
 }) => {
   const { t } = useI18n();
+  const feeRate = useFeeRate()
   return (
     <Popover>
       <Column justifyCenter itemsCenter>
@@ -38,8 +40,8 @@ export const BadFeeRate = ({
         <Text text={t('current_fee_rate')} preset="sub" />
         <Text text={`${decodedPsbt.feeRate} sats/byte`} />
 
-        <Text text={t('recommended_fee_rates')} preset="sub" mt="lg" />
-        <FeeRateBar readonly />
+        <Text text={t('recommended_fee_rates')} preset="sub" />
+        <Text text={`${feeRate} sats/byte`} />
       </Column>
     </Popover>
   );

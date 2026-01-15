@@ -23,7 +23,7 @@ export const BottomModal = ({ children, onClose }: { children: React.ReactNode; 
     <div
       className="popover-container"
       style={{
-        backgroundColor: 'rgba(0,0,0,0.7)',
+        backgroundColor: 'rgba(var(--color-background-rgb), 0.5)',
         position: 'fixed',
         top: 0,
         left: 0,
@@ -43,7 +43,7 @@ export const BottomModal = ({ children, onClose }: { children: React.ReactNode; 
       }}>
       <div
         style={{
-          backgroundColor: '#24282F',
+          backgroundColor: 'var(--color-background)',
           width: '100%',
           padding: 20,
           borderRadius: '15px 15px 0 0',

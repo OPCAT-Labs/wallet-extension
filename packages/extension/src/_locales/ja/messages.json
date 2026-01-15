@@ -1246,7 +1246,7 @@
     "message": "詳細設定"
   },
   "advanced_settings": {
-    "message": "言語、セキュリティ、権限設定"
+    "message": "テーマ、言語、セキュリティ、権限設定"
   },
   "automatic_lock_time": {
     "message": "自動ロック時間"
@@ -1267,7 +1267,7 @@
     "message": "最新バージョン"
   },
   "inscribe_and_store_your_inscriptions_in_the_worlds_first_open_source_chrome_wallet_for_ordinals": {
-    "message": "世界初のオープンソースOrdinals ChromeウォレットでインスクリプションをInscribeして保存しましょう！"
+    "message": "暗号資産ウォレットを設定して、OPCAT Layerでビットコインの旅を楽しみましょう。"
   },
   "the_broadcastchannel_name_is_missing": {
     "message": "broadcastChannel名がありません"
@@ -1839,6 +1839,15 @@
   "language_description": {
     "message": "アプリケーションの言語を変更します"
   },
+  "theme": {
+    "message": "テーマ"
+  },
+  "theme_light": {
+    "message": "ライト"
+  },
+  "theme_dark": {
+    "message": "ダーク"
+  },
   "more": {
     "message": "もっと"
   },
@@ -2156,6 +2165,9 @@
   },
   "no_inputs": {
     "message": "入力なし"
+  },
+  "no_outputs": {
+    "message": "出力なし"
   },
   "scroll_to_top": {
     "message": "↑ トップ"

@@ -84,7 +84,7 @@ export default function CAT20TokenScreen() {
     return (
       <Layout>
         <Content itemsCenter justifyCenter>
-          <Icon size={fontSizes.xxxl} color="gold">
+          <Icon size={fontSizes.xxxl} color="primary">
             <LoadingOutlined />
           </Icon>
         </Content>
@@ -122,7 +122,7 @@ export default function CAT20TokenScreen() {
               preset="title-bold"
               textCenter
               size="xxl"
-              color="gold"
+              color="text"
               testid={TestIds.CAT20.TOKEN_NAME}
             />
             <Row itemsCenter fullX justifyCenter>
@@ -202,7 +202,7 @@ export default function CAT20TokenScreen() {
             px="md"
             py="md"
             style={{
-              backgroundColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'rgba(var(--color-background-rgb),0.04)',
               borderRadius: 15
             }}>
             <Section title={t('token_id')} value={tokenSummary.cat20Info.tokenId} link={tokenUrl} />

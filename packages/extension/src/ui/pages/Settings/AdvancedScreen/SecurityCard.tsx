@@ -38,7 +38,7 @@ export function SecurityCard() {
           <Text text={t('automatic_lock_time')} size="sm" />
 
           <Row itemsCenter>
-            <Text text={lockTimeConfig.label} color="gold" size="sm" />
+            <Text text={lockTimeConfig.label} color="primary" size="sm" />
             <Icon icon="right" size={fontSizes.lg} color="textDim" />
           </Row>
         </Row>

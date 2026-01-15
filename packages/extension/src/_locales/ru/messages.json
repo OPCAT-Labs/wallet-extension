@@ -1246,7 +1246,7 @@
     "message": "Расширенные"
   },
   "advanced_settings": {
-    "message": "Настройки языка, безопасности и разрешений"
+    "message": "Настройки темы, языка, безопасности и разрешений"
   },
   "automatic_lock_time": {
     "message": "Время автоматической блокировки"
@@ -1267,7 +1267,7 @@
     "message": "Последняя версия"
   },
   "inscribe_and_store_your_inscriptions_in_the_worlds_first_open_source_chrome_wallet_for_ordinals": {
-    "message": "Создавайте и храните свои надписи в первом в мире Chrome-кошельке с открытым исходным кодом для Ordinals!"
+    "message": "Настройте свой криптокошелёк и наслаждайтесь своим путешествием с биткоином на OPCAT Layer."
   },
   "the_broadcastchannel_name_is_missing": {
     "message": "отсутствует имя broadcastChannel"
@@ -1839,6 +1839,15 @@
   "language_description": {
     "message": "Изменить язык приложения"
   },
+  "theme": {
+    "message": "Тема"
+  },
+  "theme_light": {
+    "message": "Светлая"
+  },
+  "theme_dark": {
+    "message": "Тёмная"
+  },
   "more": {
     "message": "Ещё"
   },
@@ -2156,6 +2165,9 @@
   },
   "no_inputs": {
     "message": "Нет входов"
+  },
+  "no_outputs": {
+    "message": "Нет выходов"
   },
   "scroll_to_top": {
     "message": "↑ Вверх"

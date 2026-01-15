@@ -1251,7 +1251,7 @@
     "message": "Avancé"
   },
   "advanced_settings": {
-    "message": "Paramètres de Langue, Sécurité et Permissions"
+    "message": "Paramètres de Thème, Langue, Sécurité et Permissions"
   },
   "automatic_lock_time": {
     "message": "Délai de Verrouillage Automatique"
@@ -1272,7 +1272,7 @@
     "message": "Dernière Version"
   },
   "inscribe_and_store_your_inscriptions_in_the_worlds_first_open_source_chrome_wallet_for_ordinals": {
-    "message": "Inscrivez et stockez vos inscriptions dans le premier portefeuille Chrome Open Source au monde pour les Ordinals !"
+    "message": "Configurez votre portefeuille crypto et profitez de votre aventure Bitcoin sur OPCAT Layer."
   },
   "the_broadcastchannel_name_is_missing": {
     "message": "le nom broadcastChannel est manquant"
@@ -1844,6 +1844,15 @@
   "language_description": {
     "message": "Changer la langue de l'application"
   },
+  "theme": {
+    "message": "Thème"
+  },
+  "theme_light": {
+    "message": "Clair"
+  },
+  "theme_dark": {
+    "message": "Sombre"
+  },
   "more": {
     "message": "Plus"
   },
@@ -2161,6 +2170,9 @@
   },
   "no_inputs": {
     "message": "Aucune entrée"
+  },
+  "no_outputs": {
+    "message": "Aucune sortie"
   },
   "scroll_to_top": {
     "message": "↑ Haut"

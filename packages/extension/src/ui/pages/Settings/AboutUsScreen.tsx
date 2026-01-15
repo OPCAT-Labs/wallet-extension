@@ -21,7 +21,7 @@ export default function AboutUsScreen() {
         <Column gap="lg" style={{ padding: spacing.small }}>
           {/* Logo Section */}
           <Column itemsCenter style={{ marginTop: spacing.tiny }}>
-            <Icon icon="aboutus" size={82} />
+            <Icon icon="aboutUsLogo" size={82} />
           </Column>
 
           {/* App Name */}
@@ -71,20 +71,20 @@ export default function AboutUsScreen() {
                 height: '104px',
                 flexShrink: 0,
                 borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.06)',
+                background: 'rgba(0, 0, 0, 0.04)',
                 margin: '0 auto'
               }}>
               <Row
                 style={{
                   width: '100%',
                   padding: '16px',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
                   cursor: 'pointer',
                   height: '52px'
                 }}
                 onClick={() => window.open(TERMS_OF_SERVICE_URL)}>
                 <Row style={{ justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <Text text={t('terms_of_service')} preset="regular" size="sm" style={{ color: 'white' }} />
+                  <Text text={t('terms_of_service')} preset="regular" size="sm" />
                   <Icon icon="arrow-right" size={20} color="textDim" />
                 </Row>
               </Row>
@@ -97,7 +97,7 @@ export default function AboutUsScreen() {
                 }}
                 onClick={() => window.open(PRIVACY_POLICY_URL)}>
                 <Row style={{ justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <Text text={t('privacy_policy')} preset="regular" size="sm" style={{ color: 'white' }} />
+                  <Text text={t('privacy_policy')} preset="regular" size="sm" />
                   <Icon icon="arrow-right" size={20} color="textDim" />
                 </Row>
               </Row>

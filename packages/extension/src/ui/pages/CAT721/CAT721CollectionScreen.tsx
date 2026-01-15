@@ -58,7 +58,7 @@ export default function CAT721CollectionScreen() {
     return (
       <Layout>
         <Content itemsCenter justifyCenter>
-          <Icon size={fontSizes.xxxl} color="gold">
+          <Icon size={fontSizes.xxxl} color="primary">
             <LoadingOutlined />
           </Icon>
         </Content>
@@ -91,7 +91,7 @@ export default function CAT721CollectionScreen() {
       {collectionSummary && (
         <Content>
           <Row py="xl" pb="md">
-            <Text text={collectionSummary.collectionInfo.name} preset="title" textCenter size="xl" color="gold" />
+            <Text text={collectionSummary.collectionInfo.name} preset="title" textCenter size="xl" color="primary" />
           </Row>
 
           <Card style={{ borderRadius: 15 }}>

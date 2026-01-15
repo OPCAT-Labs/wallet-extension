@@ -94,7 +94,7 @@ export default function Connect({ params: { session } }: Props) {
     return (
       <Layout>
         <Content itemsCenter justifyCenter>
-          <Icon size={fontSizes.xxxl} color="gold">
+          <Icon size={fontSizes.xxxl} color="primary">
             <LoadingOutlined />
           </Icon>
         </Content>

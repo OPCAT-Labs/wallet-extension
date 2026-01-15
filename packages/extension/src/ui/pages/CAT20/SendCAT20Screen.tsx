@@ -22,7 +22,7 @@ import { useNavigate } from '@/ui/pages/MainRoute';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { usePushBitcoinTxCallback } from '@/ui/state/transactions/hooks';
 import { colors } from '@/ui/theme/colors';
-import { isValidAddress, shortAddress, showLongNumber, useWallet } from '@/ui/utils';
+import { isValidAddress, shortAddress, showLongNumber, useFeeRate, useWallet } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
 import {Transaction} from '@opcat-labs/scrypt-ts-opcat'
 
@@ -62,7 +62,7 @@ export default function SendCAT20Screen() {
     address: '',
     domain: ''
   });
-  const [feeRate, setFeeRate] = useState(5);
+  const feeRate = useFeeRate()
   const [error, setError] = useState('');
   const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
 
@@ -356,7 +356,7 @@ export default function SendCAT20Screen() {
         title={t('send_cat20')}
       />
       <Content>
-        <Text text={cat20Info.name} preset="title-bold" textCenter size="xxl" color="gold" />
+        <Text text={cat20Info.name} preset="title-bold" textCenter size="xxl" color="text" />
         <Row itemsCenter fullX justifyCenter>
           <Text
             text={`${runesUtils.toDecimalAmount(cat20Balance.amount, cat20Balance.decimals)}`}
@@ -422,7 +422,7 @@ export default function SendCAT20Screen() {
           />
 
           {shouldShowMerge && (
-            <Column style={{ borderWidth: 1, borderRadius: 10, borderColor: 'rgba(255,255,255,0.3)' }}>
+            <Column style={{ borderWidth: 1, borderRadius: 10, borderColor: 'rgba(var(--color-background-rgb),0.2)' }}>
               <Column mx="md" my="md">
                 <Text
                   text={t('to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance')}
@@ -433,7 +433,7 @@ export default function SendCAT20Screen() {
                 <Text
                   text={t('merge_utxos_to_increase_the_available_balance')}
                   size="xs"
-                  color="gold"
+                  color="primary"
                   onClick={() => {
                     navigate('MergeCAT20Screen', {
                       cat20Balance: cat20Balance,
@@ -446,15 +446,10 @@ export default function SendCAT20Screen() {
           )}
         </Column>
 
-        <Column mt="lg">
+        <Row mt="lg" justifyBetween>
           <Text text={t('fee')} color="textDim" />
-
-          <FeeRateBar
-            onChange={(val) => {
-              setFeeRate(val);
-            }}
-          />
-        </Column>
+          <Text text={`${feeRate} sats/byte`} />
+        </Row>
 
         {error && <Text text={error} color="error" />}
 

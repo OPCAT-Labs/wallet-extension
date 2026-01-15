@@ -7,13 +7,12 @@ import { CAT721CollectionInfo, TxType } from '@/shared/types';
 import { Button, Card, Column, Content, Footer, Header, Icon, Input, Layout, Row, Text } from '@/ui/components';
 import { useTools } from '@/ui/components/ActionComponent';
 import CAT721Preview from '@/ui/components/CAT721Preview';
-import { FeeRateBar } from '@/ui/components/FeeRateBar';
 import { MergeBTCPopover } from '@/ui/components/MergeBTCPopover';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { usePushBitcoinTxCallback } from '@/ui/state/transactions/hooks';
 import { colors } from '@/ui/theme/colors';
-import { isValidAddress, shortAddress, useWallet } from '@/ui/utils';
+import { isValidAddress, shortAddress, useFeeRate, useWallet } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
 import { Transaction } from '@opcat-labs/scrypt-ts-opcat';
 
@@ -49,7 +48,7 @@ export default function SendCAT721Screen() {
     address: '',
     domain: ''
   });
-  const [feeRate, setFeeRate] = useState(5);
+  const feeRate = useFeeRate()
   const [error, setError] = useState('');
   const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
 
@@ -300,7 +299,7 @@ export default function SendCAT721Screen() {
         title={t('send_cat721')}
       />
       <Content>
-        <Text text={collectionInfo.name} preset="title-bold" textCenter size="xxl" color="gold" />
+        <Text text={collectionInfo.name} preset="title-bold" textCenter size="xxl" color="primary" />
 
         <Row justifyCenter>
           <CAT721Preview
@@ -324,15 +323,11 @@ export default function SendCAT721Screen() {
           />
         </Column>
 
-        <Column mt="lg">
+        
+        <Row mt="lg" justifyBetween>
           <Text text={t('fee')} color="textDim" />
-
-          <FeeRateBar
-            onChange={(val) => {
-              setFeeRate(val);
-            }}
-          />
-        </Column>
+          <Text text={`${feeRate} sats/byte`} />
+        </Row>
 
         {error && <Text text={error} color="error" />}
 

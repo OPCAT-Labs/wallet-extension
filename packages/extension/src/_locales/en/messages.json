@@ -1250,7 +1250,7 @@
     "message": "Advanced"
   },
   "advanced_settings": {
-    "message": "Language, Security & Permissions Settings"
+    "message": "Theme, Language, Security & Permissions Settings"
   },
   "automatic_lock_time": {
     "message": "Automatic Lock Time"
@@ -1271,7 +1271,7 @@
     "message": "Latest Version"
   },
   "inscribe_and_store_your_inscriptions_in_the_worlds_first_open_source_chrome_wallet_for_ordinals": {
-    "message": "Inscribe and store your inscriptions in the world's first Open Source Chrome wallet for Ordinals!"
+    "message": "Set up your crypto wallet and enjoy your bitcoin journey on the OPCAT Layer."
   },
   "the_broadcastchannel_name_is_missing": {
     "message": "the broadcastChannel name is missing"
@@ -1843,6 +1843,15 @@
   "language_description": {
     "message": "Change the language of the application"
   },
+  "theme": {
+    "message": "Theme"
+  },
+  "theme_light": {
+    "message": "Light"
+  },
+  "theme_dark": {
+    "message": "Dark"
+  },
   "more": {
     "message": "More"
   },
@@ -2160,6 +2169,9 @@
   },
   "no_inputs": {
     "message": "No inputs"
+  },
+  "no_outputs": {
+    "message": "No outputs"
   },
   "scroll_to_top": {
     "message": "↑ Top"

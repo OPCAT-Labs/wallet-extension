@@ -1250,7 +1250,7 @@
     "message": "進階"
   },
   "advanced_settings": {
-    "message": "語言、安全性與權限設定"
+    "message": "主題、語言、安全性與權限設定"
   },
   "automatic_lock_time": {
     "message": "自動鎖定時間"
@@ -1271,7 +1271,7 @@
     "message": "最新版本"
   },
   "inscribe_and_store_your_inscriptions_in_the_worlds_first_open_source_chrome_wallet_for_ordinals": {
-    "message": "在世界第一個開源 Ordinals Chrome 錢包中銘刻並儲存您的銘文！"
+    "message": "設定你的加密錢包，在 OPCAT Layer 上開啟並享受你的比特幣之旅。"
   },
   "the_broadcastchannel_name_is_missing": {
     "message": "缺少 broadcastChannel 名稱"
@@ -1840,6 +1840,15 @@
   "language_description": {
     "message": "更改應用程式語言"
   },
+  "theme": {
+    "message": "主題"
+  },
+  "theme_light": {
+    "message": "淺色"
+  },
+  "theme_dark": {
+    "message": "深色"
+  },
   "no_inscriptions_found": {
     "message": "找不到銘文"
   },
@@ -2160,6 +2169,9 @@
   },
   "no_inputs": {
     "message": "無輸入"
+  },
+  "no_outputs": {
+    "message": "無輸出"
   },
   "scroll_to_top": {
     "message": "↑ 頂部"

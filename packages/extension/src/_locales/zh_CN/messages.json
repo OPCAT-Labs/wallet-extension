@@ -490,7 +490,7 @@
     "message": "暂无服务提供商"
   },
   "inscribe_and_store_your_inscriptions_in_the_worlds_first_open_source_chrome_wallet_for_ordinals": {
-    "message": "在世界上第一个开源的 Chrome 钱包中铭刻和存储您的铭文！"
+    "message": "设置你的加密钱包，在 OPCAT Layer 上开启并享受你的比特币之旅。"
   },
   "disclaimStr": {
     "message": "请注意，您即将通过第三方平台购买比特币。信用卡支付服务由我们的合作伙伴提供。Opcat 钱包仅作为中介平台，不对使用信用卡支付服务可能产生的任何潜在损失或损害承担责任。"
@@ -1476,7 +1476,7 @@
     "message": "网络"
   },
   "advanced_settings": {
-    "message": "语言、安全、权限设置"
+    "message": "主题、语言、安全、权限设置"
   },
   "invalid_transaction_data": {
     "message": "无效的交易数据"
@@ -1820,6 +1820,15 @@
   "language_description": {
     "message": "更改应用程序语言"
   },
+  "theme": {
+    "message": "主题"
+  },
+  "theme_light": {
+    "message": "浅色"
+  },
+  "theme_dark": {
+    "message": "深色"
+  },
   "more": {
     "message": "更多"
   },
@@ -2134,6 +2143,9 @@
   },
   "no_inputs": {
     "message": "无输入"
+  },
+  "no_outputs": {
+    "message": "无输出"
   },
   "scroll_to_top": {
     "message": "↑ 顶部"
