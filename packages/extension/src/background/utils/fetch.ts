@@ -19,7 +19,12 @@ const PHISHING_SOURCES = {
   /**
    * Unisat phishing list source
    */
-  UNISAT: 'https://raw.githubusercontent.com/unisat-wallet/phishing-detect/master/phishing_sites.json'
+  UNISAT: 'https://raw.githubusercontent.com/unisat-wallet/phishing-detect/master/phishing_sites.json',
+
+  /**
+   * Opcat phishing list source
+   */
+  OPCAT: 'https://raw.githubusercontent.com/opcat-labs/phishing-detect/master/phishing_sites.json'
 };
 
 /**
@@ -166,6 +171,14 @@ export const fetchPhishingList = async (forceRefresh = false): Promise<any> => {
     log.error('[Phishing] Unisat source fetch failed:', error);
   }
 
+  // Always try to fetch OPCAT source
+  try {
+    await fetchAndMergeOpcat(mergedData);
+    hasAnySourceSucceeded = true;
+  } catch (error) {
+    log.error('[Phishing] OPCAT source fetch failed:', error);
+  }
+
   // If at least one source succeeded, save merged data to cache
   if (hasAnySourceSucceeded) {
     await saveToLocalCache(mergedData);
@@ -219,6 +232,40 @@ async function fetchAndMergeUnisat(targetData: any): Promise<boolean> {
 
   throw new Error('Failed to fetch from UNISAT source');
 }
+
+/**
+ * Fetches UNISAT phishing list and merges it into target data
+ * This function is separated to allow always fetching UNISAT data
+ * @param targetData The data object to merge UNISAT data into
+ * @returns Promise<boolean> indicating success
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchAndMergeOpcat(targetData: any): Promise<boolean> {
+  const fetchOptions: RequestInit = {
+    cache: 'no-cache',
+    headers: {
+      Accept: 'application/json'
+    }
+  };
+
+  const response = await fetchWithTimeout(PHISHING_SOURCES.OPCAT, fetchOptions);
+
+  if (response.ok) {
+    const data = await response.json();
+    mergePhishingData(targetData, data);
+
+    // Only add to sources if not already there
+    if (!targetData.sources.includes('OPCAT')) {
+      targetData.sources.push('OPCAT');
+    }
+
+    log.debug('[Phishing] Successfully fetched from OPCAT source');
+    return true;
+  }
+
+  throw new Error('Failed to fetch from OPCAT source');
+}
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mergePhishingData(target: any, source: any): void {
