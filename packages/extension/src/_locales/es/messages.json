@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "Opcat Wallet" },
+  "appName": { "message": "Catena Wallet" },
   "appDescription": {
-    "message": "Monedero opcat de código abierto"
+    "message": "La billetera oficial de código abierto de la capa OP_CAT"
   },
   "receive": {
     "message": "Recibir"
@@ -463,7 +463,7 @@
     "message": "Por favor, selecciona un proveedor de servicios a continuación para comprar"
   },
   "disclaimStr": {
-    "message": "Ten en cuenta que estás a punto de comprar Bitcoin a través de una plataforma de terceros. Los servicios de pago con tarjeta de crédito son proporcionados por nuestros socios. Opcat Wallet actúa únicamente como plataforma intermediaria y no asume ninguna responsabilidad por posibles pérdidas o daños que puedan surgir del uso del servicio de pago con tarjeta de crédito."
+    "message": "Ten en cuenta que estás a punto de comprar Bitcoin a través de una plataforma de terceros. Los servicios de pago con tarjeta de crédito son proporcionados por nuestros socios. Catena Wallet actúa únicamente como plataforma intermediaria y no asume ninguna responsabilidad por posibles pérdidas o daños que puedan surgir del uso del servicio de pago con tarjeta de crédito."
   },
   "additional_transaction_fees": {
     "message": "Se aplican tarifas de transacción adicionales al comprar a través de plataformas de terceros. Las tarifas varían según el país y el método de pago. Revisa las tarifas de cada plataforma antes de proceder con las transacciones."
@@ -838,10 +838,10 @@
     "message": "Se ha detectado comportamiento malicioso y actividad sospechosa."
   },
   "your_access_to_this_page_has_been_restricted_by_un": {
-    "message": "Tu acceso a esta página ha sido restringido por Opcat Wallet ya que podría ser inseguro."
+    "message": "Tu acceso a esta página ha sido restringido por Catena Wallet ya que podría ser inseguro."
   },
   "reject_blocked_by_unisat_wallet": {
-    "message": "Rechazar (bloqueado por Opcat Wallet)"
+    "message": "Rechazar (bloqueado por Catena Wallet)"
   },
   "warning": {
     "message": "Advertencia"
@@ -850,7 +850,7 @@
     "message": "Soy consciente de los riesgos"
   },
   "connect_with_unisat_wallet": {
-    "message": "Conectar con Opcat Wallet"
+    "message": "Conectar con Catena Wallet"
   },
   "select_the_account_to_use_on_this_site": {
     "message": "Selecciona la cuenta para usar en este sitio"
@@ -1355,7 +1355,7 @@
     "message": "¡Peligro! Detectado sitio web de phishing potencial"
   },
   "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
-    "message": "Este sitio web ha sido identificado como malicioso por Opcat y puede:"
+    "message": "Este sitio web ha sido identificado como malicioso por Catena y puede:"
   },
   "steal_your_private_keys_or_seed_phrases": {
     "message": "Robar tus claves privadas o frases semilla"
@@ -2003,7 +2003,7 @@
     "message": "No se admiten operaciones de eliminación de cuentas"
   },
   "disclaimStrFb": {
-    "message": "Por favor, tenga en cuenta que está a punto de comprar FB a través de una plataforma de terceros. Los servicios de pago con tarjeta de crédito son proporcionados por nuestros socios. Opcat Wallet actúa únicamente como plataforma intermedia y no asume responsabilidad por cualquier pérdida o daño potencial que pueda surgir del uso del servicio de pago con tarjeta de crédito."
+    "message": "Por favor, tenga en cuenta que está a punto de comprar FB a través de una plataforma de terceros. Los servicios de pago con tarjeta de crédito son proporcionados por nuestros socios. Catena Wallet actúa únicamente como plataforma intermedia y no asume responsabilidad por cualquier pérdida o daño potencial que pueda surgir del uso del servicio de pago con tarjeta de crédito."
   },
   "seconds_ago": {
     "message": "segundos"
@@ -2120,7 +2120,7 @@
     "message": "Abrir como barra lateral"
   },
   "sign_all_transactions_at_once": {
-    "message": "Tienes la opción de firmar todas las transacciones a la vez, pero ten en cuenta que Opcat Wallet no verificará cada transacción individualmente. Te recomendamos usarlo solo en sitios web de confianza y familiares para minimizar el riesgo de pérdidas potenciales."
+    "message": "Tienes la opción de firmar todas las transacciones a la vez, pero ten en cuenta que Catena Wallet no verificará cada transacción individualmente. Te recomendamos usarlo solo en sitios web de confianza y familiares para minimizar el riesgo de pérdidas potenciales."
   },
   "message": {
     "message": "mensaje"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { VersionDetail } from '@/shared/types';
-import { useVersionInfo } from '@/ui/state/settings/hooks';
+import { useExtensionUpdateUrl, useVersionInfo } from '@/ui/state/settings/hooks';
 import { fontSizes } from '@/ui/theme/font';
 import { useWallet } from '@/ui/utils';
 
@@ -20,6 +20,8 @@ export const UpgradePopover = ({ onClose }: { onClose: () => void }) => {
     title: '',
     notice: ''
   });
+  const updateUrl = useExtensionUpdateUrl()
+  
   const wallet = useWallet();
   useEffect(() => {
     if (!versionInfo.newVersion) return;
@@ -63,7 +65,7 @@ export const UpgradePopover = ({ onClose }: { onClose: () => void }) => {
             full
             preset="primary"
             onClick={() => {
-              window.open('https://unisat.io/extension/update');
+              window.open(updateUrl);
             }}
           />
         </Row>

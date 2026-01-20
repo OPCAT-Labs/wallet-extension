@@ -1,13 +1,14 @@
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL, VERSION } from '@/shared/constant';
 import { Column, Content, Header, Icon, Layout, Row, Text } from '@/ui/components';
 import { useI18n } from '@/ui/hooks/useI18n';
-import { useVersionInfo } from '@/ui/state/settings/hooks';
+import { useExtensionUpdateUrl, useVersionInfo } from '@/ui/state/settings/hooks';
 import { spacing } from '@/ui/theme/spacing';
 
 export default function AboutUsScreen() {
   const versionInfo = useVersionInfo();
   const hasUpdate = versionInfo.latestVersion && versionInfo.latestVersion !== versionInfo.currentVesion;
   const { t } = useI18n();
+  const updateUrl = useExtensionUpdateUrl()
 
   return (
     <Layout>
@@ -21,12 +22,12 @@ export default function AboutUsScreen() {
         <Column gap="lg" style={{ padding: spacing.small }}>
           {/* Logo Section */}
           <Column itemsCenter style={{ marginTop: spacing.tiny }}>
-            <Icon icon="aboutUsLogo" size={82} />
+            <img src={chrome.runtime.getURL('/images/logo/wallet-logo.png')} style={{width: 82}} />
           </Column>
 
           {/* App Name */}
           <Column itemsCenter>
-            <Text text="OPCAT Wallet" preset="title-bold" size="xxl" />
+            <Text text="CATENA Wallet" preset="title-bold" size="xxl" />
           </Column>
 
           {/* Version Info */}
@@ -49,7 +50,7 @@ export default function AboutUsScreen() {
                   whiteSpace: 'nowrap',
                   gap: 0
                 }}
-                onClick={() => window.open('https://opcatlabs.io/extension/update')}>
+                onClick={() => window.open(updateUrl)}>
                 <Icon icon="arrowUp" size={14} />
                 <Text
                   text={t('new_update_available')}

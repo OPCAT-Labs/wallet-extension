@@ -10,7 +10,7 @@ export function Logo(props: { preset?: 'large' | 'small' }) {
   if (preset === 'large') {
     return (
       <Row justifyCenter itemsCenter>
-        <Image src="./images/logo/wallet-logo.png" style={{ borderRadius: '50%' }} size={fontSizes.xxxl} />
+        <Image src="./images/logo/wallet-logo.png" size={fontSizes.xxxl} />
 
         <Text text={WALLET_NAME} preset="title-bold" size="xxl" disableTranslate />
       </Row>
@@ -18,7 +18,7 @@ export function Logo(props: { preset?: 'large' | 'small' }) {
   } else {
     return (
       <Row justifyCenter itemsCenter>
-        <Image src="./images/logo/wallet-logo.png" style={{ borderRadius: '50%' }} size={fontSizes.xxl} />
+        <Image src="./images/logo/wallet-logo.png" size={fontSizes.xxl} />
         <Text text={WALLET_NAME} preset="title-bold" disableTranslate />
       </Row>
     );

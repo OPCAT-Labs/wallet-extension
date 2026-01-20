@@ -2313,7 +2313,7 @@
 
 "@opcat-labs/cat-sdk@2.2.0-beta-5cee3e8-20260105":
   version "2.2.0-beta-5cee3e8-20260105"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-2.2.0-beta-5cee3e8-20260105.tgz#980c71ada4c9ea470d31dca2f6c63c9025866ac8"
+  resolved "https://registry.npmjs.org/@opcat-labs/cat-sdk/-/cat-sdk-2.2.0-beta-5cee3e8-20260105.tgz"
   integrity sha512-/CQl0oRtwK9k/HyKWaDDCCS3+6LKbHT2Xq/VNO/j2hnWiyAjvr8vziR1xN8+gHDYoNSuDWBzaurd/i2pwoxQ3A==
   dependencies:
     "@opcat-labs/opcat" "2.2.0-beta-5cee3e8-20260105"
@@ -2322,7 +2322,7 @@
 
 "@opcat-labs/opcat@2.2.0-beta-5cee3e8-20260105":
   version "2.2.0-beta-5cee3e8-20260105"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-2.2.0-beta-5cee3e8-20260105.tgz#2af78af3432ff7a89cfab6a164003d3ced563af7"
+  resolved "https://registry.npmjs.org/@opcat-labs/opcat/-/opcat-2.2.0-beta-5cee3e8-20260105.tgz"
   integrity sha512-qLQPS78aPnCZ+cwVx7keMAqiLZU7W8qtfKyW1dk65OPbCNN6zlDUQT+oIYoaMEmYKcqu/Z4US/3BiME3OJSY8g==
   dependencies:
     assert "^2.1.0"
@@ -2335,7 +2335,7 @@
 
 "@opcat-labs/scrypt-ts-opcat@2.2.0-beta-5cee3e8-20260105":
   version "2.2.0-beta-5cee3e8-20260105"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-2.2.0-beta-5cee3e8-20260105.tgz#13e7eb39719f2413ae0103c98650e9e97e6e915a"
+  resolved "https://registry.npmjs.org/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-2.2.0-beta-5cee3e8-20260105.tgz"
   integrity sha512-fgIdJ9IDzMJ7S/dpw2f3F52lN3Vta+HjOnAW/4usV3vSrL6/VeF8A7BnUuNzAvMGXpvx8ClCGrOzohtQFB2Iiw==
   dependencies:
     "@noble/curves" "^1.8.1"
@@ -15583,7 +15583,7 @@ timers-browserify@^1.0.1:
 
 tiny-secp256k1@^2.2.4:
   version "2.2.4"
-  resolved "https://registry.yarnpkg.com/tiny-secp256k1/-/tiny-secp256k1-2.2.4.tgz#1d9e45c2facb8607847da71a0a3d9cb2fd027eb2"
+  resolved "https://registry.npmjs.org/tiny-secp256k1/-/tiny-secp256k1-2.2.4.tgz"
   integrity sha512-FoDTcToPqZE454Q04hH9o2EhxWsm7pOSpicyHkgTwKhdKWdsTUuqfP5MLq3g+VjAtl2vSx6JpXGdwA2qpYkI0Q==
   dependencies:
     uint8array-tools "0.0.7"
@@ -15999,7 +15999,7 @@ uglify-js@^3.0.5:
 
 uint8array-tools@0.0.7:
   version "0.0.7"
-  resolved "https://registry.yarnpkg.com/uint8array-tools/-/uint8array-tools-0.0.7.tgz#a7a2bb5d8836eae2fade68c771454e6a438b390d"
+  resolved "https://registry.npmjs.org/uint8array-tools/-/uint8array-tools-0.0.7.tgz"
   integrity sha512-vrrNZJiusLWoFWBqz5Y5KMCgP9W9hnjZHzZiZRT8oNAkq3d5Z5Oe76jAvVVSRh4U8GGR90N2X1dWtrhvx6L8UQ==
 
 uint8array-tools@^0.0.8:

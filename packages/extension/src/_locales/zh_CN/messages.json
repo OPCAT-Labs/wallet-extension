@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "Opcat 钱包" },
+  "appName": { "message": "Catena 钱包" },
   "appDescription": {
-    "message": "开源的 Opcat 钱包"
+    "message": "官方开源 OP_CAT 层钱包"
   },
   "receive": {
     "message": "接收"
@@ -493,7 +493,7 @@
     "message": "设置你的加密钱包，在 OPCAT Layer 上开启并享受你的比特币之旅。"
   },
   "disclaimStr": {
-    "message": "请注意，您即将通过第三方平台购买比特币。信用卡支付服务由我们的合作伙伴提供。Opcat 钱包仅作为中介平台，不对使用信用卡支付服务可能产生的任何潜在损失或损害承担责任。"
+    "message": "请注意，您即将通过第三方平台购买比特币。信用卡支付服务由我们的合作伙伴提供。Catena 钱包仅作为中介平台，不对使用信用卡支付服务可能产生的任何潜在损失或损害承担责任。"
   },
   "risk_warning": {
     "message": "风险警告：除非您准备损失所有投资资金，否则不要投资。"
@@ -848,10 +848,10 @@
     "message": "已检测到恶意行为和可疑活动。"
   },
   "your_access_to_this_page_has_been_restricted_by_un": {
-    "message": "您对此页面的访问已被 Opcat 钱包限制，因为它可能不安全。"
+    "message": "您对此页面的访问已被 Catena 钱包限制，因为它可能不安全。"
   },
   "reject_blocked_by_unisat_wallet": {
-    "message": "拒绝（被 Opcat 钱包阻止）"
+    "message": "拒绝（被 Catena 钱包阻止）"
   },
   "this_token_only_supports_up_to": {
     "message": "此代币仅支持至多"
@@ -914,7 +914,7 @@
     "message": "我已了解风险"
   },
   "connect_with_unisat_wallet": {
-    "message": "连接 Opcat 钱包"
+    "message": "连接 Catena 钱包"
   },
   "select_the_account_to_use_on_this_site": {
     "message": "选择在此网站上使用的账户"
@@ -1437,7 +1437,7 @@
     "message": "危险！检测到潜在的钓鱼网站"
   },
   "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
-    "message": "此网站已被 Opcat 识别为恶意网站，可能："
+    "message": "此网站已被 Catena 识别为恶意网站，可能："
   },
   "steal_your_private_keys_or_seed_phrases": {
     "message": "窃取您的私钥或助记词"
@@ -2004,7 +2004,7 @@
     "message": "不支持账户删除操作"
   },
   "disclaimStrFb": {
-    "message": "请注意，您即将通过第三方平台购买FB。信用卡支付服务由我们的合作伙伴提供。Opcat Wallet 仅作为中介平台，不对使用信用卡支付服务可能产生的任何潜在损失或损害承担责任。"
+    "message": "请注意，您即将通过第三方平台购买FB。信用卡支付服务由我们的合作伙伴提供。Catena Wallet 仅作为中介平台，不对使用信用卡支付服务可能产生的任何潜在损失或损害承担责任。"
   },
   "seconds_ago": {
     "message": "秒前"
@@ -2106,7 +2106,7 @@
     "message": "侧边栏模式"
   },
   "sign_all_transactions_at_once": {
-    "message": "您可以选择一次性签署所有交易，但请注意，Opcat Wallet 不会单独验证每笔交易。我们强烈建议仅在可信和熟悉的网站上使用它，以最大限度地降低潜在损失的风险。"
+    "message": "您可以选择一次性签署所有交易，但请注意，Catena Wallet 不会单独验证每笔交易。我们强烈建议仅在可信和熟悉的网站上使用它，以最大限度地降低潜在损失的风险。"
   },
   "message": {
     "message": "消息"

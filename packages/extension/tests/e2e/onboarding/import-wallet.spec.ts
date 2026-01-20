@@ -50,15 +50,15 @@ test.describe('Import Wallet Flow', () => {
     await passwordContinueBtn.click();
     log('✓ Password set up');
 
-    // Step 1: Select wallet type (OPCAT Wallet - usually the first/only option)
+    // Step 1: Select wallet type (CATENA Wallet - usually the first/only option)
     log('4. Step 1: Selecting wallet type...');
     await page.waitForTimeout(2000);
 
-    // Click the first wallet option (OPCAT Wallet)
+    // Click the first wallet option (CATENA Wallet)
     const firstWalletOption = locateTestId(page, `${TestIds.IMPORT_WALLET.RESTORE_WALLET_OPTION}-0`);
     await expect(firstWalletOption).toBeVisible({ timeout: 10000 });
     await firstWalletOption.click();
-    log('✓ Selected OPCAT Wallet');
+    log('✓ Selected CATENA Wallet');
 
     // Wait for navigation to Step 2
     await page.waitForTimeout(2000);
@@ -253,7 +253,7 @@ test.describe('Import Wallet Flow', () => {
     const firstWalletOption = locateTestId(page, `${TestIds.IMPORT_WALLET.RESTORE_WALLET_OPTION}-0`);
     await expect(firstWalletOption).toBeVisible({ timeout: 10000 });
     await firstWalletOption.click();
-    log('✓ Selected OPCAT Wallet');
+    log('✓ Selected CATENA Wallet');
 
     // Enter invalid mnemonic
     log('5. Step 2: Entering invalid mnemonic...');
@@ -351,7 +351,7 @@ test.describe('Import Wallet Flow', () => {
     const firstWalletOption = locateTestId(page, `${TestIds.IMPORT_WALLET.RESTORE_WALLET_OPTION}-0`);
     await expect(firstWalletOption).toBeVisible({ timeout: 10000 });
     await firstWalletOption.click();
-    log('✓ Selected OPCAT Wallet');
+    log('✓ Selected CATENA Wallet');
 
     // Test paste functionality with individual word inputs
     log('5. Step 2: Testing paste into first mnemonic word input...');

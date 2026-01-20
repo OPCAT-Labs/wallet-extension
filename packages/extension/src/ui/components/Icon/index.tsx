@@ -34,7 +34,6 @@ export const svgRegistry = {
   btc: './images/icons/btc.svg',
   qrcode: './images/icons/qrcode.svg',
   moreInfo: './images/icons/moreinfo.svg',
-  aboutUsLogo: '/images/icons/about-us-logo.svg',
   rateUs: '/images/icons/rate-us.svg',
 
   user: '/images/icons/user-solid.svg',
@@ -111,7 +110,7 @@ export const svgRegistry = {
 
   'side-panel-logo-close': '/images/icons/side-panel-logo-close.svg',
 
-  'opcat': '/images/icons/opcat.svg'
+  'wallet-logo': '/images/icons/wallet-logo.svg'
 };
 
 const iconImgList: Array<IconTypes> = [
@@ -126,7 +125,6 @@ const iconImgList: Array<IconTypes> = [
   'baby-tip2',
   'error-boundary',
   'utxobg',
-  'aboutUsLogo',
   'version-notice',
   'side-panel-logo'
 ];
