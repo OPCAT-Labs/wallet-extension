@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "Opcat 錢包" },
+  "appName": { "message": "Catena 錢包" },
   "appDescription": {
-    "message": "開源 Opcat 錢包"
+    "message": "官方開源 OP_CAT 層錢包"
   },
   "receive": {
     "message": "接收"
@@ -466,7 +466,7 @@
     "message": "請選擇下方的服務提供商進行購買"
   },
   "disclaimStr": {
-    "message": "請注意，您即將透過第三方平台購買比特幣。信用卡支付服務由我們的合作夥伴提供。Opcat 錢包僅作為中介平台，對於使用信用卡支付服務可能產生的任何潛在損失或損害不承擔任何責任。"
+    "message": "請注意，您即將透過第三方平台購買比特幣。信用卡支付服務由我們的合作夥伴提供。Catena 錢包僅作為中介平台，對於使用信用卡支付服務可能產生的任何潛在損失或損害不承擔任何責任。"
   },
   "additional_transaction_fees": {
     "message": "透過第三方平台購買時會產生額外的交易手續費。費率因國家和支付方式而異。請在進行交易前查看各平台的費用。"
@@ -841,10 +841,10 @@
     "message": "已偵測到惡意行為和可疑活動。"
   },
   "your_access_to_this_page_has_been_restricted_by_un": {
-    "message": "由於此頁面可能不安全，Opcat 錢包已限制您對其的存取。"
+    "message": "由於此頁面可能不安全，Catena 錢包已限制您對其的存取。"
   },
   "reject_blocked_by_unisat_wallet": {
-    "message": "拒絕 (已被 Opcat 錢包阻擋)"
+    "message": "拒絕 (已被 Catena 錢包阻擋)"
   },
   "warning": {
     "message": "警告"
@@ -853,7 +853,7 @@
     "message": "我已了解相關風險"
   },
   "connect_with_unisat_wallet": {
-    "message": "連接 Opcat 錢包"
+    "message": "連接 Catena 錢包"
   },
   "select_the_account_to_use_on_this_site": {
     "message": "選擇要在此網站上使用的帳戶"
@@ -1358,7 +1358,7 @@
     "message": "危險！偵測到潛在的釣魚網站"
   },
   "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
-    "message": "此網站已被 Opcat 識別為惡意網站，可能："
+    "message": "此網站已被 Catena 識別為惡意網站，可能："
   },
   "steal_your_private_keys_or_seed_phrases": {
     "message": "竊取您的私鑰或助記詞"
@@ -2027,7 +2027,7 @@
     "message": "不支援帳戶刪除操作"
   },
   "disclaimStrFb": {
-    "message": "請注意，您即將透過第三方平台購買FB。信用卡支付服務由我們的合作夥伴提供。Opcat 錢包僅作為中介平台，對於使用信用卡支付服務可能產生的任何潛在損失或損害不承擔任何責任。"
+    "message": "請注意，您即將透過第三方平台購買FB。信用卡支付服務由我們的合作夥伴提供。Catena 錢包僅作為中介平台，對於使用信用卡支付服務可能產生的任何潛在損失或損害不承擔任何責任。"
   },
   "seconds_ago": {
     "message": "秒前"
@@ -2132,7 +2132,7 @@
     "message": "側邊欄模式"
   },
   "sign_all_transactions_at_once": {
-    "message": "您可以一次性簽署所有交易，但請注意，Opcat Wallet 不會單獨驗證每筆交易。我們強烈建議只在可信賴和熟悉的網站上使用它，以最大限度地降低潛在損失的風險。"
+    "message": "您可以一次性簽署所有交易，但請注意，Catena Wallet 不會單獨驗證每筆交易。我們強烈建議只在可信賴和熟悉的網站上使用它，以最大限度地降低潛在損失的風險。"
   },
   "message": {
     "message": "訊息"

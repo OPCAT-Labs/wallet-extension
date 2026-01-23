@@ -188,12 +188,12 @@ export async function restoreWallet(
   await passwordContinueBtn.click();
   log('✓ Password set up');
 
-  // 4. Step 1: Select wallet type (OPCAT Wallet - first option)
+  // 4. Step 1: Select wallet type (CATENA Wallet - first option)
   await page.waitForTimeout(2000);
   const firstWalletOption = locateTestId(page, `${TestIds.IMPORT_WALLET.RESTORE_WALLET_OPTION}-0`);
   await expect(firstWalletOption).toBeVisible({ timeout: 10000 });
   await firstWalletOption.click();
-  log('✓ Selected OPCAT Wallet');
+  log('✓ Selected CATENA Wallet');
 
   // 5. Step 2: Enter the mnemonic
   await page.waitForTimeout(2000);

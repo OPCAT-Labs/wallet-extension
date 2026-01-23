@@ -124,7 +124,7 @@ export const ADDRESS_TYPES: {
 export const getRestoreWallets = (): { value: RestoreWalletType; name: string; addressTypes: AddressType[] }[] => [
   {
     value: RestoreWalletType.UNISAT,
-    name: 'Opcat Wallet',
+    name: 'Catena Wallet',
     addressTypes: [
       AddressType.P2PKH
     ]
@@ -288,12 +288,12 @@ export const REVIEW_URL =
 export const TERMS_OF_SERVICE_URL = '#';
 export const PRIVACY_POLICY_URL = '#';
 
-export const WALLET_NAME = 'OPCAT'
-export const WALLET_FULL_NAME = 'OPCAT Wallet'
-export const X_CLIENT_HEADER = 'OPCAT Wallet'
+export const WALLET_NAME = 'CATENA'
+export const WALLET_FULL_NAME = 'CATENA Wallet'
+export const X_CLIENT_HEADER = 'CATENA Wallet'
 export const PAGE_PROVIDER_VARIABLE_NAME = 'opcat'
-export const PAGE_PROVIDER_VARIABLE_NAME_ALIAS = 'opcat_wallet'
-export const MESSAGE_EVENT_PRE = 'OPCAT_WALLET_'
+export const PAGE_PROVIDER_VARIABLE_NAME_ALIAS = 'catena_wallet'
+export const MESSAGE_EVENT_PRE = 'CATENA_WALLET_'
 export const ADDRESS_VERIFIER_URL = '#'
 
 export const CHANNEL = process.env.channel!;

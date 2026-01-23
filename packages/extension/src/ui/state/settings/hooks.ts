@@ -135,6 +135,11 @@ export function useCAT20TokenInfoExplorerUrl(tokenId: string) {
   return `${chain.unisatExplorerUrl}/cat20/${tokenId}`;
 }
 
+export function useExtensionUpdateUrl() {
+  const chain = useChain();
+  return `${chain.endpoints[0]}/v5/default/redirectUpdate`
+}
+
 export function useUnisatWebsite() {
   const chainType = useChainType();
   return CHAINS_MAP[chainType].unisatUrl;

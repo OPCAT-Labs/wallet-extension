@@ -1,7 +1,7 @@
 {
-  "appName": { "message": "Opcat Wallet" },
+  "appName": { "message": "Catena Wallet" },
   "appDescription": {
-    "message": "オープンソースのopcatウォレット"
+    "message": "公式オープンソースOP_CATレイヤーウォレット"
   },
   "receive": {
     "message": "受信"
@@ -466,7 +466,7 @@
     "message": "購入するには、以下のサービスプロバイダーを選択してください"
   },
   "disclaimStr": {
-    "message": "サードパーティプラットフォームを通じてビットコインを購入しようとしています。クレジットカード決済サービスは当社のパートナーによって提供されます。Opcat Walletは仲介プラットフォームとしてのみ機能し、クレジットカード決済サービスの使用から生じる可能性のある潜在的な損失または損害について、一切の責任を負いません。"
+    "message": "サードパーティプラットフォームを通じてビットコインを購入しようとしています。クレジットカード決済サービスは当社のパートナーによって提供されます。Catena Walletは仲介プラットフォームとしてのみ機能し、クレジットカード決済サービスの使用から生じる可能性のある潜在的な損失または損害について、一切の責任を負いません。"
   },
   "additional_transaction_fees": {
     "message": "サードパーティプラットフォームを通じて購入する場合、追加の取引手数料が適用されます。料金は国や支払い方法によって異なります。取引を進める前に、各プラットフォームの手数料を確認してください。"
@@ -838,10 +838,10 @@
     "message": "悪意のある行動や疑わしいアクティビティが検出されました。"
   },
   "your_access_to_this_page_has_been_restricted_by_un": {
-    "message": "安全でない可能性があるため、このページへのアクセスはOpcat Walletによって制限されています。"
+    "message": "安全でない可能性があるため、このページへのアクセスはCatena Walletによって制限されています。"
   },
   "reject_blocked_by_unisat_wallet": {
-    "message": "拒否 (Opcat Walletによりブロック)"
+    "message": "拒否 (Catena Walletによりブロック)"
   },
   "warning": {
     "message": "警告"
@@ -850,7 +850,7 @@
     "message": "リスクを承知しています"
   },
   "connect_with_unisat_wallet": {
-    "message": "Opcat Walletに接続"
+    "message": "Catena Walletに接続"
   },
   "select_the_account_to_use_on_this_site": {
     "message": "このサイトで使用するアカウントを選択してください"
@@ -1354,7 +1354,7 @@
     "message": "危険！潜在的なフィッシングウェブサイトが検出されました"
   },
   "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
-    "message": "このウェブサイトはOpcatによって悪意があると特定されており、以下の可能性があります："
+    "message": "このウェブサイトはCatenaによって悪意があると特定されており、以下の可能性があります："
   },
   "steal_your_private_keys_or_seed_phrases": {
     "message": "秘密鍵やシードフレーズを盗む"
@@ -2014,7 +2014,7 @@
     "message": "アカウント削除操作はサポートされていません"
   },
   "disclaimStrFb": {
-    "message": "第三者プラットフォームを通じてFBを購入しようとしていることに注意してください。クレジットカード支払いサービスは、私たちのパートナーによって提供されています。Opcat Walletは唯一の仲介プラットフォームであり、クレジットカード支払いサービスの使用による潜在的な損失や損害に対して責任を負いません。"
+    "message": "第三者プラットフォームを通じてFBを購入しようとしていることに注意してください。クレジットカード支払いサービスは、私たちのパートナーによって提供されています。Catena Walletは唯一の仲介プラットフォームであり、クレジットカード支払いサービスの使用による潜在的な損失や損害に対して責任を負いません。"
   },
   "seconds_ago": {
     "message": "秒前"
@@ -2128,7 +2128,7 @@
     "message": "サイドバーとして開く"
   },
   "sign_all_transactions_at_once": {
-    "message": "すべてのトランザクションを一度に署名することができますが、Opcat Walletは各トランザクションを個別に検証しないことに注意してください。信頼できるサイトでのみ使用することを強くお勧めします。"
+    "message": "すべてのトランザクションを一度に署名することができますが、Catena Walletは各トランザクションを個別に検証しないことに注意してください。信頼できるサイトでのみ使用することを強くお勧めします。"
   },
   "message": {
     "message": "メッセージ"

@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import * as path from 'path';
 
 /**
- * Playwright configuration for OPCAT Wallet E2E tests
+ * Playwright configuration for Catena Wallet E2E tests
  */
 export default defineConfig({
   // Test directory

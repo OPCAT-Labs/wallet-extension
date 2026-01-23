@@ -1,6 +1,6 @@
-# OPCAT Wallet
+# CATENA Wallet
 
-A browser extension wallet for OPCAT (Ordinal Protocol CAT) transactions.
+A browser extension wallet for CATENA (Ordinal Protocol CAT) transactions.
 
 ## Prerequisites
 
@@ -61,7 +61,7 @@ In the `utils` directory:
 
 ## Features
 
-- OPCAT transaction support
+- CATENA transaction support
 - Bitcoin wallet functionality
 - Browser extension interface
 - Developer tools integration

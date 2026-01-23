@@ -103,7 +103,7 @@ function injectScript() {
       pm.dispose();
     });
   } catch (error) {
-    console.error('OPCAT: Provider injection failed.', error);
+    console.error('CATENA: Provider injection failed.', error);
   }
 }
 

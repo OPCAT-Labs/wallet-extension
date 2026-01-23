@@ -1,6 +1,6 @@
 /**
  * API Client for E2E testing
- * Direct API calls to the OPCAT wallet backend
+ * Direct API calls to the CATENA wallet backend
  */
 
 const API_BASE_URL = 'https://wallet-api-testnet.opcatlabs.io';
