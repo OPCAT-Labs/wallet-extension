@@ -162,37 +162,34 @@ export type TypeChain = {
 export const CHAINS_MAP: { [key: string]: TypeChain } = {
   [ChainType.OPCAT_MAINNET]: {
     enum: ChainType.OPCAT_MAINNET,
-    label: 'OPCAT Layer Mainnet',
+    label: 'OP_CAT Layer Mainnet',
     iconLabel: 'Mainnet',
     icon: './images/artifacts/opcat-mainnet.svg',
     unit: 'BTC',
     networkType: NetworkType.MAINNET,
-    endpoints: [],
-    mempoolSpaceUrl: '',
+    endpoints: ['https://wallet-api.opcatlabs.io'],
+    mempoolSpaceUrl: 'https://mempool.opcatlabs.io',
     unisatUrl: '',
     unisatExplorerUrl: '',
     okxExplorerUrl: '',
     isViewTxHistoryInternally: false,
-    disable: true,
-    // isOpcat: true,
     showPrice: false,
     defaultExplorer: 'mempool-space',
   },
   [ChainType.OPCAT_TESTNET]: {
     enum: ChainType.OPCAT_TESTNET,
-    label: 'OPCAT Layer Testnet',
+    label: 'OP_CAT Layer Testnet',
     iconLabel: 'Testnet',
     icon: './images/artifacts/opcat-testnet.svg',
     unit: 'tBTC',
     networkType: NetworkType.TESTNET,
-    endpoints: ['https://wallet-api-testnet.opcatlabs.io'],
+    endpoints: ['https://testnet-wallet-api.opcatlabs.io'],
     // endpoints: ['http://127.0.0.1:3000'],
     mempoolSpaceUrl: 'https://testnet.opcatlabs.io',
     unisatUrl: '',
     unisatExplorerUrl: '',
     okxExplorerUrl: '',
     isViewTxHistoryInternally: false,
-    // isOpcat: true,
     showPrice: false,
     defaultExplorer: 'mempool-space',
   }
@@ -275,7 +272,7 @@ export const SAFE_DOMAIN_CONFIRMATION = 3;
 
 export const GITHUB_URL = '#';
 export const DISCORD_URL = '#';
-export const TWITTER_URL = 'https://x.com/opcatlayer';
+export const TWITTER_URL = 'https://x.com/catenawallet';
 export const TELEGRAM_URL = '#';
 export const WEBSITE_URL = 'https://opcatlabs.io';
 export const FEEDBACK_URL = '#';

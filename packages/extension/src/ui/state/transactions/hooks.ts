@@ -60,7 +60,7 @@ export function usePrepareSendBTCCallback() {
 
       if (!feeRate) {
         const summary = await wallet.getFeeSummary();
-        feeRate = summary.list[1].feeRate;
+        feeRate = summary.list[0].feeRate;
       }
       let psbtHex = '';
 
