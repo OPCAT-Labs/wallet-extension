@@ -106,33 +106,19 @@ export function useBTCUnit() {
   return CHAINS_MAP[chainType].unit;
 }
 
-// todo: change it
 export function useTxExplorerUrl(txid: string) {
   const chain = useChain();
-  if (chain.enum === ChainType.OPCAT_MAINNET) {
-    return `${chain.unisatExplorerUrl}/tx/${txid}`;
-  } else if (chain.defaultExplorer === 'mempool-space') {
-    return `${chain.mempoolSpaceUrl}/tx/${txid}`;
-  } else {
-    return `${chain.unisatExplorerUrl}/tx/${txid}`;
-  }
+  return `${chain.mempoolSpaceUrl}/tx/${txid}`;
 }
 
-// todo: change it
 export function useAddressExplorerUrl(address: string) {
   const chain = useChain();
-  if (chain.enum === ChainType.OPCAT_MAINNET) {
-    return `${chain.unisatExplorerUrl}/address/${address}`;
-  } else if (chain.defaultExplorer === 'mempool-space') {
-    return `${chain.mempoolSpaceUrl}/address/${address}`;
-  } else {
-    return `${chain.unisatExplorerUrl}/address/${address}`;
-  }
+  return `${chain.mempoolSpaceUrl}/address/${address}`;
 }
 
 export function useCAT20TokenInfoExplorerUrl(tokenId: string) {
   const chain = useChain();
-  return `${chain.unisatExplorerUrl}/cat20/${tokenId}`;
+  return `${chain.mempoolSpaceUrl}/cat20/${tokenId}`;
 }
 
 export function useExtensionUpdateUrl() {

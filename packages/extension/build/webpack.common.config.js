@@ -21,7 +21,10 @@ const WasmModuleWebpackPlugin = require('wasm-module-webpack-plugin');
 const { getBrowserPaths } = require('./paths');
 
 const config = (env) => {
-  const version = env.version;
+  // Read version from package.json if not provided
+  const packageConfig = require('../package.json');
+  const packageVersion = packageConfig.version.split('-beta')[0];
+  const version = env.version || packageVersion;
   const paths = getBrowserPaths(env.browser);
   const manifest = env.manifest;
   const channel = env.channel;
