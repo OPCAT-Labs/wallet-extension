@@ -24,6 +24,23 @@ jobs:
           node-version: '22'
           cache: 'yarn'
 
+      - name: Check if release already exists
+        run: |
+          TAG_NAME=${{ github.ref_name }}
+
+          # Check if release exists using GitHub CLI
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "❌ Error: Release $TAG_NAME already exists"
+            exit 1
+          fi
+
+          echo "✅ No existing release found for $TAG_NAME"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Update package.json version
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
@@ -48,23 +65,6 @@ jobs:
           "
 
           echo "✅ Updated package.json versions to $TAG_VERSION"
-
-      - name: Check if release already exists
-        run: |
-          TAG_NAME=${{ github.ref_name }}
-
-          # Check if release exists using GitHub CLI
-          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
-            echo "❌ Error: Release $TAG_NAME already exists"
-            exit 1
-          fi
-
-          echo "✅ No existing release found for $TAG_NAME"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies
-        run: yarn install
 
       - name: Build SDK
         run: yarn workspace @opcat-labs/wallet-sdk build
