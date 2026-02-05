@@ -1,0 +1,102 @@
+name: Pre-release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+
+jobs:
+  build-and-prerelease:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+
+      - name: Update package.json version
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Updating package.json version to: $TAG_VERSION"
+
+          # Update extension package.json
+          node -e "
+            const fs = require('fs');
+            const path = './packages/extension/package.json';
+            const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+            pkg.version = '$TAG_VERSION';
+            fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          # Update SDK package.json
+          node -e "
+            const fs = require('fs');
+            const path = './packages/utils/package.json';
+            const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+            pkg.version = '$TAG_VERSION';
+            fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          echo "✅ Updated package.json versions to $TAG_VERSION"
+
+      - name: Check if release already exists
+        run: |
+          TAG_NAME=${{ github.ref_name }}
+
+          # Check if release exists using GitHub CLI
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "❌ Error: Release $TAG_NAME already exists"
+            exit 1
+          fi
+
+          echo "✅ No existing release found for $TAG_NAME"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build SDK
+        run: yarn workspace @opcat-labs/wallet-sdk build
+
+      - name: Build Chrome MV3 extension
+        run: yarn workspace @opcat-labs/wallet-extension build:chrome:mv3
+        env:
+          CI: true
+
+      - name: Get tag message
+        id: tag_message
+        run: |
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' ${{ github.ref_name }})
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAG_MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ${{ steps.tag_message.outputs.message }}
+
+            ---
+
+            ⚠️ **This is a pre-release version**
+
+            This version may be unstable and is intended for testing purposes only.
+            Use at your own risk.
+          files: |
+            packages/extension/dist/catena-chrome-mv3-*.zip
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
