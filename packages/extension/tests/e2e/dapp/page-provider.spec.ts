@@ -6,7 +6,7 @@
 import { test, expect } from '../fixtures';
 import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
-import { restoreWallet } from '../helpers/wallet-utils';
+import { restoreWallet, switchToTestnet } from '../helpers/wallet-utils';
 import { TEST_WALLET } from '../test-constants';
 import { handleNextWalletPopup, setupWalletPopupHandler, removeWalletPopupHandler } from './helpers/wallet-popup-handler';
 import { bvmVerify, DummyProvider, ExtPsbt } from '@opcat-labs/scrypt-ts-opcat';
@@ -56,8 +56,11 @@ test.describe('PageProvider API', () => {
       TEST_WALLET.mnemonic
     );
 
-    // Wait a bit for the extension service worker to fully initialize
-    await setupPage.waitForTimeout(2000);
+    // Switch to testnet for E2E tests (BEFORE closing the page!)
+    await switchToTestnet(setupPage);
+
+    // Wait a bit for the network switch and accounts to reload
+    await setupPage.waitForTimeout(3000);
     await setupPage.close();
   });
 

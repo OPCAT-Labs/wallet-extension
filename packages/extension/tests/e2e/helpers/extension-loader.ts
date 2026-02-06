@@ -143,6 +143,9 @@ export async function loadExtension(): Promise<ExtensionInfo> {
 
   const extensionUrl = `chrome-extension://${extensionId}`;
 
+  // Note: E2E tests should use switchToTestnet() helper after wallet creation/restoration
+  // to ensure correct testnet addresses are generated
+
   return {
     id: extensionId,
     context,

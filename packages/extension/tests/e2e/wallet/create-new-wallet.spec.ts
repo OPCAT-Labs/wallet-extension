@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures';
 import { loadExtension } from '../helpers/extension-loader';
-import { createWallet } from '../helpers/wallet-utils';
+import { createWallet, switchToTestnet } from '../helpers/wallet-utils';
 import { log, locateTestId, TestIds } from '../helpers/test-utils';
 import { TEST_PRIVATE_KEYS, TEST_ADDRESSES, TEST_PASSWORDS } from '../test-constants';
 
@@ -15,17 +15,40 @@ test.describe('Create New Wallet', () => {
     await createWallet(page, extensionUrl, TEST_PASSWORDS.VALID);
     log('✓ Initial wallet created');
 
+    // Switch to testnet for E2E tests
+    await switchToTestnet(page);
+
     // Wait for main page to fully load
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
 
     log('2. Clicking wallet switcher button...');
     const walletSwitcher = locateTestId(page, TestIds.WALLET.WALLET_SWITCHER);
     await expect(walletSwitcher).toBeVisible({ timeout: 10000 });
-    await walletSwitcher.click();
-    log('✓ Opened wallet switcher');
 
-    // Wait for switcher page to load
-    await page.waitForTimeout(2000);
+    // Retry clicking if blocked by overlay
+    let clickSucceeded = false;
+    for (let i = 0; i < 5; i++) {
+      try {
+        await walletSwitcher.click({ timeout: 3000 });
+        clickSucceeded = true;
+        break;
+      } catch (e) {
+        log(`   Retry ${i + 1}: Wallet switcher click blocked, waiting...`);
+        await page.waitForTimeout(1000);
+      }
+    }
+
+    if (!clickSucceeded) {
+      await walletSwitcher.click({ force: true });
+    }
+
+    log('✓ Clicked wallet switcher');
+
+    // Wait for wallet list to appear
+    const walletList = locateTestId(page, TestIds.ACCOUNT_MANAGEMENT.WALLET_LIST);
+    await expect(walletList).toBeVisible({ timeout: 15000 });
+    await page.waitForTimeout(1000);
+    log('✓ Wallet management screen loaded');
 
     log('3. Clicking add wallet button (top right)...');
     const addWalletBtn = locateTestId(page, TestIds.ACCOUNT_MANAGEMENT.ADD_WALLET_BUTTON);
@@ -67,10 +90,18 @@ test.describe('Create New Wallet', () => {
     const addressCopyBtn = locateTestId(page, TestIds.ACCOUNT_MANAGEMENT.ADDRESS_COPY_BUTTON);
     await expect(addressCopyBtn).toBeVisible({ timeout: 10000 });
     await addressCopyBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
-    // Read address from clipboard
-    const clipboardAddress = await page.evaluate(() => navigator.clipboard.readText());
+    // Read address from clipboard with retries
+    let clipboardAddress = '';
+    for (let i = 0; i < 5; i++) {
+      clipboardAddress = await page.evaluate(() => navigator.clipboard.readText());
+      if (clipboardAddress) {
+        break;
+      }
+      log(`   Retry ${i + 1}: Clipboard empty, waiting...`);
+      await page.waitForTimeout(500);
+    }
     log(`   Address from clipboard: ${clipboardAddress}`);
 
     // Verify the full address matches expected (testnet address)
@@ -105,6 +136,9 @@ test.describe('Create New Wallet', () => {
 
     log('1. Creating initial wallet...');
     await createWallet(page, extensionUrl, TEST_PASSWORDS.VALID);
+
+    // Switch to testnet for E2E tests
+    await switchToTestnet(page);
 
     await page.waitForTimeout(2000);
 
