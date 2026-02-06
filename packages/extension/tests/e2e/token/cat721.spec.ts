@@ -4,7 +4,7 @@
 import { test, expect } from '../fixtures';
 import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
-import { restoreWallet, closeVersionPopupIfExists } from '../helpers/wallet-utils';
+import { restoreWallet, closeVersionPopupIfExists, switchToTestnet } from '../helpers/wallet-utils';
 import { ensureTestNft, findTestNft } from '../helpers/token-manager';
 import { getCAT721List } from '../helpers/api-client';
 import { TEST_WALLET, TEST_CAT721, TEST_CAT20 } from '../test-constants';
@@ -160,13 +160,16 @@ test.describe('CAT721 NFT Operations', () => {
     // Step 3: Create page and restore wallet
     page = await context.newPage();
     console.log('Setting up wallets for transfer tests...');
-    
+
     await restoreWallet(
       page,
       extensionInfo.extensionUrl,
       TEST_WALLET.password,
       TEST_WALLET.mnemonic
     );
+
+    // Switch to testnet for E2E tests
+    await switchToTestnet(page);
   });
 
   test.afterAll(async () => {

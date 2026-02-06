@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { SwitchChainModal } from '@/ui/pages/Settings/SwitchChainModal';
 import { useChain } from '@/ui/state/settings/hooks';
+import { TestIds } from '@/ui/utils/test-ids';
 
 import { Card } from '../Card';
 import { Icon } from '../Icon';
@@ -17,6 +18,7 @@ export function SwitchNetworkBar() {
   return (
     <Card
       preset="style2"
+      testid={TestIds.WALLET.NETWORK_INDICATOR}
       style={{
         backgroundColor: 'rgba(var(--color-background-rgb),0.08)',
         height: 28,

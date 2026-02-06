@@ -8,7 +8,7 @@ import { locateTestId, log, TestIds } from './test-utils';
  */
 export async function closeVersionPopupIfExists(page: Page): Promise<void> {
   // Wait a bit for popup to potentially appear
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(1000);
 
   // Check if version popup exists using testid
   const versionPopup = locateTestId(page, TestIds.VERSION_NOTICE.POPUP);
@@ -21,10 +21,13 @@ export async function closeVersionPopupIfExists(page: Page): Promise<void> {
     const gotItButton = locateTestId(page, TestIds.VERSION_NOTICE.GOT_IT_BUTTON);
     if (await gotItButton.count() > 0) {
       await gotItButton.click({ force: true });
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
       log('   ✓ Version popup closed');
     }
   }
+
+  // Wait additional time for any animations to complete
+  await page.waitForTimeout(1000);
 }
 
 /**
@@ -268,14 +271,37 @@ export async function createNewPrivateKeyWallet(
   // Close version popup if it appears (it may block wallet switcher)
   await closeVersionPopupIfExists(page);
 
-  // 1. Click wallet switcher button
+  // 1. Click wallet switcher button (wait for it to be clickable)
   const walletSwitcher = locateTestId(page, TestIds.WALLET.WALLET_SWITCHER);
   await expect(walletSwitcher).toBeVisible({ timeout: 10000 });
-  await walletSwitcher.click();
-  await page.waitForTimeout(2000);
-  log('✓ Opened wallet switcher');
 
-  // 2. Click add wallet button
+  // Retry clicking if blocked by overlay
+  let clickSucceeded = false;
+  for (let i = 0; i < 5; i++) {
+    try {
+      await walletSwitcher.click({ timeout: 3000 });
+      clickSucceeded = true;
+      break;
+    } catch (e) {
+      log(`   Retry ${i + 1}: Wallet switcher click blocked, waiting...`);
+      await page.waitForTimeout(1000);
+    }
+  }
+
+  if (!clickSucceeded) {
+    // Last resort: force click
+    await walletSwitcher.click({ force: true });
+  }
+
+  log('✓ Clicked wallet switcher');
+
+  // 2. Wait for SwitchKeyringScreen to load by checking for wallet list
+  const walletList = locateTestId(page, TestIds.ACCOUNT_MANAGEMENT.WALLET_LIST);
+  await expect(walletList).toBeVisible({ timeout: 15000 });
+  await page.waitForTimeout(1000);
+  log('✓ Wallet management screen loaded');
+
+  // 3. Click add wallet button
   const addWalletBtn = locateTestId(page, TestIds.ACCOUNT_MANAGEMENT.ADD_WALLET_BUTTON);
   await expect(addWalletBtn).toBeVisible({ timeout: 10000 });
   await addWalletBtn.click();
@@ -379,16 +405,38 @@ export async function getTotalBTCBalance(page: Page): Promise<number> {
 export async function switchToWalletByAddress(page: Page, targetAddress: string): Promise<void> {
   log(`Switching to wallet with address: ${targetAddress}...`);
 
-  // 1. Click the wallet switcher button (top left on main page)
+  // Close version popup if it appears (it may block wallet switcher)
+  await closeVersionPopupIfExists(page);
+
+  // 1. Click the wallet switcher button (wait for it to be clickable)
   const walletSwitcher = locateTestId(page, TestIds.WALLET.WALLET_SWITCHER);
   await expect(walletSwitcher).toBeVisible({ timeout: 10000 });
-  await walletSwitcher.click();
-  await page.waitForTimeout(2000);
-  log('✓ Opened wallet switcher');
 
-  // 2. Find the wallet list
+  // Retry clicking if blocked by overlay
+  let clickSucceeded = false;
+  for (let i = 0; i < 5; i++) {
+    try {
+      await walletSwitcher.click({ timeout: 3000 });
+      clickSucceeded = true;
+      break;
+    } catch (e) {
+      log(`   Retry ${i + 1}: Wallet switcher click blocked, waiting...`);
+      await page.waitForTimeout(1000);
+    }
+  }
+
+  if (!clickSucceeded) {
+    // Last resort: force click
+    await walletSwitcher.click({ force: true });
+  }
+
+  log('✓ Clicked wallet switcher');
+
+  // 2. Wait for SwitchKeyringScreen to load
   const walletList = locateTestId(page, TestIds.ACCOUNT_MANAGEMENT.WALLET_LIST);
-  await expect(walletList).toBeVisible({ timeout: 10000 });
+  await expect(walletList).toBeVisible({ timeout: 15000 });
+  await page.waitForTimeout(1000);
+  log('✓ Wallet management screen loaded');
 
   // 3. Find all wallet items and click the one matching the address
   const walletItems = walletList.locator(`[data-testid="${TestIds.ACCOUNT_MANAGEMENT.WALLET_ITEM}"]`);
@@ -422,6 +470,76 @@ export async function switchToWalletByAddress(page: Page, targetAddress: string)
   await expect(balanceDisplay).toBeVisible({ timeout: 15000 });
 
   log('✅ Successfully switched wallet');
+}
+
+/**
+ * Switch to testnet network
+ * This is required for e2e tests as they can only run on testnet
+ * @param page - Playwright page object
+ */
+export async function switchToTestnet(page: Page): Promise<void> {
+  log('Switching to testnet network...');
+
+  // 1. Verify we're on main page
+  const balanceDisplay = locateTestId(page, TestIds.WALLET.BALANCE_DISPLAY);
+  await expect(balanceDisplay).toBeVisible({ timeout: 10000 });
+
+  // Close version popup if it appears (it may block the network switcher)
+  await closeVersionPopupIfExists(page);
+
+  // 2. Click network indicator to open network selector
+  const networkIndicator = locateTestId(page, TestIds.WALLET.NETWORK_INDICATOR);
+  await expect(networkIndicator).toBeVisible({ timeout: 10000 });
+  await networkIndicator.click();
+  await page.waitForTimeout(2000);
+  log('✓ Opened network selector');
+
+  // 3. Check current network by looking at the text
+  const currentNetworkText = await networkIndicator.textContent();
+  log(`   Current network indicator text: "${currentNetworkText}"`);
+
+  // Only skip if explicitly on testnet (not mainnet)
+  if (currentNetworkText?.includes('Testnet') && !currentNetworkText?.includes('Mainnet')) {
+    log('✓ Already on testnet, skipping switch');
+    // Close the modal by pressing escape
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(2000);
+    // Ensure modal is fully closed
+    return;
+  }
+
+  log(`   Need to switch from "${currentNetworkText}" to testnet`);
+
+  // 4. Find and click the testnet option in the modal
+  // The testnet option should be in a card with the text "OP_CAT Layer Testnet"
+  await page.waitForTimeout(1000);
+
+  // Look for the testnet card by text content
+  const testnetCard = page.locator('text=OP_CAT Layer Testnet').first();
+  await expect(testnetCard).toBeVisible({ timeout: 10000 });
+  await testnetCard.click();
+  log('✓ Clicked testnet option');
+
+  // 5. Wait for network switch to complete and accounts to reload
+  await page.waitForTimeout(5000);
+
+  // 6. Verify we're now on testnet by checking the network indicator
+  const updatedNetworkText = await networkIndicator.textContent();
+  if (!updatedNetworkText?.includes('Testnet')) {
+    throw new Error(`Failed to switch to testnet. Current network: ${updatedNetworkText}`);
+  }
+
+  // 7. Ensure we're on the main page after network switch
+  // The network switch triggers account reload which may cause navigation
+  const balanceDisplayAfter = locateTestId(page, TestIds.WALLET.BALANCE_DISPLAY);
+  await expect(balanceDisplayAfter).toBeVisible({ timeout: 15000 });
+
+  // 8. Close any remaining overlays by clicking outside modal area
+  // This ensures no lingering overlays that might block subsequent clicks
+  await page.mouse.click(10, 10);
+  await page.waitForTimeout(1000);
+
+  log('✅ Successfully switched to testnet');
 }
 
 /**

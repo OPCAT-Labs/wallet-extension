@@ -4,7 +4,7 @@
 import { test, expect } from '../fixtures';
 import { Page, BrowserContext } from '@playwright/test';
 import { loadExtension, ExtensionInfo } from '../helpers/extension-loader';
-import { restoreWallet, closeVersionPopupIfExists } from '../helpers/wallet-utils';
+import { restoreWallet, closeVersionPopupIfExists, switchToTestnet } from '../helpers/wallet-utils';
 import { ensureTestToken } from '../helpers/token-manager';
 import { getCAT20List } from '../helpers/api-client';
 import { TEST_WALLET, TEST_CAT20 } from '../test-constants';
@@ -139,6 +139,9 @@ test.describe('CAT20 Token', () => {
       TEST_WALLET.password,
       TEST_WALLET.mnemonic
     );
+
+    // Switch to testnet for E2E tests
+    await switchToTestnet(page);
   });
 
   test.afterAll(async () => {

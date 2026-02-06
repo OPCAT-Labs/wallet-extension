@@ -7,6 +7,7 @@ import {
   getTotalBTCBalance,
   switchToWalletByAddress,
   closeVersionPopupIfExists,
+  switchToTestnet,
 } from '../helpers/wallet-utils';
 import { log, locateTestId, TestIds } from '../helpers/test-utils';
 import {
@@ -144,6 +145,13 @@ test.describe('Transfer BTC', () => {
       TEST_MNEMONICS.MNEMONIC_12
     );
     log(`✓ Mnemonic wallet restored: ${mnemonicWalletAddress}`);
+
+    // Switch to testnet for E2E tests
+    await switchToTestnet(page);
+
+    // After switching to testnet, the wallet address changes to testnet format
+    mnemonicWalletAddress = TEST_ADDRESSES.MNEMONIC_12_P2PKH_TESTNET;
+    log(`✓ Wallet address updated to testnet: ${mnemonicWalletAddress}`);
 
     // 2. Import private key wallet
     privateKeyWalletAddress = await createNewPrivateKeyWallet(page, TEST_PRIVATE_KEYS.KEY_1);
