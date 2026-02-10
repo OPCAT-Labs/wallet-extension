@@ -2311,19 +2311,19 @@
     "@types/node-fetch" "^2.5.10"
     node-fetch "^2.6.1"
 
-"@opcat-labs/cat-sdk@3":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-3.0.0.tgz#2f3c51a050f07fa276ab9fc90dafb479044ad3de"
-  integrity sha512-JpB3pBuqrQqCXqbuQxGPcLw5XgcxEsDvtZgrHPc1IawPNFki3T79aujcVOlnb+G7vcHLVo7mGsxAMsP7QMzDEg==
+"@opcat-labs/cat-sdk@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-3.2.0.tgz#a4b0e9a2c1dbb6bd5501b7267685239f0cd1d4f8"
+  integrity sha512-URZMs8g0mcCoQs7NF2Pu81yg3BKg0Rcse1KkrrMDstk+8cJ/+DXpMVN8XSelirHs0D4wO2kvAvJADPmDaSt3Sg==
   dependencies:
-    "@opcat-labs/opcat" "3.0.0"
-    "@opcat-labs/scrypt-ts-opcat" "3.0.0"
+    "@opcat-labs/opcat" "3.2.0"
+    "@opcat-labs/scrypt-ts-opcat" "3.2.0"
     cbor2 "^2.0.1"
 
-"@opcat-labs/opcat@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-3.0.0.tgz#83e9ba6c68f2a72d3d323762c5db5a570d64455e"
-  integrity sha512-9KGs2aMWxe8J6ZM2nZ7/i4IApQKmLnjRxYhglqgMVFOY3LUbWva4nnpdDnWlqwTyhliH59bV2JLpuvMBR/Tziw==
+"@opcat-labs/opcat@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-3.2.0.tgz#781eaff9299e713d74fdc7fb926a84cb5a4310b6"
+  integrity sha512-KvplPoRKe//MeXghPhibtBZ7tpA0cwbkM8Wnqu7nJMEBU9vIwLmWkg7wDRik/pEBV55e5klOCQNkYQlsvxeEhQ==
   dependencies:
     assert "^2.1.0"
     bs58 "=4.0.1"
@@ -2333,13 +2333,13 @@
     inherits "2.0.3"
     unorm "1.4.1"
 
-"@opcat-labs/scrypt-ts-opcat@3", "@opcat-labs/scrypt-ts-opcat@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-3.0.0.tgz#dc50b8bfbb9336acf546b77635f35213749ad211"
-  integrity sha512-0NMFEUNk2U5FmZXmOv2gdomMGWrlPvphBkrDF2hkZtLUzHBELSMGmhc3k036HQRUEtPFlfW8moas/aBMV897xQ==
+"@opcat-labs/scrypt-ts-opcat@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-3.2.0.tgz#d24f4ea0d4c05fe8387a224c1703a5ad845bbf03"
+  integrity sha512-zKP/uzHzzxjwOV8PjmkL8EdjudI+B5bfiY4D8ArBpUpSlblqXEErTidDF568HS3z+oUKoifjiQaK+a6NLUtBIg==
   dependencies:
     "@noble/curves" "^1.8.1"
-    "@opcat-labs/opcat" "3.0.0"
+    "@opcat-labs/opcat" "3.2.0"
     bip174 "^3.0.0-rc.1"
     cbor2 "^2.0.1"
     cross-fetch "^4.1.0"
