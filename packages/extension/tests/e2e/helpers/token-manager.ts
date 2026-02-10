@@ -10,7 +10,7 @@ import {
   deployClosedMinterCollection,
   mintClosedMinterNft,
 } from '@opcat-labs/cat-sdk';
-import { DefaultSigner, PrivateKey, MempoolProvider } from '@opcat-labs/scrypt-ts-opcat';
+import { DefaultSigner, PrivateKey, OpenApiProvider } from '@opcat-labs/scrypt-ts-opcat';
 import { TEST_WALLET, TEST_CAT20, TIMEOUT_CONFIG, TEST_CAT721 } from '../test-constants';
 import { getCAT20List, CAT20Balance, getCAT721List, CAT721Balance } from './api-client';
 
@@ -34,8 +34,8 @@ export function createSigner(): DefaultSigner {
 /**
  * Create mempool provider for testnet
  */
-export function createProvider(): MempoolProvider {
-  return new MempoolProvider('opcat-testnet');
+export function createProvider(): OpenApiProvider {
+  return new OpenApiProvider('opcat-testnet');
 }
 
 /**
