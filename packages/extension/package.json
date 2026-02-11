@@ -1,6 +1,6 @@
 {
   "name": "@opcat-labs/wallet-extension",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "homepage": "https://github.com/OPCAT-Labs/wallet-extension#readme",
   "bugs": {
@@ -50,7 +50,7 @@
     "@noble/curves": "^1.0.0",
     "@noble/hashes": "^1.7.1",
     "@noble/secp256k1": "1.7.1",
-    "@opcat-labs/cat-sdk": "3.2.0",
+    "@opcat-labs/cat-sdk": "3.3.0",
     "@opcat-labs/wallet-sdk": "^0.1.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@reduxjs/toolkit": "^1.9.2",
