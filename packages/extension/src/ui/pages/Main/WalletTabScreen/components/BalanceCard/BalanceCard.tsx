@@ -44,7 +44,6 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
   const [isExpanded, setIsExpanded] = useState(false);
   const dispatch = useDispatch();
   const isBalanceHidden = useSelector((state: AppState) => state.ui.isBalanceHidden);
-  const isBtcMainnet = chain.enum === ChainType.OPCAT_MAINNET;
 
   const [isSpecialLocale, setIsSpecialLocale] = useState(false);
 
@@ -149,7 +148,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
           <span className={styles.balanceNumber}>{isBalanceHidden ? '*****' : totalAmount.split('.')[0]}</span>
           {!isBalanceHidden && (
             <>
-              <span className={styles.decimal} style={{ color: isBtcMainnet ? '#000' : 'rgba(var(--color-text-rgb), 0.45)' }}>
+              <span className={styles.decimal}>
                 .{totalAmount.split('.')[1]}
               </span>
               <span className={styles.unit}>{btcUnit}</span>
