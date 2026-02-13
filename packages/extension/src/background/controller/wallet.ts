@@ -43,7 +43,7 @@ import { psbtFromString } from '@/ui/utils/psbt-utils';
 import { txHelpers } from '@opcat-labs/wallet-sdk';
 import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
 import { bitcoin, ECPair } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
-import { ExtPsbt, Signer, SignOptions, SupportedNetwork, UTXO as ExtUtxo, Transaction, MempoolProvider } from '@opcat-labs/scrypt-ts-opcat';
+import { ExtPsbt, Signer, SignOptions, SupportedNetwork, UTXO as ExtUtxo, Transaction, OpenApiProvider } from '@opcat-labs/scrypt-ts-opcat';
 import {mergeSendToken, singleSendNft, toTokenOwnerAddress} from '@opcat-labs/cat-sdk'
 import { KeystoneKeyring } from '@opcat-labs/wallet-sdk/lib/keyring';
 import {
@@ -1562,7 +1562,7 @@ export class WalletController extends BaseController {
       _keyring,
       toOpcatNetwork(networkType)
     )
-    const provider = new MempoolProvider(toOpcatNetwork(networkType))
+    const provider = new OpenApiProvider(toOpcatNetwork(networkType))
 
     // Broadcast progress: preparing
     eventBus.emit(EVENTS.broadcastToUI, {
@@ -1711,7 +1711,7 @@ export class WalletController extends BaseController {
       _keyring,
       toOpcatNetwork(networkType)
     )
-    const provider = new MempoolProvider(toOpcatNetwork(networkType))
+    const provider = new OpenApiProvider(toOpcatNetwork(networkType))
 
     // Broadcast progress: preparing
     eventBus.emit(EVENTS.broadcastToUI, {

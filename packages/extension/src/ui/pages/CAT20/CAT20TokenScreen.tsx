@@ -15,9 +15,9 @@ import { useCurrentKeyring } from '@/ui/state/keyrings/hooks';
 import { useCAT20MarketPlaceWebsite, useCAT20TokenInfoExplorerUrl, useChainType } from '@/ui/state/settings/hooks';
 import { colors } from '@/ui/theme/colors';
 import { fontSizes } from '@/ui/theme/font';
-import { showLongNumber, useLocationState, useWallet } from '@/ui/utils';
+import { copyToClipboard, shortAddress, showLongNumber, useLocationState, useWallet } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
-import { LoadingOutlined } from '@ant-design/icons';
+import { CopyOutlined, LoadingOutlined } from '@ant-design/icons';
 
 import { useNavigate } from '../MainRoute';
 
@@ -205,7 +205,30 @@ export default function CAT20TokenScreen() {
               backgroundColor: 'rgba(var(--color-background-rgb),0.04)',
               borderRadius: 15
             }}>
-            <Section title={t('token_id')} value={tokenSummary.cat20Info.tokenId} link={tokenUrl} />
+            <Section
+              title={t('token_id')}
+              value={tokenSummary.cat20Info.tokenId}
+              rightComponent={
+                <Row gap="sm" itemsCenter>
+                  <Text
+                    text={shortAddress(tokenSummary.cat20Info.tokenId, 10)}
+                    preset="link"
+                    size="xs"
+                    onClick={() => window.open(tokenUrl)}
+                  />
+                  <Icon
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyToClipboard(tokenSummary.cat20Info.tokenId).then(() => {
+                        tools.toastSuccess(t('copied'));
+                      });
+                    }}
+                    style={{ cursor: 'pointer', fontSize: 14 }}>
+                    <CopyOutlined />
+                  </Icon>
+                </Row>
+              }
+            />
             <Line />
             <Section title={t('name')} value={tokenSummary.cat20Info.name} />
             <Line />
