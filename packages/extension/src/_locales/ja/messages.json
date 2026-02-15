@@ -9,6 +9,15 @@
   "total_balance": {
     "message": "総残高"
   },
+  "btc_balance": {
+    "message": "BTC残高"
+  },
+  "bitcoin_on_opcat_mainnet": {
+    "message": "OP_CAT Layer メインネット上のビットコイン"
+  },
+  "testnet4_bitcoin_on_opcat_testnet": {
+    "message": "OP_CAT Layer テストネット上のビットコイン"
+  },
   "enter_your_password": {
     "message": "パスワードを入力してください"
   },
