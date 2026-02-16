@@ -9,6 +9,15 @@
   "total_balance": {
     "message": "Saldo Total"
   },
+  "btc_balance": {
+    "message": "Saldo de BTC"
+  },
+  "bitcoin_on_opcat_mainnet": {
+    "message": "Bitcoin en OP_CAT Layer Mainnet"
+  },
+  "testnet4_bitcoin_on_opcat_testnet": {
+    "message": "Bitcoin Testnet4 en OP_CAT Layer Testnet"
+  },
   "enter_your_password": {
     "message": "Introduce tu contraseña"
   },

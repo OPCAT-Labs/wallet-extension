@@ -61,6 +61,14 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
 
   const backgroundImage = './images/artifacts/balance-bg-btc.png';
 
+  const btcLogoSrc = chain.enum === ChainType.OPCAT_MAINNET
+    ? './images/icons/opcat-mainnet-btc.svg'
+    : './images/icons/opcat-testnet4-btc.svg';
+
+  const btcTooltip = chain.enum === ChainType.OPCAT_MAINNET
+    ? t('bitcoin_on_opcat_mainnet')
+    : t('testnet4_bitcoin_on_opcat_testnet');
+
   const totalAmount = satoshisToAmount(+accountBalance.amount * 1e8);
   const confirmedAmount = satoshisToAmount(+accountBalance.confirm_btc_amount * 1e8);
   const unconfirmedAmount = satoshisToAmount(+accountBalance.pending_btc_amount * 1e8);
@@ -135,7 +143,7 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       {/* <img className={styles.decorativeImage} src={backgroundImage} alt="Balance background" /> */}
 
       <div className={styles.header}>
-        {t('total_balance')}
+        {t('btc_balance')}
         <div style={{ display: 'flex', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
           <EyeIcon onClick={toggleBalanceVisibility} />
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -144,17 +152,30 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       </div>
 
       <div className={styles.balanceWrapper} data-testid={TestIds.WALLET.BALANCE_DISPLAY}>
-        <div className={styles.balanceContent}>
-          <span className={styles.balanceNumber}>{isBalanceHidden ? '*****' : totalAmount.split('.')[0]}</span>
+        <div className={styles.balanceContent} title={btcTooltip}>
           {!isBalanceHidden && (
             <>
+            <span className={styles.balanceNumber}>{totalAmount.split('.')[0]}</span>
               <span className={styles.decimal}>
                 .{totalAmount.split('.')[1]}
               </span>
-              <span className={styles.unit}>{btcUnit}</span>
+              <img
+                src={btcLogoSrc}
+                alt="BTC"
+                className={styles.btcLogo}
+              />
             </>
           )}
-          {isBalanceHidden && <span className={styles.unit}>{btcUnit}</span>}
+          {isBalanceHidden && (
+            <>
+              <span className={styles.balanceNumber} style={{transform: 'translateY(5px)'}}>*****</span>
+              <img
+                src={btcLogoSrc}
+                alt="BTC"
+                className={styles.btcLogo}
+              />
+            </>
+          )}
         </div>
         {/* <Icon icon="balance-right" size={10} containerStyle={{ transform: `rotate(${isExpanded ? 270 : 90}deg)` }} /> */}
       </div>

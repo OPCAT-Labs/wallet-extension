@@ -9,6 +9,15 @@
   "total_balance": {
     "message": "总余额"
   },
+  "btc_balance": {
+    "message": "BTC 余额"
+  },
+  "bitcoin_on_opcat_mainnet": {
+    "message": "OP_CAT Layer 主网比特币"
+  },
+  "testnet4_bitcoin_on_opcat_testnet": {
+    "message": "OP_CAT Layer 测试网比特币"
+  },
   "enter_your_password": {
     "message": "输入您的密码"
   },
