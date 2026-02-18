@@ -1825,6 +1825,15 @@
   "address_label": {
     "message": "地址"
   },
+  "receive_notice_opcat_only": {
+    "message": "請注意，此地址僅用於 OP_CAT Layer 網路內的 BTC 轉帳。"
+  },
+  "receive_notice_bridge_prefix": {
+    "message": "如果您想將比特幣主網的 BTC 轉移到 OP_CAT Layer 錢包，請使用 "
+  },
+  "receive_notice_bridge_suffix": {
+    "message": " 的橋服務。"
+  },
   "saving": {
     "message": "保存中..."
   },
