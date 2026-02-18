@@ -1824,6 +1824,15 @@
   "address_label": {
     "message": "アドレス"
   },
+  "receive_notice_opcat_only": {
+    "message": "このアドレスは OP_CAT Layer ネットワーク内の BTC 送金にのみ使用できます。"
+  },
+  "receive_notice_bridge_prefix": {
+    "message": "ビットコインメインネットから OP_CAT Layer ウォレットに BTC を移動するには、"
+  },
+  "receive_notice_bridge_suffix": {
+    "message": " のブリッジサービスをご利用ください。"
+  },
   "saving": {
     "message": "保存中..."
   },

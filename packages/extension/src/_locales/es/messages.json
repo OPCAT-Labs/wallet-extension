@@ -1825,6 +1825,15 @@
   "address_label": {
     "message": "Dirección"
   },
+  "receive_notice_opcat_only": {
+    "message": "Tenga en cuenta que esta dirección es solo para transferencias de BTC dentro de la red OP_CAT Layer."
+  },
+  "receive_notice_bridge_prefix": {
+    "message": "Si desea transferir BTC de la red principal de Bitcoin a su billetera OP_CAT Layer, utilice el servicio de puente en "
+  },
+  "receive_notice_bridge_suffix": {
+    "message": "."
+  },
   "saving": {
     "message": "Guardando..."
   },

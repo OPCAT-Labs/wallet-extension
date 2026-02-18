@@ -1824,6 +1824,15 @@
   "address_label": {
     "message": "Адрес"
   },
+  "receive_notice_opcat_only": {
+    "message": "Обратите внимание, что этот адрес предназначен только для переводов BTC в сети OP_CAT Layer."
+  },
+  "receive_notice_bridge_prefix": {
+    "message": "Если вы хотите перевести BTC из основной сети Bitcoin в кошелёк OP_CAT Layer, воспользуйтесь мостом на "
+  },
+  "receive_notice_bridge_suffix": {
+    "message": "."
+  },
   "saving": {
     "message": "Сохранение..."
   },

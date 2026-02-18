@@ -1805,6 +1805,15 @@
   "address_label": {
     "message": "地址"
   },
+  "receive_notice_opcat_only": {
+    "message": "请注意，此地址仅用于 OP_CAT Layer 网络内的 BTC 转账。"
+  },
+  "receive_notice_bridge_prefix": {
+    "message": "如果您想将比特币主网的 BTC 转移到 OP_CAT Layer 钱包，请使用 "
+  },
+  "receive_notice_bridge_suffix": {
+    "message": " 的桥服务。"
+  },
   "saving": {
     "message": "保存中..."
   },

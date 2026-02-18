@@ -46,6 +46,39 @@ export default function ReceiveScreen() {
             <Text preset="regular-bold" text={currentAccount?.alianName} />
           </Row>
           <AddressBar />
+
+          <Column
+            style={{
+              backgroundColor: 'var(--color-warning-bg)',
+              borderRadius: 8,
+              padding: '12px 16px',
+              marginTop: 4
+            }}>
+            <Text
+              preset="sub"
+              color="warning_content"
+              style={{ lineHeight: '1.6', textAlign: 'center' }}
+              text={t('receive_notice_opcat_only')}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                lineHeight: '1.6',
+                textAlign: 'center',
+                color: 'var(--color-warning-content)',
+                marginTop: 8
+              }}>
+              {t('receive_notice_bridge_prefix')}
+              <a
+                href="https://bridge.opcatlabs.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
+                bridge.opcatlabs.io
+              </a>
+              {t('receive_notice_bridge_suffix')}
+            </span>
+          </Column>
         </Column>
       </Content>
     </Layout>
