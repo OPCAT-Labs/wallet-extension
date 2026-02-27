@@ -2311,19 +2311,19 @@
     "@types/node-fetch" "^2.5.10"
     node-fetch "^2.6.1"
 
-"@opcat-labs/cat-sdk@3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-3.3.0.tgz#21f3bf5db20b59dda72d91b79d85fb6b6204ac40"
-  integrity sha512-cfHAuNxOTsppb6fHQN9lJTRO/fNp/jAV+/f+ijq1tTrdA75LLAffr/SbTFa49JUtMKHg2a9VtzvtHvdrZRqE2A==
+"@opcat-labs/cat-sdk@3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-3.4.0.tgz#c1b4c933146ee8ee152b1c9f0efdd1e6ffea7d86"
+  integrity sha512-KFBaw4twpEIaKXHHll5RYJ/IPlhVXMiAE6pUslIsP+YbJVAwWnArk+3j97ePBfGiEp5jF7uJRrcBKMN8Z/A8+g==
   dependencies:
-    "@opcat-labs/opcat" "3.3.0"
-    "@opcat-labs/scrypt-ts-opcat" "3.3.0"
+    "@opcat-labs/opcat" "3.4.0"
+    "@opcat-labs/scrypt-ts-opcat" "3.4.0"
     cbor2 "^2.0.1"
 
-"@opcat-labs/opcat@3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-3.3.0.tgz#34d8a744ab92f1e1bdab511528c7aedd692a2551"
-  integrity sha512-RjDuZyWuaQy1KrABoiCLEPjps4s7jwYv372f+iJ01+ziW/zPa630WPnnQHhRf4m2f+GOMGfdkJKL3EJ30/gnrA==
+"@opcat-labs/opcat@3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-3.4.0.tgz#dd2e31135506c106ef4201f36e723a65858a602f"
+  integrity sha512-mZdzV4qAmAySf9NuSenfMNEOWUIdZvV3juVyFkPl6kz/tiFxmBV3Ffqft6+Wgh5KSBfYjzT815BzfRlD9nNdzw==
   dependencies:
     assert "^2.1.0"
     bs58 "=4.0.1"
@@ -2333,13 +2333,13 @@
     inherits "2.0.3"
     unorm "1.4.1"
 
-"@opcat-labs/scrypt-ts-opcat@3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-3.3.0.tgz#d6b03acf971bed7ad193b68f7b4367b444a0bb16"
-  integrity sha512-+dM7JUG5/pZ0aFkl49UMSOUWiIai7QSW4V6MPrYe28PNxET+TVtRcbE9VTfRkZdsxTHiSxLtRoRLHKJ7yL6r+Q==
+"@opcat-labs/scrypt-ts-opcat@3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-3.4.0.tgz#e1dd203f395506920e007d829db223f80cc6f43b"
+  integrity sha512-1aWeauCrspWmFK1RBVlLCTyr3ZGJb4a7NVsiTFb0p0UqkTBJr3pA/Kdx/CjO4Tq31nj9AT6k/wcYo1yA3QTxcQ==
   dependencies:
     "@noble/curves" "^1.8.1"
-    "@opcat-labs/opcat" "3.3.0"
+    "@opcat-labs/opcat" "3.4.0"
     bip174 "^3.0.0-rc.1"
     cbor2 "^2.0.1"
     cross-fetch "^4.1.0"

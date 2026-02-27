@@ -128,7 +128,6 @@ export default function SendCAT20Screen() {
 
   // Validate input
   useEffect(() => {
-    setError('');
     setDisabled(true);
 
     if (!isValidAddress(toInfo.address)) {
@@ -177,15 +176,11 @@ export default function SendCAT20Screen() {
         }, 300);
       }
     } catch (e) {
+      console.error(e)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const msg = (e as any).message;
-      if (msg.includes('-307')) {
-        setShowMergeBTCUTXOPopover(true);
-        setStep(Step.INPUT);
-        return;
-      }
-      setError(msg);
       setStep(Step.INPUT);
+      setError(msg);
     }
   };
 
@@ -383,7 +378,11 @@ export default function SendCAT20Screen() {
             preset="address"
             addressInputData={toInfo}
             onAddressInputChange={(val) => {
+              const addressChanged = val.address !== toInfo.address;
               setToInfo(val);
+              if (addressChanged && error) {
+                setError('');
+              }
             }}
             recipientLabel={<Text text={t('recipient')} preset="regular" color="textDim" />}
             autoFocus={true}
@@ -416,7 +415,11 @@ export default function SendCAT20Screen() {
             value={inputAmount.toString()}
             runesDecimal={cat20Balance.decimals}
             onAmountInputChange={(amount) => {
+              const amountChanged = amount !== inputAmount;
               setInputAmount(amount);
+              if (amountChanged && error) {
+                setError('');
+              }
             }}
             testid={TestIds.CAT20.SEND_AMOUNT_INPUT}
           />
@@ -444,14 +447,18 @@ export default function SendCAT20Screen() {
               </Column>
             </Column>
           )}
+
+          {error && (
+            <Column mt="lg">
+              <Text text={error} color="error" />
+            </Column>
+          )}
         </Column>
 
         <Row mt="lg" justifyBetween>
           <Text text={t('fee')} color="textDim" />
           <Text text={`${feeRate} sats/byte`} />
         </Row>
-
-        {error && <Text text={error} color="error" />}
 
         <Button
           disabled={disabled}
