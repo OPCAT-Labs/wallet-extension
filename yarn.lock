@@ -2311,19 +2311,19 @@
     "@types/node-fetch" "^2.5.10"
     node-fetch "^2.6.1"
 
-"@opcat-labs/cat-sdk@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-3.4.0.tgz#c1b4c933146ee8ee152b1c9f0efdd1e6ffea7d86"
-  integrity sha512-KFBaw4twpEIaKXHHll5RYJ/IPlhVXMiAE6pUslIsP+YbJVAwWnArk+3j97ePBfGiEp5jF7uJRrcBKMN8Z/A8+g==
+"@opcat-labs/cat-sdk@4.0.0-beta-d60092a3-20260227":
+  version "4.0.0-beta-d60092a3-20260227"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/cat-sdk/-/cat-sdk-4.0.0-beta-d60092a3-20260227.tgz#4a249ff8dbd772f06304ae3164c8e8ea25e98f6a"
+  integrity sha512-sSSmF39sDSBBCYuOvvHOaVkyNIG0YZLXxPcdSFbKpL8ojEWQc1jCiRJm5TJnpcrNKZ3k++0zDCdDT5hZ3coJRA==
   dependencies:
-    "@opcat-labs/opcat" "3.4.0"
-    "@opcat-labs/scrypt-ts-opcat" "3.4.0"
+    "@opcat-labs/opcat" "4.0.0-beta-d60092a3-20260227"
+    "@opcat-labs/scrypt-ts-opcat" "4.0.0-beta-d60092a3-20260227"
     cbor2 "^2.0.1"
 
-"@opcat-labs/opcat@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-3.4.0.tgz#dd2e31135506c106ef4201f36e723a65858a602f"
-  integrity sha512-mZdzV4qAmAySf9NuSenfMNEOWUIdZvV3juVyFkPl6kz/tiFxmBV3Ffqft6+Wgh5KSBfYjzT815BzfRlD9nNdzw==
+"@opcat-labs/opcat@4.0.0-beta-d60092a3-20260227":
+  version "4.0.0-beta-d60092a3-20260227"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/opcat/-/opcat-4.0.0-beta-d60092a3-20260227.tgz#0ef86514cb12dc5c9326ee58e47e10b8065f13c8"
+  integrity sha512-mfgtEsT2IRBWhuRE5BC4Jh1un03BM4FKHHprfb4exXVRbW3kz80UuWM7k4Y0xvYrBePdLyoOLJ0NrD1GSqFOJA==
   dependencies:
     assert "^2.1.0"
     bs58 "=4.0.1"
@@ -2333,13 +2333,13 @@
     inherits "2.0.3"
     unorm "1.4.1"
 
-"@opcat-labs/scrypt-ts-opcat@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-3.4.0.tgz#e1dd203f395506920e007d829db223f80cc6f43b"
-  integrity sha512-1aWeauCrspWmFK1RBVlLCTyr3ZGJb4a7NVsiTFb0p0UqkTBJr3pA/Kdx/CjO4Tq31nj9AT6k/wcYo1yA3QTxcQ==
+"@opcat-labs/scrypt-ts-opcat@4.0.0-beta-d60092a3-20260227":
+  version "4.0.0-beta-d60092a3-20260227"
+  resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-4.0.0-beta-d60092a3-20260227.tgz#51e1c4f3a40fdb6ba4067044ea90241bedea73ca"
+  integrity sha512-06YILoXuqKnJcZFKOZbx1UXg4mX8fPBMSpxdk7geIsgXoNIReE2zqjcHXyetyDZCNtq3WK8D4peKsp7/+AN0xA==
   dependencies:
     "@noble/curves" "^1.8.1"
-    "@opcat-labs/opcat" "3.4.0"
+    "@opcat-labs/opcat" "4.0.0-beta-d60092a3-20260227"
     bip174 "^3.0.0-rc.1"
     cbor2 "^2.0.1"
     cross-fetch "^4.1.0"
