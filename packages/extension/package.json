@@ -51,7 +51,7 @@
     "@noble/curves": "^1.0.0",
     "@noble/hashes": "^1.7.1",
     "@noble/secp256k1": "1.7.1",
-    "@opcat-labs/cat-sdk": "4.0.0-beta-d60092a3-20260227",
+    "@opcat-labs/cat-sdk": "4.0.0-beta-a60fffb-20260301",
     "@opcat-labs/wallet-sdk": "^0.1.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@reduxjs/toolkit": "^1.9.2",
