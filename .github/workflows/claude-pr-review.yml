@@ -4,9 +4,13 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   claude-review:
-    uses: OPCAT-Labs/internal/.github/workflows/claude-pr-review.yml@main
+    uses: OPCAT-Labs/common-tools/.github/workflows/claude-pr-review.yml@main
     secrets:
-      ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
       ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+      ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
