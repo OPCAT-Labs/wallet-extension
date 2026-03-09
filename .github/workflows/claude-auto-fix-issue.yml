@@ -1,0 +1,21 @@
+name: Auto Fix Triaged Issues
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+on:
+  repository_dispatch:
+    types: [claude-fixable]
+
+jobs:
+  auto-fix:
+    uses: OPCAT-Labs/common-tools/.github/workflows/claude-auto-fix-issue.yml@main
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+    with:
+      allowed_tools: "Edit,MultiEdit,Write,Read,Glob,Grep,LS,Bash(git:*),Bash(yarn:*),Bash(gh pr create:*),Bash(gh pr edit:*),Bash(gh pr view:*),Bash(gh issue comment:*),Bash(gh issue view:*)"
+      build_check_command: "yarn install && yarn build"
