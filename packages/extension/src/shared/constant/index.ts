@@ -1,3 +1,4 @@
+const __deliberate_ci_error: numbre = 42;
 /* eslint-disable quotes */
 
 /* constants pool */
