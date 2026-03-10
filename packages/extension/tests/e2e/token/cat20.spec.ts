@@ -118,14 +118,21 @@ test.describe('CAT20 Token', () => {
   let page: Page;
   let context: BrowserContext;
   let testTokenId: string;
+  let setupFailed = false;
 
   test.beforeAll(async ({ }, testInfo) => {
     testInfo.setTimeout(180000); // 3 minutes
     // Step 1: Clean up tokens and ensure testCat20 is ready
     // This is done BEFORE loading the extension to avoid wallet state conflicts
     console.log('Setting up test token...');
-    testTokenId = await ensureTestToken();
-    console.log(`Test token ready: ${testTokenId}`);
+    try {
+      testTokenId = await ensureTestToken();
+      console.log(`Test token ready: ${testTokenId}`);
+    } catch (error) {
+      console.log(`⚠️ Test token setup failed: ${error}. Tests will be skipped.`);
+      setupFailed = true;
+      return;
+    }
 
     // Step 2: Load extension
     extensionInfo = await loadExtension();
@@ -149,6 +156,7 @@ test.describe('CAT20 Token', () => {
   });
 
   test('should transfer CAT20 token to Satoshi address', async () => {
+    test.skip(setupFailed, 'Test setup failed: insufficient funds or testnet issues');
     let initialBalance: number;
 
     await test.step('Navigate to CAT20 token screen', async () => {

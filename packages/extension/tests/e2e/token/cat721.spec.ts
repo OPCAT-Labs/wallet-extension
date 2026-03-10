@@ -144,14 +144,21 @@ test.describe('CAT721 NFT Operations', () => {
   let page: Page;
   let context: BrowserContext;
   let testCollectionId: string;
+  let setupFailed = false;
 
   test.beforeAll(async ({ }, testInfo) => {
     testInfo.setTimeout(180000); // 3 minutes
     // Step 1: Ensure testCat721 NFT is ready
     // This is done BEFORE loading the extension to avoid wallet state conflicts
     console.log('Setting up test NFT...');
-    testCollectionId = await ensureTestNft();
-    console.log(`Test NFT ready: ${testCollectionId}`);
+    try {
+      testCollectionId = await ensureTestNft();
+      console.log(`Test NFT ready: ${testCollectionId}`);
+    } catch (error) {
+      console.log(`⚠️ Test NFT setup failed: ${error}. Tests will be skipped.`);
+      setupFailed = true;
+      return;
+    }
 
     // Step 2: Load extension
     extensionInfo = await loadExtension();
@@ -177,6 +184,7 @@ test.describe('CAT721 NFT Operations', () => {
   });
 
   test('should transfer CAT721 NFT to Satoshi address', async () => {
+    test.skip(setupFailed, 'Test setup failed: insufficient funds or testnet issues');
     // Refresh page to ensure fresh UTXO data is loaded
 
     // Navigate to CAT721 collection screen by simulating user actions
