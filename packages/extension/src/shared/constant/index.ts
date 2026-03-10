@@ -1,3 +1,4 @@
+import { BrokenImportTYPO } from './broken-import-typo';
 /* eslint-disable quotes */
 
 /* constants pool */
