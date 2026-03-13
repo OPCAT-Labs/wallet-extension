@@ -1,5 +1,7 @@
 import { decode } from 'bs58check';
 import { EventEmitter } from 'events';
+import * as noble_secp256k1 from '@noble/secp256k1';
+import { sha256 } from '@noble/hashes/sha256';
 import { ECPair, ECPairInterface, bitcoin } from '../bitcoin-core';
 import { signMessageOfDeterministicECDSA, verifyMessageOfECDSA } from '../message';
 import { ToSignInput } from '../types';
@@ -100,6 +102,42 @@ export class SimpleKeyring extends EventEmitter {
     }
 
     this.wallets = this.wallets.filter((wallet) => wallet.publicKey.toString('hex') !== publicKey);
+  }
+
+  /**
+   * Compute ECDH shared secret with an external public key
+   * Uses secp256k1 curve (Bitcoin native) and SHA256 hash
+   * @param publicKey - The wallet's public key (hex)
+   * @param externalPubKey - The external party's public key (hex, 02/03/04 prefix)
+   * @returns Object containing sharedSecret (hex) and ecdhPubKey (hex)
+   */
+  async computeECDH(publicKey: string, externalPubKey: string): Promise<{
+    sharedSecret: string;
+    ecdhPubKey: string;
+  }> {
+    const keyPair = this._getPrivateKeyFor(publicKey);
+    const privateKey = keyPair.privateKey;
+
+    if (!privateKey) {
+      throw new Error('Private key not available');
+    }
+
+    // Validate external public key format
+    const externalPubKeyBytes = Buffer.from(externalPubKey, 'hex');
+    if (externalPubKeyBytes.length !== 33 && externalPubKeyBytes.length !== 65) {
+      throw new Error('Invalid external public key format');
+    }
+
+    // Compute ECDH shared point using secp256k1
+    const sharedPoint = noble_secp256k1.getSharedSecret(privateKey, externalPubKeyBytes);
+
+    // SHA256 hash of shared point (excluding prefix byte for x-coordinate only)
+    const sharedSecret = sha256(sharedPoint.slice(1));
+
+    return {
+      sharedSecret: Buffer.from(sharedSecret).toString('hex'),
+      ecdhPubKey: keyPair.publicKey.toString('hex'),
+    };
   }
 
   private _getWalletForAccount(publicKey: string) {

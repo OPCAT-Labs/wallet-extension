@@ -2176,5 +2176,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "重要: 请不要转移此代币，因为存在临时索引不一致的问题。我们正在等待协议创始团队的解决方案。其他代币不受影响。"
+  },
+  "ecdh_request": {
+    "message": "ECDH 请求"
+  },
+  "this_site_is_requesting_to_compute_a_shared_secret": {
+    "message": "此网站请求使用您的钱包密钥计算共享密钥。这将生成一个您和对方都可以用于加密通信的密钥。"
+  },
+  "external_public_key": {
+    "message": "对方公钥"
+  },
+  "ecdh_warning": {
+    "message": "警告：仅在您信任此网站时才批准此请求。共享密钥可用于加密/解密您与对方之间的消息。"
+  },
+  "approve": {
+    "message": "批准"
   }
 }
