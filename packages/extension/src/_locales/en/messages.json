@@ -2202,5 +2202,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "Important: Please do not transfer this token due to a temporary indexing discrepancy. We are awaiting resolution from the protocol's founding team. Other tokens unaffected."
+  },
+  "ecdh_request": {
+    "message": "ECDH Request"
+  },
+  "this_site_is_requesting_to_compute_a_shared_secret": {
+    "message": "This site is requesting to compute a shared secret using your wallet's key. This will derive a secret key that both you and the other party can use for encrypted communication."
+  },
+  "external_public_key": {
+    "message": "External Public Key"
+  },
+  "ecdh_warning": {
+    "message": "Warning: Only approve this request if you trust this site. The shared secret can be used to encrypt/decrypt messages between you and the other party."
+  },
+  "approve": {
+    "message": "Approve"
   }
 }

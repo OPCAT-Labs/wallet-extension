@@ -90,6 +90,12 @@ export interface Keyring {
   genSignMsgUr?(publicKey: string, text: string): Promise<{ type: string; cbor: string; requestId: string }>;
   parseSignMsgUr?(type: string, cbor: string): Promise<{ requestId: string; publicKey: string; signature: string }>;
   getConnectionType?(): 'USB' | 'QR';
+
+  // ECDH - Elliptic Curve Diffie-Hellman key exchange
+  computeECDH?(publicKey: string, externalPubKey: string): Promise<{
+    sharedSecret: string;
+    ecdhPubKey: string;
+  }>;
 }
 
 class EmptyKeyring implements Keyring {

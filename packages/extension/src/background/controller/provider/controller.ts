@@ -284,6 +284,25 @@ class ProviderController extends BaseController {
     const utxos = await wallet.getBTCUtxos()
     return utxos;
   };
+
+  /**
+   * ECDH - Elliptic Curve Diffie-Hellman key exchange
+   * Requires user approval before computing shared secret
+   */
+  @Reflect.metadata('APPROVAL', ['ECDH', (req) => {
+    const params = req.data.params;
+    if (!params.externalPubKey) {
+      throw new Error('externalPubKey is required');
+    }
+    // Validate public key format (compressed: 66 chars, uncompressed: 130 chars)
+    const pubKeyHex = params.externalPubKey;
+    if (!/^(02|03)[0-9a-fA-F]{64}$/.test(pubKeyHex) && !/^04[0-9a-fA-F]{128}$/.test(pubKeyHex)) {
+      throw new Error('Invalid externalPubKey format. Must be compressed (02/03 prefix, 33 bytes) or uncompressed (04 prefix, 65 bytes)');
+    }
+  }])
+  ecdh = async ({ data: { params } }) => {
+    return wallet.computeECDH(params.externalPubKey);
+  };
 }
 
 export default new ProviderController();

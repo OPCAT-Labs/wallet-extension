@@ -1,4 +1,5 @@
 export { default as Connect } from './Connect';
+export { default as ECDH } from './ECDH';
 export { default as MultiSignMessage } from './MultiSignMessage';
 export { default as MultiSignPsbt } from './MultiSignPsbt';
 export { default as SignData } from './SignData';

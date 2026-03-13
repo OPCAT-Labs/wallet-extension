@@ -396,6 +396,23 @@ export class OpcatProvider extends EventEmitter {
     });
     return utxos;
   };
+
+  /**
+   * ECDH - Elliptic Curve Diffie-Hellman key exchange
+   * Compute a shared secret with an external public key using secp256k1
+   * @param externalPubKey - The external party's public key (hex, 02/03/04 prefix)
+   * @returns Object containing sharedSecret (hex), ecdhPubKey (hex), and creatorPubkey (hex)
+   */
+  ecdh = async (params: { externalPubKey: string }): Promise<{
+    sharedSecret: string;
+    ecdhPubKey: string;
+    creatorPubkey: string;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'ecdh',
+      params
+    });
+  };
 }
 
 declare global {

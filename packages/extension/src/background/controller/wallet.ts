@@ -1446,6 +1446,32 @@ export class WalletController extends BaseController {
     return keyring.getConnectionType!();
   };
 
+  /**
+   * Compute ECDH shared secret with an external public key
+   * Uses secp256k1 curve and SHA256 hash
+   * @param externalPubKey - The external party's public key (hex, 02/03/04 prefix)
+   * @returns Object containing sharedSecret (hex), ecdhPubKey (hex), and creatorPubkey (hex)
+   */
+  computeECDH = async (externalPubKey: string): Promise<{
+    sharedSecret: string;
+    ecdhPubKey: string;
+    creatorPubkey: string;
+  }> => {
+    const account = await this.getCurrentAccount();
+    if (!account) throw new Error('no current account');
+
+    const keyring = await keyringService.getKeyringForAccount(account.pubkey, account.type);
+    if (!keyring.computeECDH) {
+      throw new Error('Keyring does not support ECDH');
+    }
+
+    const result = await keyring.computeECDH(account.pubkey, externalPubKey);
+    return {
+      ...result,
+      creatorPubkey: account.pubkey,
+    };
+  };
+
   getEnableSignData = async () => {
     return preferenceService.getEnableSignData();
   };
