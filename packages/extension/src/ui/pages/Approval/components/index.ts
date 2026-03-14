@@ -1,3 +1,4 @@
+export { default as AutoPayment } from './AutoPayment';
 export { default as Connect } from './Connect';
 export { default as ECDH } from './ECDH';
 export { default as MultiSignMessage } from './MultiSignMessage';

@@ -5,7 +5,8 @@ import {
   openapiService,
   permissionService,
   preferenceService,
-  sessionService
+  sessionService,
+  smallPayService
 } from '@/background/service';
 import { DisplayedKeyring, Keyring } from '@/background/service/keyring';
 import {
@@ -1470,6 +1471,127 @@ export class WalletController extends BaseController {
       ...result,
       creatorPubkey: account.pubkey,
     };
+  };
+
+  // ========== SmallPay Methods ==========
+
+  /**
+   * Get SmallPay status for a specific origin
+   */
+  getSmallPayStatus = (origin: string) => {
+    return smallPayService.getStatusForOrigin(origin);
+  };
+
+  /**
+   * Get SmallPay global enabled status
+   */
+  isSmallPayEnabled = () => {
+    return smallPayService.isEnabled();
+  };
+
+  /**
+   * Set SmallPay global enabled status
+   */
+  setSmallPayEnabled = (enabled: boolean) => {
+    smallPayService.setEnabled(enabled);
+  };
+
+  /**
+   * Get SmallPay single payment limit
+   */
+  getSmallPaySingleLimit = () => {
+    return smallPayService.getSinglePaymentLimit();
+  };
+
+  /**
+   * Set SmallPay single payment limit
+   */
+  setSmallPaySingleLimit = (limit: number) => {
+    smallPayService.setSinglePaymentLimit(limit);
+  };
+
+  /**
+   * Get SmallPay daily limit
+   */
+  getSmallPayDailyLimit = () => {
+    return smallPayService.getDailyLimit();
+  };
+
+  /**
+   * Set SmallPay daily limit
+   */
+  setSmallPayDailyLimit = (limit: number) => {
+    smallPayService.setDailyLimit(limit);
+  };
+
+  /**
+   * Get SmallPay max fee rate
+   */
+  getSmallPayMaxFeeRate = () => {
+    return smallPayService.getMaxFeeRate();
+  };
+
+  /**
+   * Set SmallPay max fee rate
+   */
+  setSmallPayMaxFeeRate = (rate: number) => {
+    smallPayService.setMaxFeeRate(rate);
+  };
+
+  /**
+   * Get SmallPay whitelist
+   */
+  getSmallPayWhitelist = () => {
+    return smallPayService.getWhitelist();
+  };
+
+  /**
+   * Check if origin is approved for SmallPay
+   */
+  isSmallPayOriginApproved = (origin: string) => {
+    return smallPayService.isOriginApproved(origin);
+  };
+
+  /**
+   * Approve an origin for SmallPay (called after user approval)
+   */
+  approveSmallPayOrigin = (origin: string, logo?: string) => {
+    smallPayService.addToWhitelist(origin, logo);
+  };
+
+  /**
+   * Remove an origin from SmallPay whitelist
+   */
+  removeSmallPayOrigin = (origin: string) => {
+    smallPayService.removeFromWhitelist(origin);
+  };
+
+  /**
+   * Get SmallPay payment history
+   */
+  getSmallPayHistory = () => {
+    return smallPayService.getHistory();
+  };
+
+  /**
+   * Clear SmallPay payment history
+   */
+  clearSmallPayHistory = () => {
+    smallPayService.clearHistory();
+  };
+
+  /**
+   * Validate a SmallPay payment
+   */
+  validateSmallPayment = (origin: string, amount: number, feeRate: number) => {
+    return smallPayService.validatePayment(origin, amount, feeRate);
+  };
+
+  /**
+   * Record a SmallPay payment in history
+   */
+  recordSmallPayment = (origin: string, amount: number, txid: string) => {
+    smallPayService.addToHistory(origin, amount, txid);
   };
 
   getEnableSignData = async () => {

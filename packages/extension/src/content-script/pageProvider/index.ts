@@ -413,6 +413,62 @@ export class OpcatProvider extends EventEmitter {
       params
     });
   };
+
+  // ========== SmallPay Methods ==========
+
+  /**
+   * Get SmallPay status for the current origin
+   * Returns enabled status, approval status, limits, and remaining allowance
+   */
+  smallPayStatus = async (): Promise<{
+    isEnabled: boolean;
+    isApproved: boolean;
+    singlePaymentLimit: number;
+    dailyLimit: number;
+    maxFeeRate: number;
+    remaining24h: number;
+    spent24h: number;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'smallPayStatus'
+    });
+  };
+
+  /**
+   * Request SmallPay authorization for the current origin
+   * Will show an approval popup to the user
+   * @param params.logo - Optional logo URL to display in the approval popup
+   */
+  autoPayment = async (params?: { logo?: string }): Promise<{
+    status: 'approved' | 'rejected';
+    message: string;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'autoPayment',
+      params: params || {}
+    });
+  };
+
+  /**
+   * Execute a small payment (auto-approved if within limits)
+   * Validates origin whitelist, amount limits, fee rate, and 24h rolling limit
+   * @param params.psbtHex - The PSBT to sign and broadcast (hex format)
+   * @param params.options.autoFinalized - Whether to auto-finalize the PSBT (default: true)
+   */
+  smallPay = async (params: {
+    psbtHex: string;
+    options?: { autoFinalized?: boolean };
+  }): Promise<{
+    status: 'success' | 'error';
+    txid?: string;
+    signedPsbtHex?: string;
+    message?: string;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'smallPay',
+      params
+    });
+  };
 }
 
 declare global {

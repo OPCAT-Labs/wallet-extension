@@ -2191,5 +2191,50 @@
   },
   "approve": {
     "message": "批准"
+  },
+  "auto_payment_request": {
+    "message": "自动支付请求"
+  },
+  "auto_payment_description": {
+    "message": "此网站请求启用自动支付功能。启用后，在以下限额内的小额交易将自动签名，无需每次确认。"
+  },
+  "single_payment_limit": {
+    "message": "单笔支付限额"
+  },
+  "daily_limit_24h": {
+    "message": "24小时限额"
+  },
+  "max_fee_rate": {
+    "message": "最大手续费率"
+  },
+  "auto_payment_warning_title": {
+    "message": "安全提示"
+  },
+  "auto_payment_warning": {
+    "message": "启用此功能后，在限额内的交易将自动签名。仅对您信任的网站启用此功能。您可以随时在设置中撤销授权。"
+  },
+  "smallpay_settings": {
+    "message": "小额支付设置"
+  },
+  "smallpay_enabled": {
+    "message": "启用小额支付"
+  },
+  "smallpay_whitelist": {
+    "message": "已授权网站"
+  },
+  "smallpay_history": {
+    "message": "支付历史"
+  },
+  "smallpay_no_authorized_sites": {
+    "message": "暂无已授权网站"
+  },
+  "smallpay_no_history": {
+    "message": "暂无支付记录"
+  },
+  "smallpay_revoke": {
+    "message": "撤销授权"
+  },
+  "smallpay_remaining_24h": {
+    "message": "24小时剩余额度"
   }
 }
