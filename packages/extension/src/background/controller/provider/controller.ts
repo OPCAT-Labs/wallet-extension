@@ -303,6 +303,116 @@ class ProviderController extends BaseController {
   ecdh = async ({ data: { params } }) => {
     return wallet.computeECDH(params.externalPubKey);
   };
+
+  // ========== SmallPay Methods ==========
+
+  /**
+   * Get SmallPay status for the current origin (SAFE - no approval needed)
+   */
+  @Reflect.metadata('SAFE', true)
+  smallPayStatus = async ({ session }) => {
+    return wallet.getSmallPayStatus(session.origin);
+  };
+
+  /**
+   * Request SmallPay authorization for the current origin
+   * Requires user approval via popup
+   */
+  @Reflect.metadata('APPROVAL', ['AutoPayment', () => {
+    // No validation needed - just show approval popup
+  }])
+  autoPayment = async ({ session, data: { params } }) => {
+    // If we get here, user approved - add to whitelist
+    wallet.approveSmallPayOrigin(session.origin, params?.logo);
+    return {
+      status: 'approved',
+      message: 'SmallPay authorization granted'
+    };
+  };
+
+  /**
+   * Execute a small payment (auto-approved if within limits)
+   * Validates: origin whitelist, amount limits, fee rate, 24h rolling limit
+   */
+  @Reflect.metadata('SAFE', true)
+  smallPay = async ({ session, data: { params } }) => {
+    const origin = session.origin;
+
+    if (!params || !params.psbtHex) {
+      throw new Error('psbtHex is required');
+    }
+
+    // Parse PSBT to get amount and fee rate
+    const networkType = wallet.getNetworkType();
+    const psbtNetwork = toPsbtNetwork(networkType);
+    const psbt = bitcoin.Psbt.fromHex(params.psbtHex, { network: psbtNetwork });
+
+    // Calculate total input value
+    let totalInputValue = 0;
+    for (let i = 0; i < psbt.data.inputs.length; i++) {
+      const input = psbt.data.inputs[i];
+      if (input.witnessUtxo) {
+        totalInputValue += input.witnessUtxo.value;
+      } else if (input.nonWitnessUtxo) {
+        const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
+        const prevIndex = psbt.txInputs[i].index;
+        totalInputValue += tx.outs[prevIndex].value;
+      }
+    }
+
+    // Calculate total output value
+    let totalOutputValue = 0;
+    for (const output of psbt.txOutputs) {
+      totalOutputValue += output.value;
+    }
+
+    // Calculate fee and estimate vsize
+    const fee = totalInputValue - totalOutputValue;
+    // Estimate vsize (rough estimate: ~68 vbytes per input, ~34 per output for P2WPKH)
+    const estimatedVsize = psbt.data.inputs.length * 68 + psbt.txOutputs.length * 34 + 10;
+    const feeRate = fee / estimatedVsize;
+
+    // Use total output value as the "amount" for limit checking
+    const amount = totalOutputValue;
+
+    // Validate the payment
+    const validation = wallet.validateSmallPayment(origin, amount, feeRate);
+    if (!validation.valid) {
+      throw new Error(validation.error || 'SmallPay validation failed');
+    }
+
+    // Get current account
+    const account = await wallet.getCurrentAccount();
+    if (!account) {
+      throw new Error('No current account');
+    }
+
+    // Sign the PSBT
+    const autoFinalized = params.options?.autoFinalized !== false;
+    const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
+    await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
+    const signedPsbtHex = psbt.toHex();
+
+    // Extract transaction and broadcast
+    let txid: string;
+    try {
+      const tx = psbt.extractTransaction(true);
+      txid = tx.getId();
+      // Broadcast transaction
+      await wallet.pushTx(tx.toHex());
+    } catch (e) {
+      throw new Error(`Failed to broadcast transaction: ${(e as Error).message}`);
+    }
+
+    // Record the payment in history
+    wallet.recordSmallPayment(origin, amount, txid);
+
+    return {
+      status: 'success',
+      txid,
+      signedPsbtHex
+    };
+  };
 }
 
 export default new ProviderController();

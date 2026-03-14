@@ -2217,5 +2217,50 @@
   },
   "approve": {
     "message": "Approve"
+  },
+  "auto_payment_request": {
+    "message": "SmallPay Authorization"
+  },
+  "auto_payment_description": {
+    "message": "This site is requesting permission to automatically sign small transactions without confirmation. Transactions will only be auto-signed if they are within the limits below."
+  },
+  "single_payment_limit": {
+    "message": "Single Payment Limit"
+  },
+  "daily_limit_24h": {
+    "message": "Daily Limit (24h)"
+  },
+  "max_fee_rate": {
+    "message": "Max Fee Rate"
+  },
+  "auto_payment_warning_title": {
+    "message": "Security Warning"
+  },
+  "auto_payment_warning": {
+    "message": "Only approve this for trusted sites. The site will be able to sign transactions automatically without showing you a confirmation popup, as long as they are within the configured limits."
+  },
+  "smallpay_settings": {
+    "message": "SmallPay Settings"
+  },
+  "smallpay_enabled": {
+    "message": "SmallPay Enabled"
+  },
+  "smallpay_whitelist": {
+    "message": "Authorized Sites"
+  },
+  "smallpay_history": {
+    "message": "Payment History"
+  },
+  "smallpay_no_whitelist": {
+    "message": "No sites authorized"
+  },
+  "smallpay_no_history": {
+    "message": "No payment history"
+  },
+  "smallpay_clear_history": {
+    "message": "Clear History"
+  },
+  "smallpay_remove_site": {
+    "message": "Remove"
   }
 }
