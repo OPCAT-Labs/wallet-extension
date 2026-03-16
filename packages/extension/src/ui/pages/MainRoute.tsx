@@ -50,6 +50,7 @@ import ExportPrivateKeyScreen from './Settings/ExportPrivateKeyScreen';
 import LanguageScreen from './Settings/LanguageScreen';
 import ThemeScreen from './Settings/ThemeScreen';
 import NetworkTypeScreen from './Settings/NetworkTypeScreen';
+import SmallPayScreen from './Settings/SmallPayScreen';
 import UpgradeNoticeScreen from './Settings/UpgradeNoticeScreen';
 import TestScreen from './Test/TestScreen';
 import HistoryScreen from './Wallet/HistoryScreen';
@@ -260,6 +261,10 @@ export const routes = {
   AboutUsScreen: {
     path: '/settings/about-us',
     element: <AboutUsScreen />
+  },
+  SmallPayScreen: {
+    path: '/settings/smallpay',
+    element: <SmallPayScreen />
   },
 };
 
