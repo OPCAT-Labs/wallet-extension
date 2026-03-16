@@ -2242,8 +2242,14 @@
   "smallpay_settings": {
     "message": "SmallPay Settings"
   },
+  "smallpay_settings_desc": {
+    "message": "Auto-payment for trusted sites"
+  },
   "smallpay_enabled": {
     "message": "SmallPay Enabled"
+  },
+  "smallpay_limits": {
+    "message": "Payment Limits"
   },
   "smallpay_whitelist": {
     "message": "Authorized Sites"

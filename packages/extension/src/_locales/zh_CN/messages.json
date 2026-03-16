@@ -2216,8 +2216,14 @@
   "smallpay_settings": {
     "message": "小额支付设置"
   },
+  "smallpay_settings_desc": {
+    "message": "信任网站自动支付"
+  },
   "smallpay_enabled": {
     "message": "启用小额支付"
+  },
+  "smallpay_limits": {
+    "message": "支付限额"
   },
   "smallpay_whitelist": {
     "message": "已授权网站"

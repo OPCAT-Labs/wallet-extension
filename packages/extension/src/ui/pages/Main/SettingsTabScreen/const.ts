@@ -58,6 +58,15 @@ export const getSettingsList = (): SettingsItemType[] => [
     icon: 'advance'
   },
   {
+    label: t('smallpay_settings'),
+    value: t('smallpay_settings_desc'),
+    desc: '',
+    action: SettingsAction.SMALLPAY,
+    route: '/settings/smallpay',
+    right: true,
+    icon: 'wallet'
+  },
+  {
     label: '',
     value: '',
     desc: '',
