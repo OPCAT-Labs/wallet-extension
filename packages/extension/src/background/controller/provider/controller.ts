@@ -342,38 +342,65 @@ class ProviderController extends BaseController {
       throw new Error('psbtHex is required');
     }
 
-    // Parse PSBT to get amount and fee rate
+    // Format and parse PSBT (same as signPsbt)
+    const psbtHex = formatPsbtHex(params.psbtHex);
+    const psbt = psbtFromHex(psbtHex);
+
+    // Get network info for address operations
     const networkType = wallet.getNetworkType();
     const psbtNetwork = toPsbtNetwork(networkType);
-    const psbt = bitcoin.Psbt.fromHex(params.psbtHex, { network: psbtNetwork });
 
-    // Calculate total input value
-    let totalInputValue = 0;
+    // Get current account address to identify self-transfers
+    const account = await wallet.getCurrentAccount();
+    if (!account) {
+      throw new Error('No current account');
+    }
+    const walletAddress = account.address;
+
+    // Convert wallet address to output script for comparison
+    let walletScript: Buffer;
+    try {
+      walletScript = bitcoin.address.toOutputScript(walletAddress, psbtNetwork);
+    } catch {
+      throw new Error('Failed to parse wallet address');
+    }
+
+    // Calculate total input value using scrypt-ts-opcat's getInputOutput method
+    let totalInputValue = 0n;
     for (let i = 0; i < psbt.data.inputs.length; i++) {
-      const input = psbt.data.inputs[i];
-      if (input.witnessUtxo) {
-        totalInputValue += input.witnessUtxo.value;
-      } else if (input.nonWitnessUtxo) {
-        const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
-        const prevIndex = psbt.txInputs[i].index;
-        totalInputValue += tx.outs[prevIndex].value;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const inputOutput = (psbt as any).getInputOutput(i);
+        totalInputValue += BigInt(inputOutput.value);
+      } catch {
+        // Input value not available
       }
     }
 
-    // Calculate total output value
-    let totalOutputValue = 0;
+    // Calculate total output value and external spending (outputs not going back to wallet)
+    let totalOutputValue = 0n;
+    let externalSpending = 0n;
+    const walletScriptHex = walletScript.toString('hex');
     for (const output of psbt.txOutputs) {
-      totalOutputValue += output.value;
+      const outputValue = BigInt(output.value);
+      totalOutputValue += outputValue;
+      const outputScriptHex = Buffer.from(output.script).toString('hex');
+      if (outputScriptHex !== walletScriptHex) {
+        externalSpending += outputValue;
+      }
     }
 
-    // Calculate fee and estimate vsize
-    const fee = totalInputValue - totalOutputValue;
-    // Estimate vsize (rough estimate: ~68 vbytes per input, ~34 per output for P2WPKH)
+    // Calculate fee and fee rate
+    const fee = Number(totalInputValue - totalOutputValue);
+    if (fee < 0) {
+      throw new Error(`Invalid PSBT: outputs exceed inputs by ${Math.abs(fee)} sats`);
+    }
+
     const estimatedVsize = psbt.data.inputs.length * 68 + psbt.txOutputs.length * 34 + 10;
     const feeRate = fee / estimatedVsize;
 
-    // Use total output value as the "amount" for limit checking
-    const amount = totalOutputValue;
+    // Amount for limit checking = external spending + fee
+    const amount = Number(externalSpending) + fee;
 
     // Validate the payment
     const validation = wallet.validateSmallPayment(origin, amount, feeRate);
@@ -381,13 +408,7 @@ class ProviderController extends BaseController {
       throw new Error(validation.error || 'SmallPay validation failed');
     }
 
-    // Get current account
-    const account = await wallet.getCurrentAccount();
-    if (!account) {
-      throw new Error('No current account');
-    }
-
-    // Sign the PSBT
+    // Sign the PSBT (reuse signPsbt logic)
     const autoFinalized = params.options?.autoFinalized !== false;
     const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
     await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
@@ -397,9 +418,9 @@ class ProviderController extends BaseController {
     let txid: string;
     try {
       const tx = psbt.extractTransaction(true);
-      txid = tx.getId();
-      // Broadcast transaction
-      await wallet.pushTx(tx.toHex());
+      const rawtx = tx.toHex();
+      txid = tx.id;
+      await wallet.pushTx(rawtx);
     } catch (e) {
       throw new Error(`Failed to broadcast transaction: ${(e as Error).message}`);
     }

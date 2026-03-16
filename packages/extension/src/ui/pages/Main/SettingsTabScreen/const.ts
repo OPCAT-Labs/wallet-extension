@@ -64,7 +64,7 @@ export const getSettingsList = (): SettingsItemType[] => [
     action: SettingsAction.SMALLPAY,
     route: '/settings/smallpay',
     right: true,
-    icon: 'wallet'
+    icon: 'smallpay'
   },
   {
     label: '',

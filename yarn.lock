@@ -2333,6 +2333,19 @@
     inherits "2.0.3"
     unorm "1.4.1"
 
+"@opcat-labs/opcat@4.0.0":
+  version "4.0.0"
+  resolved "https://npm.pkg.github.com/download/@opcat-labs/opcat/4.0.0/95da1458e88f61e2851d9dacc81edee5ddce650e#95da1458e88f61e2851d9dacc81edee5ddce650e"
+  integrity sha512-7bMXdYCTrqghrgnfDWDtrxLxwu6rAAjO1rH7u6IXQcKEcjiwq6ykZnGfIvP1FQqY1srmqYrGrWQjGkHFq13jVQ==
+  dependencies:
+    assert "^2.1.0"
+    bs58 "=4.0.1"
+    buffer "^6.0.3"
+    elliptic "^6.6.1"
+    hash.js "^1.1.7"
+    inherits "2.0.3"
+    unorm "1.4.1"
+
 "@opcat-labs/scrypt-ts-opcat@3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@opcat-labs/scrypt-ts-opcat/-/scrypt-ts-opcat-3.4.0.tgz#e1dd203f395506920e007d829db223f80cc6f43b"
@@ -2340,6 +2353,23 @@
   dependencies:
     "@noble/curves" "^1.8.1"
     "@opcat-labs/opcat" "3.4.0"
+    bip174 "^3.0.0-rc.1"
+    cbor2 "^2.0.1"
+    cross-fetch "^4.1.0"
+    decimal.js "^10.5.0"
+    md5 "^2.3.0"
+    reflect-metadata "^0.2.2"
+    uint8array-tools "^0.0.9"
+    valibot "^0.38.0"
+    varuint-bitcoin "^2.0.0"
+
+"@opcat-labs/scrypt-ts-opcat@4.0.0":
+  version "4.0.0"
+  resolved "https://npm.pkg.github.com/download/@opcat-labs/scrypt-ts-opcat/4.0.0/a521493147707a8d0620d5a40e8f85d71d219894#a521493147707a8d0620d5a40e8f85d71d219894"
+  integrity sha512-N7Nq9LPZKKd8W6KQ81U8/vjjFM8eK0oys8dWV9SDPjDKXuhSvYZVHpqODua5NjAUVdjstKi+UrsJqCgh4UfbvA==
+  dependencies:
+    "@noble/curves" "^1.8.1"
+    "@opcat-labs/opcat" "4.0.0"
     bip174 "^3.0.0-rc.1"
     cbor2 "^2.0.1"
     cross-fetch "^4.1.0"
@@ -15754,9 +15784,9 @@ ts-mixer@^6.0.3:
   resolved "https://registry.npmjs.org/ts-mixer/-/ts-mixer-6.0.4.tgz"
   integrity sha512-ufKpbmrugz5Aou4wcr5Wc1UUFWOLhq+Fm6qa6P0w0K5Qw2yhaUoiWszhCVuNQyNwrlGiscHOmqYoAox1PtvgjA==
 
-ts-node@^10.4.0:
+ts-node@^10.9.2:
   version "10.9.2"
-  resolved "https://registry.npmjs.org/ts-node/-/ts-node-10.9.2.tgz"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.2.tgz#70f021c9e185bccdca820e26dc413805c101c71f"
   integrity sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==
   dependencies:
     "@cspotcode/source-map-support" "^0.8.0"

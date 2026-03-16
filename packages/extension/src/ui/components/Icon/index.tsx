@@ -110,7 +110,8 @@ export const svgRegistry = {
 
   'side-panel-logo-close': '/images/icons/side-panel-logo-close.svg',
 
-  'wallet-logo': '/images/icons/wallet-logo.svg'
+  'wallet-logo': '/images/icons/wallet-logo.svg',
+  smallpay: '/images/icons/smallpay.svg'
 };
 
 const iconImgList: Array<IconTypes> = [
