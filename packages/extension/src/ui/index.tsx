@@ -102,8 +102,6 @@ const wallet: Record<string, any> = new Proxy(
               get(obj, key) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 return function (...params: any) {
-                  // todo console.log
-                  console.log('openapi', key, params);
                   return portMessageChannel.request({
                     type: 'openapi',
                     method: key,
@@ -116,7 +114,6 @@ const wallet: Record<string, any> = new Proxy(
         default:
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return function (...params: any) {
-            console.log('controller', key, params);
             return portMessageChannel.request({
               type: 'controller',
               method: key,
