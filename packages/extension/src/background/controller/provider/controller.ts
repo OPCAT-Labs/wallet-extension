@@ -304,6 +304,20 @@ class ProviderController extends BaseController {
     return wallet.computeECDH(params.externalPubKey);
   };
 
+  /**
+   * Get PKH (Public Key Hash) derived from a custom BIP32 path
+   * Requires user approval
+   */
+  @Reflect.metadata('APPROVAL', ['GetPKHByPath', (req) => {
+    const params = req.data.params;
+    if (!params.path || typeof params.path !== 'string') {
+      throw new Error('path is required and must be a string');
+    }
+  }])
+  getPKHByPath = async ({ data: { params } }) => {
+    return wallet.getPKHByPath(params.path);
+  };
+
   // ========== SmallPay Methods ==========
 
   /**

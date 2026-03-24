@@ -1473,6 +1473,24 @@ export class WalletController extends BaseController {
     };
   };
 
+  /**
+   * Derive PKH (Public Key Hash) from a custom BIP32 derivation path
+   * PKH = RIPEMD160(SHA256(compressedPublicKey))
+   * @param path - BIP32 derivation path, e.g. "m/100/0"
+   * @returns PKH as hex string (40 hex chars)
+   */
+  getPKHByPath = async (path: string): Promise<string> => {
+    const account = await this.getCurrentAccount();
+    if (!account) throw new Error('no current account');
+
+    const keyring = await keyringService.getKeyringForAccount(account.pubkey, account.type);
+    if (!keyring.getPKHByPath) {
+      throw new Error('Keyring does not support getPKHByPath');
+    }
+
+    return keyring.getPKHByPath(path);
+  };
+
   // ========== SmallPay Methods ==========
 
   /**

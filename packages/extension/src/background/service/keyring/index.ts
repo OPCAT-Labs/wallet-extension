@@ -96,6 +96,9 @@ export interface Keyring {
     sharedSecret: string;
     ecdhPubKey: string;
   }>;
+
+  // Derive PKH from a custom BIP32 path
+  getPKHByPath?(path: string): string;
 }
 
 class EmptyKeyring implements Keyring {

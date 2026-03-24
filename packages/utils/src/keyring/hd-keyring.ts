@@ -130,6 +130,25 @@ export class HdKeyring extends SimpleKeyring {
     return address;
   }
 
+  /**
+   * Derive a public key hash (PKH) from a given BIP32 derivation path.
+   * PKH = RIPEMD160(SHA256(compressedPublicKey))
+   * @param path - Full derivation path, e.g. "m/100/0"
+   * @returns PKH as hex string (20 bytes / 40 hex chars)
+   */
+  getPKHByPath(path: string): string {
+    if (!this.hdWallet) {
+      throw new Error('Btc-Hd-Keyring: Not initialized');
+    }
+    const child = this.hdWallet.derive(path);
+    const ecpair = ECPair.fromPrivateKey(child.privateKey, {
+      network: this.network
+    });
+    const pubKey = ecpair.publicKey;
+    const pkh = bitcoin.crypto.hash160(pubKey);
+    return pkh.toString('hex');
+  }
+
   addAccounts(numberOfAccounts = 1) {
     let count = numberOfAccounts;
     let currentIdx = 0;

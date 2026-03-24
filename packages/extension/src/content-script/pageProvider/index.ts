@@ -414,6 +414,19 @@ export class OpcatProvider extends EventEmitter {
     });
   };
 
+  /**
+   * Get PKH (Public Key Hash) derived from a custom BIP32 path
+   * PKH = RIPEMD160(SHA256(compressedPublicKey))
+   * @param params.path - BIP32 derivation path, e.g. "m/100/0"
+   * @returns PKH as hex string (40 hex chars)
+   */
+  getPKHByPath = async (params: { path: string }): Promise<string> => {
+    return this[requestMethodKey]({
+      method: 'getPKHByPath',
+      params
+    });
+  };
+
   // ========== SmallPay Methods ==========
 
   /**
