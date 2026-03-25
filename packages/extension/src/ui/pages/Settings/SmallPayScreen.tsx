@@ -192,7 +192,7 @@ export default function SmallPayScreen() {
             <Column gap="sm">
               {history.length > 0 ? (
                 <>
-                  {history.slice(0, 20).map((item, index) => (
+                  {history.slice(-20).reverse().map((item, index) => (
                     <Card key={`${item.txid}-${index}`} style={{ borderRadius: 10 }}>
                       <Column gap="xs">
                         <Row justifyBetween>

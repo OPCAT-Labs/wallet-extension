@@ -2231,16 +2231,28 @@
   "smallpay_history": {
     "message": "支付历史"
   },
-  "smallpay_no_authorized_sites": {
+  "smallpay_no_whitelist": {
     "message": "暂无已授权网站"
   },
   "smallpay_no_history": {
     "message": "暂无支付记录"
   },
-  "smallpay_revoke": {
-    "message": "撤销授权"
+  "smallpay_clear_history": {
+    "message": "清除历史"
   },
-  "smallpay_remaining_24h": {
-    "message": "24小时剩余额度"
+  "smallpay_remove_site": {
+    "message": "移除"
+  },
+  "get_pkh_by_path_request": {
+    "message": "获取公钥哈希"
+  },
+  "get_pkh_by_path_description": {
+    "message": "此网站正在请求从以下路径派生公钥哈希："
+  },
+  "derivation_path": {
+    "message": "派生路径"
+  },
+  "get_pkh_by_path_warning": {
+    "message": "这将使用指定路径从您的钱包派生公钥哈希（PKH）。PKH 可用于在加密通信中标识您的身份。"
   }
 }

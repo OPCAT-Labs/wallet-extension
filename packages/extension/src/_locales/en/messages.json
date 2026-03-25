@@ -2268,5 +2268,17 @@
   },
   "smallpay_remove_site": {
     "message": "Remove"
+  },
+  "get_pkh_by_path_request": {
+    "message": "Get PKH By Path"
+  },
+  "get_pkh_by_path_description": {
+    "message": "This site is requesting to derive a public key hash from the following path:"
+  },
+  "derivation_path": {
+    "message": "Derivation Path"
+  },
+  "get_pkh_by_path_warning": {
+    "message": "This will derive a public key hash (PKH) from your wallet using the specified path. The PKH can be used to identify you in encrypted communications."
   }
 }

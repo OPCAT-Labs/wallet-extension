@@ -414,6 +414,9 @@ class ProviderController extends BaseController {
     const feeRate = fee / estimatedVsize;
 
     // Amount for limit checking = external spending + fee
+    if (externalSpending > BigInt(Number.MAX_SAFE_INTEGER)) {
+      throw new Error('Payment amount exceeds safe integer range');
+    }
     const amount = Number(externalSpending) + fee;
 
     // Validate the payment
