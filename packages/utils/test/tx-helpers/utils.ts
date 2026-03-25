@@ -87,7 +87,7 @@ export async function dummySendBTC({
   });
 
   await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any});
-  const tx = psbt.extractTransaction(true);
+  const tx = psbt.extractTransaction(true) as any;
   const txid = tx.getId();
   const inputCount = psbt.txInputs.length;
   const outputCount = psbt.txOutputs.length;
@@ -134,7 +134,7 @@ export async function dummySendAllBTC({
   }
 
   const fee = psbt.getFee();
-  const tx = psbt.extractTransaction(true);
+  const tx = psbt.extractTransaction(true) as any;
   const virtualSize = tx.virtualSize();
   const txid = tx.getId();
   const finalFeeRate = parseFloat((Number(fee) / virtualSize).toFixed(1));

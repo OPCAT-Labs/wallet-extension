@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { AddressType } from '../../src';
 import { ECPair, bitcoin } from '../../src/bitcoin-core';
 import { NetworkType } from '../../src/network';
-import { toXOnly, tweakSigner, validator } from '../../src/utils';
+import { validator } from '../../src/utils';
 import { LocalWallet } from '../../src/wallet';
 const dummyWallets = {
   walletA: {

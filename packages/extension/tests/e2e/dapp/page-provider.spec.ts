@@ -193,6 +193,67 @@ test.describe('PageProvider API', () => {
     await closeModal(dappPage);
   });
 
+  test('getPKHByPath should return valid PKH', async () => {
+    // Setup popup handler to approve all popups
+    setupWalletPopupHandler(context, {
+      password: TEST_WALLET.password,
+      action: 'approve',
+    });
+
+    // First connect
+    await dappPage.click('[data-testid="test-request-accounts-approve"]');
+    await waitForModalStatus(dappPage, 'success', 30000);
+    await closeModal(dappPage);
+
+    // Test getPKHByPath
+    await dappPage.click('[data-testid="test-get-pkh-by-path"]');
+    const content = await waitForModalStatus(dappPage, 'success', 60000);
+    expect(content).toContain('getPKHByPath returned valid PKH');
+    expect(content).toContain('40 hex chars (20 bytes)');
+
+    await closeModal(dappPage);
+  });
+
+  test('getPKHByPath should return different PKH for different paths', async () => {
+    // Setup popup handler to approve all popups
+    setupWalletPopupHandler(context, {
+      password: TEST_WALLET.password,
+      action: 'approve',
+    });
+
+    // First connect
+    await dappPage.click('[data-testid="test-request-accounts-approve"]');
+    await waitForModalStatus(dappPage, 'success', 30000);
+    await closeModal(dappPage);
+
+    // Test getPKHByPath uniqueness
+    await dappPage.click('[data-testid="test-get-pkh-by-path-unique"]');
+    const content = await waitForModalStatus(dappPage, 'success', 60000);
+    expect(content).toContain('Different paths produce different PKHs');
+
+    await closeModal(dappPage);
+  });
+
+  test('ecdh should compute shared secret', async () => {
+    // Setup popup handler to approve all popups
+    setupWalletPopupHandler(context, {
+      password: TEST_WALLET.password,
+      action: 'approve',
+    });
+
+    // First connect
+    await dappPage.click('[data-testid="test-request-accounts-approve"]');
+    await waitForModalStatus(dappPage, 'success', 30000);
+    await closeModal(dappPage);
+
+    // Test ECDH
+    await dappPage.click('[data-testid="test-ecdh"]');
+    const content = await waitForModalStatus(dappPage, 'success', 60000);
+    expect(content).toContain('ECDH key exchange successful');
+
+    await closeModal(dappPage);
+  });
+
   test('signPsbt should sign transaction correctly', async () => {
     // Setup popup handler in advance - it will auto-handle all popups
     setupWalletPopupHandler(context, {
