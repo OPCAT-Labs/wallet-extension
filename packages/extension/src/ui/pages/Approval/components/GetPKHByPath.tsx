@@ -1,6 +1,7 @@
 import { Button, Card, Column, Content, Footer, Header, Layout, Row, Text } from '@/ui/components';
 import WebsiteBar from '@/ui/components/WebsiteBar';
 import { useApproval } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 
 interface Props {
   params: {
@@ -63,8 +64,8 @@ export default function GetPKHByPath({ params: { data, session } }: Props) {
 
       <Footer>
         <Row full>
-          <Button text="Reject" full preset="default" onClick={handleCancel} />
-          <Button text="Approve" full preset="primary" onClick={handleConfirm} />
+          <Button text="Reject" full preset="default" onClick={handleCancel} testid={TestIds.APPROVAL.REJECT_BUTTON} />
+          <Button text="Approve" full preset="primary" onClick={handleConfirm} testid={TestIds.APPROVAL.APPROVE_BUTTON} />
         </Row>
       </Footer>
     </Layout>
