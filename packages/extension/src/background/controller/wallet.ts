@@ -1258,6 +1258,14 @@ export class WalletController extends BaseController {
     permissionService.removeConnectedSite(origin);
   };
 
+  grantSitePermissions = (origin: string, permissions: string[]) => {
+    permissionService.grantPermissions(origin, permissions as any);
+  };
+
+  revokeSitePermission = (origin: string, permission: string) => {
+    permissionService.revokePermission(origin, permission as any);
+  };
+
   setKeyringAlianName = (keyring: WalletKeyring, name: string) => {
     preferenceService.setKeyringAlianName(keyring.key, name);
     keyring.alianName = name;
@@ -1540,6 +1548,13 @@ export class WalletController extends BaseController {
    */
   setSmallPayDailyLimit = (limit: number) => {
     smallPayService.setDailyLimit(limit);
+  };
+
+  /**
+   * Get amount spent in last 24 hours
+   */
+  getSmallPaySpent24h = () => {
+    return smallPayService.getSpentInLast24Hours();
   };
 
   /**

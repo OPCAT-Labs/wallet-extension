@@ -35,7 +35,7 @@ class SmallPayService {
     this.store = await createPersistStore<SmallPayStore>({
       name: 'smallPay',
       template: {
-        enabled: false,
+        enabled: true,
         singlePaymentLimit: DEFAULT_SINGLE_PAYMENT_LIMIT,
         dailyLimit: DEFAULT_DAILY_LIMIT,
         maxFeeRate: DEFAULT_MAX_FEE_RATE,

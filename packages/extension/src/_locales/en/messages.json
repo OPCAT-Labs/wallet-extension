@@ -2280,5 +2280,14 @@
   },
   "get_pkh_by_path_warning": {
     "message": "This will derive a public key hash (PKH) from your wallet using the specified path. The PKH can be used to identify you in encrypted communications."
+  },
+  "permission_request": {
+    "message": "Permission Request"
+  },
+  "permission_request_desc": {
+    "message": "This site is requesting the following permissions:"
+  },
+  "permission_warning": {
+    "message": "Only approve permissions for sites you trust."
   }
 }

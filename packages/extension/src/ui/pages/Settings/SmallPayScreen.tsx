@@ -1,44 +1,42 @@
-import { Switch } from 'antd';
+import { InputNumber, Switch } from 'antd';
 import { useEffect, useState } from 'react';
 
-import { SmallPayHistoryItem, SmallPayWhitelistItem } from '@/background/service/smallPay';
-import { Button, Card, Column, Content, Header, Icon, Image, Layout, Row, Text } from '@/ui/components';
+import { SmallPayHistoryItem } from '@/background/service/smallPay';
+import { Button, Card, Column, Content, Header, Layout, Row, Text } from '@/ui/components';
 import { Empty } from '@/ui/components/Empty';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { colors } from '@/ui/theme/colors';
-import { fontSizes } from '@/ui/theme/font';
-import { formatSessionIcon, useWallet } from '@/ui/utils';
-
-type TabType = 'whitelist' | 'history';
+import { useChain } from '@/ui/state/settings/hooks';
+import { useWallet } from '@/ui/utils';
 
 export default function SmallPayScreen() {
   const wallet = useWallet();
   const { t } = useI18n();
+  const chain = useChain();
 
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [singleLimit, setSingleLimit] = useState(10000);
   const [dailyLimit, setDailyLimit] = useState(5000000);
   const [maxFeeRate, setMaxFeeRate] = useState(0.01);
-  const [whitelist, setWhitelist] = useState<SmallPayWhitelistItem[]>([]);
+  const [spent24h, setSpent24h] = useState(0);
   const [history, setHistory] = useState<SmallPayHistoryItem[]>([]);
-  const [activeTab, setActiveTab] = useState<TabType>('whitelist');
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     try {
-      const [isEnabled, single, daily, fee, sites, records] = await Promise.all([
+      const [isEnabled, single, daily, fee, spent, records] = await Promise.all([
         wallet.isSmallPayEnabled(),
         wallet.getSmallPaySingleLimit(),
         wallet.getSmallPayDailyLimit(),
         wallet.getSmallPayMaxFeeRate(),
-        wallet.getSmallPayWhitelist(),
+        wallet.getSmallPaySpent24h(),
         wallet.getSmallPayHistory()
       ]);
       setEnabled(isEnabled);
       setSingleLimit(single);
       setDailyLimit(daily);
       setMaxFeeRate(fee);
-      setWhitelist(sites);
+      setSpent24h(spent);
       setHistory(records);
     } finally {
       setLoading(false);
@@ -55,14 +53,22 @@ export default function SmallPayScreen() {
     setEnabled(newValue);
   };
 
-  const handleRemoveSite = async (origin: string) => {
-    await wallet.removeSmallPayOrigin(origin);
-    loadData();
+  const handleSingleLimitChange = async (value: number | null) => {
+    if (value == null || value < 0) return;
+    setSingleLimit(value);
+    await wallet.setSmallPaySingleLimit(value);
+  };
+
+  const handleDailyLimitChange = async (value: number | null) => {
+    if (value == null || value < 0) return;
+    setDailyLimit(value);
+    await wallet.setSmallPayDailyLimit(value);
   };
 
   const handleClearHistory = async () => {
     await wallet.clearSmallPayHistory();
     setHistory([]);
+    setSpent24h(0);
   };
 
   const formatSats = (sats: number) => {
@@ -92,6 +98,15 @@ export default function SmallPayScreen() {
     );
   }
 
+  const inputStyle: React.CSSProperties = {
+    background: '#1a1a2e',
+    border: '1px solid #333',
+    borderRadius: 6,
+    color: '#eee',
+    width: 120,
+    textAlign: 'right' as const
+  };
+
   return (
     <Layout>
       <Header onBack={() => window.history.go(-1)} title={t('smallpay_settings')} />
@@ -108,19 +123,38 @@ export default function SmallPayScreen() {
             </Row>
           </Card>
 
-          {/* Limits Display */}
+          {/* Limits Config */}
           <Card style={{ borderRadius: 10 }}>
             <Column gap="sm">
               <Text text={t('smallpay_limits')} preset="bold" size="sm" />
               <Row style={{ borderTopWidth: 1, borderColor: colors.border }} my="sm" />
-              <Row justifyBetween>
+
+              <Row justifyBetween itemsCenter>
                 <Text text={t('single_payment_limit')} preset="sub" size="xs" />
-                <Text text={formatSats(singleLimit)} size="xs" />
+                <InputNumber
+                  value={singleLimit}
+                  min={0}
+                  step={1000}
+                  onChange={handleSingleLimitChange}
+                  style={inputStyle}
+                  formatter={(v) => `${v} sats`}
+                  parser={(v) => Number((v || '').replace(/[^\d]/g, ''))}
+                />
               </Row>
-              <Row justifyBetween>
+
+              <Row justifyBetween itemsCenter>
                 <Text text={t('daily_limit_24h')} preset="sub" size="xs" />
-                <Text text={formatSats(dailyLimit)} size="xs" />
+                <InputNumber
+                  value={dailyLimit}
+                  min={0}
+                  step={100000}
+                  onChange={handleDailyLimitChange}
+                  style={inputStyle}
+                  formatter={(v) => `${v} sats`}
+                  parser={(v) => Number((v || '').replace(/[^\d]/g, ''))}
+                />
               </Row>
+
               <Row justifyBetween>
                 <Text text={t('max_fee_rate')} preset="sub" size="xs" />
                 <Text text={`${maxFeeRate} sat/byte`} size="xs" />
@@ -128,102 +162,71 @@ export default function SmallPayScreen() {
             </Column>
           </Card>
 
-          {/* Tabs */}
-          <Row style={{ gap: 8 }}>
-            <Button
-              text={t('smallpay_whitelist')}
-              preset={activeTab === 'whitelist' ? 'primary' : 'default'}
-              style={{ flex: 1 }}
-              onClick={() => setActiveTab('whitelist')}
-            />
-            <Button
-              text={t('smallpay_history')}
-              preset={activeTab === 'history' ? 'primary' : 'default'}
-              style={{ flex: 1 }}
-              onClick={() => setActiveTab('history')}
-            />
-          </Row>
+          {/* 24h Spending Summary */}
+          <Card style={{ borderRadius: 10, background: spent24h > 0 ? 'rgba(255, 165, 0, 0.08)' : undefined }}>
+            <Row justifyBetween itemsCenter>
+              <Text text="Spent in last 24h" preset="sub" size="xs" />
+              <Text
+                text={formatSats(spent24h)}
+                size="sm"
+                preset="bold"
+                color={spent24h > dailyLimit * 0.8 ? 'danger' : 'gold'}
+              />
+            </Row>
+            <Row justifyBetween itemsCenter style={{ marginTop: 4 }}>
+              <Text text="Remaining" preset="sub" size="xxs" color="textDim" />
+              <Text text={formatSats(Math.max(0, dailyLimit - spent24h))} size="xxs" color="textDim" />
+            </Row>
+          </Card>
 
-          {/* Whitelist Tab */}
-          {activeTab === 'whitelist' && (
-            <Column gap="sm">
-              {whitelist.length > 0 ? (
-                whitelist.map((item) => (
-                  <Card key={item.origin} style={{ borderRadius: 10 }}>
-                    <Row full justifyBetween itemsCenter>
-                      <Row itemsCenter style={{ flex: 1, overflow: 'hidden' }}>
-                        <Image
-                          src={formatSessionIcon({ icon: item.logo || '', origin: item.origin, name: item.origin })}
-                          size={fontSizes.logo}
-                        />
-                        <Column style={{ marginLeft: 8, overflow: 'hidden' }}>
-                          <Text
-                            text={item.origin}
-                            preset="sub"
-                            size="xs"
-                            style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                          />
-                          <Text
-                            text={formatTime(item.approvedAt)}
-                            preset="sub"
-                            size="xxs"
-                            color="textDim"
-                          />
-                        </Column>
-                      </Row>
-                      <Icon
-                        icon="close"
-                        onClick={() => handleRemoveSite(item.origin)}
-                        style={{ cursor: 'pointer' }}
-                      />
+          {/* Payment History */}
+          <Card style={{ borderRadius: 10 }}>
+            <Text text={t('smallpay_history')} preset="bold" size="sm" />
+          </Card>
+
+          <Column gap="sm">
+            {history.length > 0 ? (
+              <>
+                {history.length > 20 && (
+                  <Text
+                    text={`Showing last 20 of ${history.length} transactions`}
+                    preset="sub"
+                    size="xxs"
+                    color="textDim"
+                    textCenter
+                  />
+                )}
+                {history.slice(-20).reverse().map((item, index) => (
+                  <Card key={`${item.txid}-${index}`} style={{ borderRadius: 10 }}>
+                    <Row justifyBetween itemsCenter>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <a
+                          href={`${chain.mempoolSpaceUrl}/tx/${item.txid}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#00d4ff', fontSize: 12, textDecoration: 'underline' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {item.txid.slice(0, 8)}...
+                        </a>
+                        <span style={{ fontSize: 11, color: '#888' }}>{formatTime(item.timestamp)}</span>
+                      </div>
+                      <Text text={formatSats(item.amount)} size="xs" color="gold" />
                     </Row>
                   </Card>
-                ))
-              ) : (
-                <Card style={{ borderRadius: 10 }}>
-                  <Empty text={t('smallpay_no_whitelist')} />
-                </Card>
-              )}
-            </Column>
-          )}
-
-          {/* History Tab */}
-          {activeTab === 'history' && (
-            <Column gap="sm">
-              {history.length > 0 ? (
-                <>
-                  {history.slice(-20).reverse().map((item, index) => (
-                    <Card key={`${item.txid}-${index}`} style={{ borderRadius: 10 }}>
-                      <Column gap="xs">
-                        <Row justifyBetween>
-                          <Text text={item.origin} preset="sub" size="xs" />
-                          <Text text={formatSats(item.amount)} size="xs" color="gold" />
-                        </Row>
-                        <Row justifyBetween>
-                          <Text
-                            text={item.txid.slice(0, 16) + '...' + item.txid.slice(-8)}
-                            preset="sub"
-                            size="xxs"
-                            color="textDim"
-                          />
-                          <Text text={formatTime(item.timestamp)} preset="sub" size="xxs" color="textDim" />
-                        </Row>
-                      </Column>
-                    </Card>
-                  ))}
-                  <Button
-                    text={t('smallpay_clear_history')}
-                    preset="default"
-                    onClick={handleClearHistory}
-                  />
-                </>
-              ) : (
-                <Card style={{ borderRadius: 10 }}>
-                  <Empty text={t('smallpay_no_history')} />
-                </Card>
-              )}
-            </Column>
-          )}
+                ))}
+                <Button
+                  text={t('smallpay_clear_history')}
+                  preset="default"
+                  onClick={handleClearHistory}
+                />
+              </>
+            ) : (
+              <Card style={{ borderRadius: 10 }}>
+                <Empty text={t('smallpay_no_history')} />
+              </Card>
+            )}
+          </Column>
         </Column>
       </Content>
     </Layout>

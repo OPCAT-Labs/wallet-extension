@@ -47,6 +47,57 @@ class ProviderController extends BaseController {
     wallet.removeConnectedSite(origin)
   };
 
+  /**
+   * Request multiple permissions in one approval popup.
+   * DApp can request: connect, ecdh, getPKHByPath, smallPay
+   */
+  @Reflect.metadata('APPROVAL', ['RequestPermissions', (req) => {
+    const params = req.data.params;
+    if (!params.permissions || !Array.isArray(params.permissions) || params.permissions.length === 0) {
+      throw new Error('permissions array is required');
+    }
+    const validPerms = ['connect', 'ecdh', 'getPKHByPath', 'smallPay'];
+    for (const p of params.permissions) {
+      if (!validPerms.includes(p)) {
+        throw new Error(`Invalid permission: ${p}. Valid: ${validPerms.join(', ')}`);
+      }
+    }
+  }])
+  requestPermissions = async ({ data: { params }, session, approvalRes }) => {
+    const origin = session.origin;
+    const grantedPerms: string[] = approvalRes?.grantedPermissions || params.permissions;
+
+    // Connect or update site with granted permissions
+    const chainType = wallet.getChainType();
+    permissionService.connectWithPermissions(
+      origin,
+      session.name,
+      session.icon,
+      CHAINS_MAP[chainType].enum,
+      grantedPerms
+    );
+
+    // If smallPay was granted, also add to SmallPay whitelist
+    if (grantedPerms.includes('smallPay')) {
+      wallet.approveSmallPayOrigin(origin, session.icon);
+    }
+
+    // Return which permissions were granted
+    const result: Record<string, boolean> = {};
+    for (const p of params.permissions) {
+      result[p] = grantedPerms.includes(p);
+    }
+    return result;
+  };
+
+  /**
+   * Get current permissions for the calling origin (SAFE - no approval needed)
+   */
+  @Reflect.metadata('SAFE', true)
+  getPermissions = async ({ session: { origin } }) => {
+    return permissionService.getSitePermissions(origin);
+  };
+
   @Reflect.metadata('SAFE', true)
   getAccounts = async ({ session: { origin } }) => {
     if (!permissionService.hasPermission(origin)) {
@@ -294,13 +345,20 @@ class ProviderController extends BaseController {
     if (!params.externalPubKey) {
       throw new Error('externalPubKey is required');
     }
-    // Validate public key format (compressed: 66 chars, uncompressed: 130 chars)
     const pubKeyHex = params.externalPubKey;
     if (!/^(02|03)[0-9a-fA-F]{64}$/.test(pubKeyHex) && !/^04[0-9a-fA-F]{128}$/.test(pubKeyHex)) {
       throw new Error('Invalid externalPubKey format. Must be compressed (02/03 prefix, 33 bytes) or uncompressed (04 prefix, 65 bytes)');
     }
+    // Skip approval if site already has ecdh permission
+    if (permissionService.hasSitePermission(req.session.origin, 'ecdh')) {
+      return true; // condition returns true → skip approval
+    }
   }])
-  ecdh = async ({ data: { params } }) => {
+  ecdh = async ({ data: { params }, session }) => {
+    // Grant ecdh permission after first approval
+    if (!permissionService.hasSitePermission(session.origin, 'ecdh')) {
+      permissionService.grantPermissions(session.origin, ['ecdh']);
+    }
     return wallet.computeECDH(params.externalPubKey);
   };
 
@@ -313,17 +371,23 @@ class ProviderController extends BaseController {
     if (!params.path || typeof params.path !== 'string') {
       throw new Error('path is required and must be a string');
     }
-    // Validate BIP32 path format
     if (!/^m(\/\d+'?)+$/.test(params.path)) {
       throw new Error('Invalid BIP32 path format');
     }
-    // Block standard paths to prevent address tracking
     const blocked = ["m/44'", "m/49'", "m/84'", "m/86'"];
     if (blocked.some(p => params.path.startsWith(p))) {
       throw new Error('Standard BIP44/49/84/86 paths are not allowed');
     }
+    // Skip approval if site already has getPKHByPath permission
+    if (permissionService.hasSitePermission(req.session.origin, 'getPKHByPath')) {
+      return true;
+    }
   }])
-  getPKHByPath = async ({ data: { params } }) => {
+  getPKHByPath = async ({ data: { params }, session }) => {
+    // Grant getPKHByPath permission after first approval
+    if (!permissionService.hasSitePermission(session.origin, 'getPKHByPath')) {
+      permissionService.grantPermissions(session.origin, ['getPKHByPath']);
+    }
     return wallet.getPKHByPath(params.path);
   };
 
@@ -341,11 +405,17 @@ class ProviderController extends BaseController {
    * Request SmallPay authorization for the current origin
    * Requires user approval via popup
    */
-  @Reflect.metadata('APPROVAL', ['AutoPayment', () => {
-    // No validation needed - just show approval popup
+  @Reflect.metadata('APPROVAL', ['AutoPayment', (req) => {
+    // Skip approval if site already has smallPay permission
+    if (permissionService.hasSitePermission(req.session.origin, 'smallPay')) {
+      return true;
+    }
   }])
   autoPayment = async ({ session, data: { params } }) => {
-    // If we get here, user approved - add to whitelist
+    // Grant smallPay permission and add to whitelist
+    if (!permissionService.hasSitePermission(session.origin, 'smallPay')) {
+      permissionService.grantPermissions(session.origin, ['smallPay']);
+    }
     wallet.approveSmallPayOrigin(session.origin, params?.logo);
     return {
       status: 'approved',
@@ -360,6 +430,11 @@ class ProviderController extends BaseController {
   @Reflect.metadata('SAFE', true)
   smallPay = async ({ session, data: { params } }) => {
     const origin = session.origin;
+
+    // If site has smallPay permission but not in SmallPay whitelist, sync it
+    if (permissionService.hasSitePermission(origin, 'smallPay') && !wallet.isSmallPayOriginApproved(origin)) {
+      wallet.approveSmallPayOrigin(origin, session.icon);
+    }
 
     if (!params || !params.psbtHex) {
       throw new Error('psbtHex is required');
@@ -388,42 +463,47 @@ class ProviderController extends BaseController {
       throw new Error('Failed to parse wallet address');
     }
 
-    // P2PKH script pattern: OP_DUP OP_HASH160 <20-byte-hash> OP_EQUALVERIFY OP_CHECKSIG (25 bytes)
+    // Verify wallet address is P2PKH (SmallPay only supports P2PKH wallets)
     const isP2PKHScript = (script: Buffer): boolean => {
       return script.length === 25 && script[0] === 0x76 && script[1] === 0xa9 &&
         script[2] === 0x14 && script[23] === 0x88 && script[24] === 0xac;
     };
+    if (!isP2PKHScript(walletScript)) {
+      throw new Error('SmallPay only supports P2PKH wallets');
+    }
 
-    // Analyze inputs: calculate wallet input value and verify all wallet inputs are P2PKH
+    // Analyze inputs: calculate wallet input value
+    // Uses ExtPsbt.getInputOutput() which handles opcat layer's custom UTXO encoding
     let walletInputValue = 0n;
     const walletScriptHex = walletScript.toString('hex');
     for (let i = 0; i < psbt.data.inputs.length; i++) {
-      const input = psbt.data.inputs[i];
-      let script: Buffer | null = null;
+      let scriptHex: string | null = null;
       let inputValue: bigint | null = null;
 
-      if (input.witnessUtxo) {
-        script = input.witnessUtxo.script;
-        inputValue = BigInt(input.witnessUtxo.value);
-      } else if (input.nonWitnessUtxo) {
-        const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
-        const output = tx.outs[psbt.txInputs[i].index];
-        script = output.script;
-        inputValue = BigInt(output.value);
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const inputOutput = (psbt as any).getInputOutput(i);
+        if (inputOutput) {
+          scriptHex = Buffer.from(inputOutput.script).toString('hex');
+          inputValue = BigInt(inputOutput.value);
+        }
+      } catch {
+        // Fallback to standard PSBT fields
+        const input = psbt.data.inputs[i];
+        if (input.witnessUtxo) {
+          scriptHex = input.witnessUtxo.script.toString('hex');
+          inputValue = BigInt(input.witnessUtxo.value);
+        } else if (input.nonWitnessUtxo) {
+          const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
+          const output = tx.outs[psbt.txInputs[i].index];
+          scriptHex = output.script.toString('hex');
+          inputValue = BigInt(output.value);
+        }
       }
 
-      if (script) {
-        const scriptHex = script.toString('hex');
-        if (scriptHex === walletScriptHex) {
-          // This is a wallet input — must be P2PKH
-          if (!isP2PKHScript(script)) {
-            throw new Error('SmallPay only supports P2PKH inputs');
-          }
-          if (inputValue === null) {
-            throw new Error('SmallPay: cannot determine value of wallet input');
-          }
-          walletInputValue += inputValue;
-        }
+      // Match wallet inputs by script (address comparison)
+      if (scriptHex && scriptHex === walletScriptHex && inputValue != null) {
+        walletInputValue += inputValue;
       }
     }
 
@@ -497,20 +577,7 @@ class ProviderController extends BaseController {
       };
     }
 
-    // Verify all inputs to be signed are P2PKH
-    for (const signInput of toSignInputs) {
-      const input = psbt.data.inputs[signInput.index];
-      let script: Buffer | null = null;
-      if (input.witnessUtxo) {
-        script = input.witnessUtxo.script;
-      } else if (input.nonWitnessUtxo) {
-        const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
-        script = tx.outs[psbt.txInputs[signInput.index].index].script;
-      }
-      if (!script || !isP2PKHScript(script)) {
-        throw new Error('SmallPay only supports P2PKH inputs');
-      }
-    }
+    // P2PKH wallet check already done above — safe to sign
 
     // Sign the PSBT (reuse signPsbt logic)
     const autoFinalized = params.options?.autoFinalized !== false;

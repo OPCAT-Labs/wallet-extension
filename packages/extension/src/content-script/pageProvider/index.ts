@@ -217,6 +217,30 @@ export class OpcatProvider extends EventEmitter {
     });
   };
 
+  /**
+   * Request multiple permissions in one popup.
+   * @param params.permissions - Array of permission types: 'connect', 'ecdh', 'getPKHByPath', 'smallPay'
+   * @returns Object mapping each requested permission to granted (true/false)
+   */
+  requestPermissions = async (params: {
+    permissions: string[];
+  }): Promise<Record<string, boolean>> => {
+    return this[requestMethodKey]({
+      method: 'requestPermissions',
+      params
+    });
+  };
+
+  /**
+   * Get current granted permissions for this origin.
+   * @returns Object mapping permission types to granted status
+   */
+  getPermissions = async (): Promise<Record<string, boolean>> => {
+    return this[requestMethodKey]({
+      method: 'getPermissions'
+    });
+  };
+
   getNetwork = async () => {
     return this[requestMethodKey]({
       method: 'getNetwork'

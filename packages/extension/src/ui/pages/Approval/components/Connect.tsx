@@ -57,16 +57,32 @@ interface Props {
   };
 }
 
+const OPTIONAL_PERMISSIONS = [
+  { key: 'ecdh', label: 'ECDH Key Exchange', desc: 'Compute shared secrets' },
+  { key: 'getPKHByPath', label: 'Derive PKH', desc: 'Derive public key hashes' },
+  { key: 'smallPay', label: 'SmallPay', desc: 'Auto-payment within limits' }
+];
+
 export default function Connect({ params: { session } }: Props) {
   const [_getApproval, resolveApproval, rejectApproval] = useApproval();
   const { t } = useI18n();
+
+  const [checkedPerms, setCheckedPerms] = useState<Record<string, boolean>>({});
+
+  const togglePerm = (key: string) => {
+    setCheckedPerms((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleCancel = () => {
     rejectApproval(t('user_rejected_the_request'));
   };
 
   const handleConnect = async () => {
-    resolveApproval();
+    const grantedPermissions = ['connect'];
+    for (const [key, val] of Object.entries(checkedPerms)) {
+      if (val) grantedPermissions.push(key);
+    }
+    resolveApproval({ grantedPermissions });
   };
 
   const wallet = useWallet();
@@ -167,6 +183,47 @@ export default function Connect({ params: { session } }: Props) {
 
           <Text text={currentKeyring.alianName} preset="sub" />
           <MyItem account={currentAccount} />
+
+          {/* Optional permissions */}
+          <Text text={t('permission_request') || 'Permissions'} preset="sub" mt="lg" />
+          {OPTIONAL_PERMISSIONS.map((perm) => {
+            const isChecked = checkedPerms[perm.key] ?? false;
+            return (
+              <div
+                key={perm.key}
+                onClick={() => togglePerm(perm.key)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 0',
+                  cursor: 'pointer',
+                  gap: 10
+                }}
+              >
+                <div
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: 4,
+                    border: `2px solid ${isChecked ? '#4caf50' : '#555'}`,
+                    background: isChecked ? '#4caf50' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    color: '#fff',
+                    flexShrink: 0
+                  }}
+                >
+                  {isChecked ? '✓' : ''}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: '#eee', fontWeight: 500 }}>{perm.label}</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>{perm.desc}</div>
+                </div>
+              </div>
+            );
+          })}
         </Column>
       </Content>
 
