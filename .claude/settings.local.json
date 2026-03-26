@@ -2,10 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(npm run build:chrome:mv3:*)",
-      "Bash(npx playwright install chrome)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(npx playwright install chrome)"
     ],
     "deny": [],
     "ask": []
