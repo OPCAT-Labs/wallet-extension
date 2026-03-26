@@ -81,7 +81,7 @@ const flowContext = flow
       mapMethod
     } = ctx;
     // if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-    if (!['getNetwork', 'switchNetwork', 'getChain', 'switchChain'].includes(mapMethod)) {
+    if (!['getNetwork', 'switchNetwork', 'getChain', 'switchChain', 'requestPermissions'].includes(mapMethod)) {
       if (!permissionService.hasPermission(origin)) {
         if (['getAccounts'].includes(mapMethod)) {
           return [];
