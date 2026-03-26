@@ -1,4 +1,4 @@
-import { permissionService, sessionService } from '@/background/service';
+import { notificationService, permissionService, sessionService } from '@/background/service';
 import { CHAINS, CHAINS_MAP, NETWORK_TYPES, VERSION } from '@/shared/constant';
 import { NetworkType, RequestMethodSendBitcoinParams, RequestMethodSignMessageParams, RequestMethodSignMessagesParams, RequestMethodSignPsbtParams, RequestMethodSignPsbtsParams } from '@/shared/types';
 import { getChainInfo } from '@/shared/utils';
@@ -313,6 +313,15 @@ class ProviderController extends BaseController {
     if (!params.path || typeof params.path !== 'string') {
       throw new Error('path is required and must be a string');
     }
+    // Validate BIP32 path format
+    if (!/^m(\/\d+'?)+$/.test(params.path)) {
+      throw new Error('Invalid BIP32 path format');
+    }
+    // Block standard paths to prevent address tracking
+    const blocked = ["m/44'", "m/49'", "m/84'", "m/86'"];
+    if (blocked.some(p => params.path.startsWith(p))) {
+      throw new Error('Standard BIP44/49/84/86 paths are not allowed');
+    }
   }])
   getPKHByPath = async ({ data: { params } }) => {
     return wallet.getPKHByPath(params.path);
@@ -379,55 +388,132 @@ class ProviderController extends BaseController {
       throw new Error('Failed to parse wallet address');
     }
 
-    // Calculate total input value using scrypt-ts-opcat's getInputOutput method
-    let totalInputValue = 0n;
-    for (let i = 0; i < psbt.data.inputs.length; i++) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const inputOutput = (psbt as any).getInputOutput(i);
-        totalInputValue += BigInt(inputOutput.value);
-      } catch {
-        // Input value not available
-      }
-    }
+    // P2PKH script pattern: OP_DUP OP_HASH160 <20-byte-hash> OP_EQUALVERIFY OP_CHECKSIG (25 bytes)
+    const isP2PKHScript = (script: Buffer): boolean => {
+      return script.length === 25 && script[0] === 0x76 && script[1] === 0xa9 &&
+        script[2] === 0x14 && script[23] === 0x88 && script[24] === 0xac;
+    };
 
-    // Calculate total output value and external spending (outputs not going back to wallet)
-    let totalOutputValue = 0n;
-    let externalSpending = 0n;
+    // Analyze inputs: calculate wallet input value and verify all wallet inputs are P2PKH
+    let walletInputValue = 0n;
     const walletScriptHex = walletScript.toString('hex');
-    for (const output of psbt.txOutputs) {
-      const outputValue = BigInt(output.value);
-      totalOutputValue += outputValue;
-      const outputScriptHex = Buffer.from(output.script).toString('hex');
-      if (outputScriptHex !== walletScriptHex) {
-        externalSpending += outputValue;
+    for (let i = 0; i < psbt.data.inputs.length; i++) {
+      const input = psbt.data.inputs[i];
+      let script: Buffer | null = null;
+      let inputValue: bigint | null = null;
+
+      if (input.witnessUtxo) {
+        script = input.witnessUtxo.script;
+        inputValue = BigInt(input.witnessUtxo.value);
+      } else if (input.nonWitnessUtxo) {
+        const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
+        const output = tx.outs[psbt.txInputs[i].index];
+        script = output.script;
+        inputValue = BigInt(output.value);
+      }
+
+      if (script) {
+        const scriptHex = script.toString('hex');
+        if (scriptHex === walletScriptHex) {
+          // This is a wallet input — must be P2PKH
+          if (!isP2PKHScript(script)) {
+            throw new Error('SmallPay only supports P2PKH inputs');
+          }
+          if (inputValue === null) {
+            throw new Error('SmallPay: cannot determine value of wallet input');
+          }
+          walletInputValue += inputValue;
+        }
       }
     }
 
-    // Calculate fee and fee rate
-    const fee = Number(totalInputValue - totalOutputValue);
-    if (fee < 0) {
-      throw new Error(`Invalid PSBT: outputs exceed inputs by ${Math.abs(fee)} sats`);
+    if (walletInputValue === 0n) {
+      throw new Error('SmallPay: no wallet inputs found in PSBT');
     }
 
-    const estimatedVsize = psbt.data.inputs.length * 68 + psbt.txOutputs.length * 34 + 10;
-    const feeRate = fee / estimatedVsize;
-
-    // Amount for limit checking = external spending + fee
-    if (externalSpending > BigInt(Number.MAX_SAFE_INTEGER)) {
-      throw new Error('Payment amount exceeds safe integer range');
+    // Calculate wallet output value (outputs going back to wallet)
+    let walletOutputValue = 0n;
+    for (const output of psbt.txOutputs) {
+      const outputScriptHex = Buffer.from(output.script).toString('hex');
+      if (outputScriptHex === walletScriptHex) {
+        walletOutputValue += BigInt(output.value);
+      }
     }
-    const amount = Number(externalSpending) + fee;
+
+    // User net cost = wallet inputs - wallet outputs (what the user actually spends)
+    const userNetCost = walletInputValue - walletOutputValue;
+    if (userNetCost < 0n) {
+      throw new Error('Invalid PSBT: wallet outputs exceed wallet inputs');
+    }
+    // Early reject if amount exceeds single payment limit (also guards BigInt→Number conversion)
+    const singlePaymentLimit = wallet.getSmallPaySingleLimit();
+    if (userNetCost > BigInt(singlePaymentLimit)) {
+      throw new Error(`Amount exceeds single payment limit of ${singlePaymentLimit} sats`);
+    }
+    const amount = Number(userNetCost);
+
+    // Estimate fee rate using P2PKH input size (148 bytes per input, 34 per output, 10 overhead)
+    const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
+    const walletInputCount = toSignInputs.length;
+    const estimatedVsize = walletInputCount * 148 + psbt.txOutputs.length * 34 + 10;
+    const feeRate = amount > 0 ? amount / estimatedVsize : 0;
 
     // Validate the payment
     const validation = wallet.validateSmallPayment(origin, amount, feeRate);
     if (!validation.valid) {
-      throw new Error(validation.error || 'SmallPay validation failed');
+      // Fallback to signPsbt approval popup when SmallPay limits exceeded
+      const approvalRes = await notificationService.requestApproval({
+        approvalComponent: 'SignPsbt',
+        params: {
+          method: 'signPsbt',
+          data: { psbtHex: params.psbtHex, options: params.options },
+          session: { origin: session.origin, name: session.name, icon: session.icon }
+        },
+        origin: session.origin
+      });
+
+      // Sign the PSBT after user approval
+      let fallbackSignedHex: string;
+      if (approvalRes && approvalRes.signed === true) {
+        fallbackSignedHex = approvalRes.psbtHex;
+      } else {
+        const fallbackPsbt = psbtFromHex(formatPsbtHex(params.psbtHex));
+        const fallbackAutoFinalized = params.options?.autoFinalized !== false;
+        const fallbackToSignInputs = await wallet.formatOptionsToSignInputs(fallbackPsbt, params.options);
+        await wallet.signPsbt(fallbackPsbt, fallbackToSignInputs, fallbackAutoFinalized);
+        fallbackSignedHex = fallbackPsbt.toHex();
+      }
+
+      // Broadcast the signed transaction (consistent with normal SmallPay flow)
+      const fallbackPsbtFinal = psbtFromHex(fallbackSignedHex);
+      const fallbackTx = fallbackPsbtFinal.extractTransaction(true);
+      const fallbackTxid = fallbackTx.id;
+      await wallet.pushTx(fallbackTx.toHex());
+
+      return {
+        status: 'success',
+        txid: fallbackTxid,
+        signedPsbtHex: fallbackSignedHex
+      };
+    }
+
+    // Verify all inputs to be signed are P2PKH
+    for (const signInput of toSignInputs) {
+      const input = psbt.data.inputs[signInput.index];
+      let script: Buffer | null = null;
+      if (input.witnessUtxo) {
+        script = input.witnessUtxo.script;
+      } else if (input.nonWitnessUtxo) {
+        const tx = bitcoin.Transaction.fromBuffer(input.nonWitnessUtxo);
+        script = tx.outs[psbt.txInputs[signInput.index].index].script;
+      }
+      if (!script || !isP2PKHScript(script)) {
+        throw new Error('SmallPay only supports P2PKH inputs');
+      }
     }
 
     // Sign the PSBT (reuse signPsbt logic)
     const autoFinalized = params.options?.autoFinalized !== false;
-    const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
     await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
     const signedPsbtHex = psbt.toHex();
 

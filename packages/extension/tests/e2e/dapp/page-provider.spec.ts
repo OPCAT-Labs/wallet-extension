@@ -296,4 +296,38 @@ test.describe('PageProvider API', () => {
 
     await closeModal(dappPage);
   });
+
+  test('smallPay should fallback to signPsbt popup when limits exceeded', async () => {
+    // Setup popup handler to approve all popups (connection + autoPayment + signPsbt fallback)
+    setupWalletPopupHandler(context, {
+      password: TEST_WALLET.password,
+      action: 'approve',
+    });
+
+    // First connect
+    await dappPage.click('[data-testid="test-request-accounts-approve"]');
+    await waitForModalStatus(dappPage, 'success', 30000);
+    await closeModal(dappPage);
+
+    // Create a test PSBT (same as signPsbt test)
+    const provider = new DummyProvider('opcat-testnet');
+    const psbt = new ExtPsbt({ network: 'opcat-testnet' })
+      .spendUTXO(await provider.getUtxos(TEST_WALLET.address))
+      .change(TEST_WALLET.address, 1)
+      .seal();
+    const psbtHex = psbt.toHex();
+
+    // Enter PSBT in the input field (needed by the test button)
+    await dappPage.fill('[data-testid="psbt-input"]', psbtHex);
+
+    // Click the smallPay fallback test button
+    // This will call smallPay which should exceed limits and fallback to signPsbt popup
+    await dappPage.click('[data-testid="test-smallpay-fallback"]');
+
+    // Wait for result - should succeed via the signPsbt fallback popup
+    const content = await waitForModalStatus(dappPage, 'success', 60000);
+    expect(content).toContain('SmallPay fallback to signPsbt worked');
+
+    await closeModal(dappPage);
+  });
 });

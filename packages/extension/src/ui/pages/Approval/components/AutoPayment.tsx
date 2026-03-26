@@ -24,7 +24,7 @@ export default function AutoPayment({ params: { data, session } }: Props) {
 
   const [singleLimit, setSingleLimit] = useState(10000);
   const [dailyLimit, setDailyLimit] = useState(5000000);
-  const [maxFeeRate, setMaxFeeRate] = useState(1000);
+  const [maxFeeRate, setMaxFeeRate] = useState(0.01);
 
   useEffect(() => {
     const loadLimits = async () => {
@@ -84,7 +84,7 @@ export default function AutoPayment({ params: { data, session } }: Props) {
               </Row>
               <Row justifyBetween>
                 <Text text={t('max_fee_rate')} preset="sub" color="textDim" />
-                <Text text={`${maxFeeRate} sat/vB`} preset="bold" />
+                <Text text={`${maxFeeRate} sat/byte`} preset="bold" />
               </Row>
             </Column>
           </Card>

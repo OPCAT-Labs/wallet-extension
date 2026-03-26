@@ -18,7 +18,7 @@ export default function SmallPayScreen() {
   const [enabled, setEnabled] = useState(false);
   const [singleLimit, setSingleLimit] = useState(10000);
   const [dailyLimit, setDailyLimit] = useState(5000000);
-  const [maxFeeRate, setMaxFeeRate] = useState(1000);
+  const [maxFeeRate, setMaxFeeRate] = useState(0.01);
   const [whitelist, setWhitelist] = useState<SmallPayWhitelistItem[]>([]);
   const [history, setHistory] = useState<SmallPayHistoryItem[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('whitelist');
@@ -123,7 +123,7 @@ export default function SmallPayScreen() {
               </Row>
               <Row justifyBetween>
                 <Text text={t('max_fee_rate')} preset="sub" size="xs" />
-                <Text text={`${maxFeeRate} sat/vB`} size="xs" />
+                <Text text={`${maxFeeRate} sat/byte`} size="xs" />
               </Row>
             </Column>
           </Card>

@@ -301,6 +301,15 @@
         Run Test
       </button>
     </div>
+
+    <!-- Test 10: SmallPay daily limit fallback -->
+    <div class="test-card">
+      <h3>Test 10: SmallPay Limit Fallback</h3>
+      <p>Call smallPay with an amount exceeding daily limit. Should fallback to signPsbt popup.</p>
+      <button data-testid="test-smallpay-fallback" onclick="testSmallPayFallback()">
+        Run Test
+      </button>
+    </div>
   </div>
 
   <!-- PSBT Input Section -->
@@ -590,6 +599,54 @@
           showModal('fail', 'Failed', 'Unexpected ECDH result:\n' + JSON.stringify(result, null, 2));
         }
       } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 10: SmallPay daily limit fallback to signPsbt
+    async function testSmallPayFallback() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling smallPay with amount exceeding limits...\nA signPsbt popup should appear. Please APPROVE it.');
+
+      try {
+        // First check SmallPay status
+        const status = await window.opcat.smallPayStatus();
+
+        if (!status.isApproved) {
+          showModal('fail', 'Failed', 'SmallPay not approved for this origin. Please authorize first via autoPayment.');
+          return;
+        }
+
+        // Use the PSBT from the input field, or show error
+        const psbtHex = document.getElementById('psbt-input').value.trim();
+        if (!psbtHex) {
+          showModal('fail', 'Failed', 'Please enter a PSBT hex in the PSBT input field first.\nThe PSBT should have an amount that exceeds SmallPay limits to trigger the fallback popup.');
+          return;
+        }
+
+        // Call smallPay - if limit exceeded, it should fallback to signPsbt popup
+        const result = await window.opcat.smallPay({
+          psbtHex: psbtHex,
+          options: { autoFinalized: true }
+        });
+
+        if (result && result.status === 'success' && result.signedPsbtHex) {
+          const hasTxid = result.txid && result.txid.length > 0;
+          showModal('success', 'Success',
+            'SmallPay fallback to signPsbt worked!\n' +
+            'Status: ' + result.status + '\n' +
+            'Txid: ' + (hasTxid ? result.txid : '(none - sign only)') + '\n' +
+            'Signed PSBT (first 80 chars): ' + result.signedPsbtHex.substring(0, 80) + '...'
+          );
+        } else {
+          showModal('fail', 'Failed', 'Unexpected result:\n' + JSON.stringify(result, null, 2));
+        }
+      } catch (error) {
+        // This is also acceptable - if user rejects the fallback popup
         showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
       }
     }

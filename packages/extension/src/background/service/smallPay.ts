@@ -17,7 +17,7 @@ export interface SmallPayStore {
   enabled: boolean;
   singlePaymentLimit: number; // satoshis
   dailyLimit: number; // satoshis (24h rolling window)
-  maxFeeRate: number; // sat/vByte
+  maxFeeRate: number; // sat/byteyte
   whitelist: SmallPayWhitelistItem[];
   history: SmallPayHistoryItem[];
 }
@@ -25,7 +25,7 @@ export interface SmallPayStore {
 // Default values
 const DEFAULT_SINGLE_PAYMENT_LIMIT = 10000; // 10,000 sats
 const DEFAULT_DAILY_LIMIT = 5000000; // 5,000,000 sats (0.05 BTC)
-const DEFAULT_MAX_FEE_RATE = 1000; // 1000 sat/vByte (0.001 sat/byte = 1 sat/1000 bytes, but typically measured per vByte)
+const DEFAULT_MAX_FEE_RATE = 0.01; // 0.01 sat/byte
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 
 class SmallPayService {
@@ -55,6 +55,10 @@ class SmallPayService {
       this.store.dailyLimit = DEFAULT_DAILY_LIMIT;
     }
     if (typeof this.store.maxFeeRate !== 'number') {
+      this.store.maxFeeRate = DEFAULT_MAX_FEE_RATE;
+    }
+    // Migrate old default fee rate (1000 sat/vB) to new default (0.01 sat/byte)
+    if (this.store.maxFeeRate >= 1) {
       this.store.maxFeeRate = DEFAULT_MAX_FEE_RATE;
     }
     if (!Array.isArray(this.store.whitelist)) {
@@ -195,7 +199,7 @@ class SmallPayService {
     if (feeRate > this.store.maxFeeRate) {
       return {
         valid: false,
-        error: `Fee rate ${feeRate} sat/vB exceeds maximum of ${this.store.maxFeeRate} sat/vB`
+        error: `Fee rate ${feeRate} sat/byte exceeds maximum of ${this.store.maxFeeRate} sat/byte`
       };
     }
 
@@ -204,7 +208,7 @@ class SmallPayService {
     if (amount > remaining) {
       return {
         valid: false,
-        error: `Amount ${amount} exceeds remaining daily allowance of ${remaining} sats`
+        error: `Amount ${amount} exceeds remaining daily allowance of ${remaining} sats. The 24-hour rolling limit resets gradually as older payments expire.`
       };
     }
 
