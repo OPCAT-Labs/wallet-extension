@@ -117,38 +117,40 @@ export default function RequestPermissions({ params: { data, session } }: Props)
                   marginTop: 12,
                   cursor: isConnect ? 'default' : 'pointer',
                   opacity: isChecked ? 1 : 0.5,
-                  border: isChecked ? `1px solid ${getRiskColor(info.risk)}` : '1px solid #333'
+                  border: isChecked ? `1px solid ${getRiskColor(info.risk)}` : '1px solid #333',
+                  justifyContent: 'flex-start'
                 }}
                 onClick={() => handleToggle(perm)}
               >
-                <Row justifyBetween itemsCenter>
-                  <Column>
-                    <Row itemsCenter gap="sm">
-                      <div
-                        style={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: 4,
-                          border: `2px solid ${isChecked ? getRiskColor(info.risk) : '#555'}`,
-                          background: isChecked ? getRiskColor(info.risk) : 'transparent',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 12,
-                          color: '#fff',
-                          flexShrink: 0
-                        }}
-                      >
-                        {isChecked ? '✓' : ''}
-                      </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: 4,
+                      border: `2px solid ${isChecked ? getRiskColor(info.risk) : '#555'}`,
+                      background: isChecked ? getRiskColor(info.risk) : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      color: '#fff',
+                      flexShrink: 0,
+                      marginTop: 2
+                    }}
+                  >
+                    {isChecked ? '✓' : ''}
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <Text text={info.label} preset="bold" size="sm" />
                       {isConnect && (
                         <Text text="(required)" preset="sub" size="xxs" color="textDim" />
                       )}
-                    </Row>
-                    <Text text={info.desc} preset="sub" size="xxs" color="textDim" style={{ marginTop: 4, marginLeft: 26 }} />
-                  </Column>
-                </Row>
+                    </div>
+                    <Text text={info.desc} preset="sub" size="xxs" color="textDim" style={{ marginTop: 2 }} />
+                  </div>
+                </div>
               </Card>
             );
           })}
