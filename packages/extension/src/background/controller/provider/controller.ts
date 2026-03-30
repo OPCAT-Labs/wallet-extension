@@ -525,9 +525,10 @@ class ProviderController extends BaseController {
     if (userNetCost < 0n) {
       throw new Error('Invalid PSBT: wallet outputs exceed wallet inputs');
     }
-    // Guard BigInt→Number conversion: cap at Number.MAX_SAFE_INTEGER
-    if (userNetCost > BigInt(Number.MAX_SAFE_INTEGER)) {
-      throw new Error('Amount too large');
+    // Reject if amount exceeds single payment limit
+    const singlePaymentLimit = wallet.getSmallPaySingleLimit();
+    if (userNetCost > BigInt(singlePaymentLimit)) {
+      throw new Error(`Amount exceeds single payment limit of ${singlePaymentLimit} sats`);
     }
     const amount = Number(userNetCost);
 
