@@ -58,10 +58,12 @@ interface Props {
 }
 
 const OPTIONAL_PERMISSIONS = [
-  { key: 'ecdh', label: 'ECDH Key Exchange', desc: 'Compute shared secrets' },
-  { key: 'getPKHByPath', label: 'Derive PKH', desc: 'Derive public key hashes' },
-  { key: 'smallPay', label: 'SmallPay', desc: 'Auto-payment within limits' }
+  { key: 'ecdh', label: 'ECDH Key Exchange', desc: 'Compute shared secrets for encrypted communication' },
+  { key: 'getPKHByPath', label: 'Derive PKH', desc: 'Derive public key hashes from custom paths' },
+  { key: 'smallPay', label: 'SmallPay Auto-Payment', desc: 'Auto-sign small transactions within configured limits' }
 ];
+
+const PERM_COLOR = '#4caf50';
 
 export default function Connect({ params: { session } }: Props) {
   const [_getApproval, resolveApproval, rejectApproval] = useApproval();
@@ -189,39 +191,42 @@ export default function Connect({ params: { session } }: Props) {
           {OPTIONAL_PERMISSIONS.map((perm) => {
             const isChecked = checkedPerms[perm.key] ?? false;
             return (
-              <div
+              <Card
                 key={perm.key}
-                onClick={() => togglePerm(perm.key)}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '8px 0',
+                  marginTop: 12,
                   cursor: 'pointer',
-                  gap: 10
+                  opacity: isChecked ? 1 : 0.5,
+                  border: isChecked ? `1px solid ${PERM_COLOR}` : '1px solid #333',
+                  justifyContent: 'flex-start'
                 }}
+                onClick={() => togglePerm(perm.key)}
               >
-                <div
-                  style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 4,
-                    border: `2px solid ${isChecked ? '#4caf50' : '#555'}`,
-                    background: isChecked ? '#4caf50' : 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                    color: '#fff',
-                    flexShrink: 0
-                  }}
-                >
-                  {isChecked ? '✓' : ''}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: 4,
+                      border: `2px solid ${isChecked ? PERM_COLOR : '#555'}`,
+                      background: isChecked ? PERM_COLOR : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      color: '#fff',
+                      flexShrink: 0,
+                      marginTop: 2
+                    }}
+                  >
+                    {isChecked ? '✓' : ''}
+                  </div>
+                  <div>
+                    <Text text={perm.label} preset="bold" size="sm" />
+                    <Text text={perm.desc} preset="sub" size="xxs" color="textDim" style={{ marginTop: 2 }} />
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: '#eee', fontWeight: 500 }}>{perm.label}</div>
-                  <div style={{ fontSize: 11, color: '#888' }}>{perm.desc}</div>
-                </div>
-              </div>
+              </Card>
             );
           })}
         </Column>

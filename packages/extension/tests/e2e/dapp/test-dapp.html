@@ -613,14 +613,6 @@
       showModal('testing', 'Testing...', 'Calling smallPay with amount exceeding limits...\nA signPsbt popup should appear. Please APPROVE it.');
 
       try {
-        // First check SmallPay status
-        const status = await window.opcat.smallPayStatus();
-
-        if (!status.isApproved) {
-          showModal('fail', 'Failed', 'SmallPay not approved for this origin. Please authorize first via autoPayment.');
-          return;
-        }
-
         // Use the PSBT from the input field, or show error
         const psbtHex = document.getElementById('psbt-input').value.trim();
         if (!psbtHex) {

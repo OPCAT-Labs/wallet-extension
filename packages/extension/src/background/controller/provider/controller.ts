@@ -525,10 +525,9 @@ class ProviderController extends BaseController {
     if (userNetCost < 0n) {
       throw new Error('Invalid PSBT: wallet outputs exceed wallet inputs');
     }
-    // Early reject if amount exceeds single payment limit (also guards BigInt→Number conversion)
-    const singlePaymentLimit = wallet.getSmallPaySingleLimit();
-    if (userNetCost > BigInt(singlePaymentLimit)) {
-      throw new Error(`Amount exceeds single payment limit of ${singlePaymentLimit} sats`);
+    // Guard BigInt→Number conversion: cap at Number.MAX_SAFE_INTEGER
+    if (userNetCost > BigInt(Number.MAX_SAFE_INTEGER)) {
+      throw new Error('Amount too large');
     }
     const amount = Number(userNetCost);
 
@@ -564,15 +563,11 @@ class ProviderController extends BaseController {
         fallbackSignedHex = fallbackPsbt.toHex();
       }
 
-      // Broadcast the signed transaction (consistent with normal SmallPay flow)
-      const fallbackPsbtFinal = psbtFromHex(fallbackSignedHex);
-      const fallbackTx = fallbackPsbtFinal.extractTransaction(true);
-      const fallbackTxid = fallbackTx.id;
-      await wallet.pushTx(fallbackTx.toHex());
-
+      // Fallback behaves like signPsbt: return signed PSBT without broadcasting.
+      // The caller (dApp) decides whether to broadcast.
       return {
         status: 'success',
-        txid: fallbackTxid,
+        txid: '',
         signedPsbtHex: fallbackSignedHex
       };
     }

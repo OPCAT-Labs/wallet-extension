@@ -6,34 +6,32 @@ import { useI18n } from '@/ui/hooks/useI18n';
 import { useApproval } from '@/ui/utils';
 import { TestIds } from '@/ui/utils/test-ids';
 
-const PERMISSION_INFO: Record<string, { label: string; labelZh: string; desc: string; descZh: string; risk: string }> = {
+const PERM_COLOR = '#4caf50';
+
+const PERMISSION_INFO: Record<string, { label: string; labelZh: string; desc: string; descZh: string }> = {
   connect: {
     label: 'Connect',
     labelZh: '连接',
     desc: 'View your address, public key and balance',
-    descZh: '查看您的地址、公钥和余额',
-    risk: 'low'
+    descZh: '查看您的地址、公钥和余额'
   },
   ecdh: {
     label: 'ECDH Key Exchange',
     labelZh: 'ECDH 密钥交换',
     desc: 'Compute shared secrets for encrypted communication',
-    descZh: '计算用于加密通信的共享密钥',
-    risk: 'medium'
+    descZh: '计算用于加密通信的共享密钥'
   },
   getPKHByPath: {
     label: 'Derive PKH',
     labelZh: '派生公钥哈希',
     desc: 'Derive public key hashes from custom paths',
-    descZh: '从自定义路径派生公钥哈希',
-    risk: 'medium'
+    descZh: '从自定义路径派生公钥哈希'
   },
   smallPay: {
     label: 'SmallPay Auto-Payment',
     labelZh: '小额自动支付',
     desc: 'Auto-sign small transactions within configured limits',
-    descZh: '在配置限额内自动签名小额交易',
-    risk: 'high'
+    descZh: '在配置限额内自动签名小额交易'
   }
 };
 
@@ -83,12 +81,6 @@ export default function RequestPermissions({ params: { data, session } }: Props)
     resolveApproval({ grantedPermissions });
   };
 
-  const getRiskColor = (risk: string) => {
-    if (risk === 'high') return '#ff4757';
-    if (risk === 'medium') return '#ffa500';
-    return '#4caf50';
-  };
-
   return (
     <Layout>
       <Content>
@@ -117,7 +109,7 @@ export default function RequestPermissions({ params: { data, session } }: Props)
                   marginTop: 12,
                   cursor: isConnect ? 'default' : 'pointer',
                   opacity: isChecked ? 1 : 0.5,
-                  border: isChecked ? `1px solid ${getRiskColor(info.risk)}` : '1px solid #333',
+                  border: isChecked ? `1px solid ${PERM_COLOR}` : '1px solid #333',
                   justifyContent: 'flex-start'
                 }}
                 onClick={() => handleToggle(perm)}
@@ -128,8 +120,8 @@ export default function RequestPermissions({ params: { data, session } }: Props)
                       width: 18,
                       height: 18,
                       borderRadius: 4,
-                      border: `2px solid ${isChecked ? getRiskColor(info.risk) : '#555'}`,
-                      background: isChecked ? getRiskColor(info.risk) : 'transparent',
+                      border: `2px solid ${isChecked ? PERM_COLOR : '#555'}`,
+                      background: isChecked ? PERM_COLOR : 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
