@@ -4,6 +4,13 @@ import LRU from 'lru-cache';
 import { createPersistStore } from '@/background/utils';
 import { CHAINS_ENUM, INTERNAL_REQUEST_ORIGIN } from '@/shared/constant';
 
+export type PermissionType = 'connect' | 'ecdh' | 'getPKHByPath' | 'smallPay';
+
+export interface PermissionGrant {
+  granted: boolean;
+  grantedAt: number;
+}
+
 export interface ConnectedSite {
   origin: string;
   icon: string;
@@ -14,6 +21,8 @@ export interface ConnectedSite {
   isTop: boolean;
   order?: number;
   isConnected: boolean;
+  // Granular permissions (optional for backward compatibility)
+  permissions?: Partial<Record<PermissionType, PermissionGrant>>;
 }
 
 export type PermissionStore = {
@@ -185,6 +194,122 @@ class PermissionService {
 
   isInternalOrigin = (origin: string) => {
     return origin === INTERNAL_REQUEST_ORIGIN;
+  };
+
+  // ========== Granular Permission Methods ==========
+
+  /**
+   * Grant specific permissions to a connected site.
+   * Ensures 'connect' is always included.
+   */
+  grantPermissions = (origin: string, permissionTypes: PermissionType[]) => {
+    const site = this.lruCache?.get(origin);
+    if (!site) return;
+
+    const now = Date.now();
+    const permissions = site.permissions || {};
+
+    for (const perm of permissionTypes) {
+      permissions[perm] = { granted: true, grantedAt: now };
+    }
+
+    // connect is always required
+    if (!permissions.connect?.granted) {
+      permissions.connect = { granted: true, grantedAt: now };
+    }
+
+    this.updateConnectSite(origin, { permissions }, true);
+  };
+
+  /**
+   * Revoke a specific permission from a site.
+   * Revoking 'connect' revokes all permissions.
+   */
+  revokePermission = (origin: string, permissionType: PermissionType) => {
+    const site = this.lruCache?.get(origin);
+    if (!site || !site.permissions) return;
+
+    if (permissionType === 'connect') {
+      // Revoking connect = disconnect entirely
+      this.removeConnectedSite(origin);
+      return;
+    }
+
+    const permissions = { ...site.permissions };
+    if (permissions[permissionType]) {
+      permissions[permissionType] = { granted: false, grantedAt: permissions[permissionType]!.grantedAt };
+    }
+    this.updateConnectSite(origin, { permissions }, true);
+  };
+
+  /**
+   * Check if a site has a specific permission.
+   */
+  hasSitePermission = (origin: string, permissionType: PermissionType): boolean => {
+    if (origin === INTERNAL_REQUEST_ORIGIN) return true;
+
+    const site = this.lruCache?.get(origin);
+    if (!site || !site.isConnected) return false;
+
+    // 'connect' is implicit if isConnected is true
+    if (permissionType === 'connect') return true;
+
+    return site.permissions?.[permissionType]?.granted === true;
+  };
+
+  /**
+   * Get all granted permissions for a site.
+   */
+  getSitePermissions = (origin: string): Partial<Record<PermissionType, boolean>> => {
+    const site = this.lruCache?.get(origin);
+    if (!site || !site.isConnected) return {};
+
+    const result: Partial<Record<PermissionType, boolean>> = { connect: true };
+    if (site.permissions) {
+      for (const [key, val] of Object.entries(site.permissions)) {
+        if (val?.granted) {
+          result[key as PermissionType] = true;
+        }
+      }
+    }
+    return result;
+  };
+
+  /**
+   * Connect a site with specific permissions (for requestPermissions flow).
+   */
+  connectWithPermissions = (
+    origin: string,
+    name: string,
+    icon: string,
+    defaultChain: CHAINS_ENUM,
+    permissionTypes: PermissionType[]
+  ) => {
+    if (!this.lruCache) return;
+
+    const now = Date.now();
+    const permissions: Partial<Record<PermissionType, PermissionGrant>> = {};
+    for (const perm of permissionTypes) {
+      permissions[perm] = { granted: true, grantedAt: now };
+    }
+    // Always grant connect
+    if (!permissions.connect) {
+      permissions.connect = { granted: true, grantedAt: now };
+    }
+
+    const existingSite = this.lruCache.get(origin);
+    this.lruCache.set(origin, {
+      origin,
+      name,
+      icon,
+      chain: defaultChain,
+      isSigned: existingSite?.isSigned || false,
+      isTop: existingSite?.isTop || false,
+      order: existingSite?.order,
+      isConnected: true,
+      permissions
+    });
+    this.sync();
   };
 }
 

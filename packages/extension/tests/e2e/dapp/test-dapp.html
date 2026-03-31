@@ -274,6 +274,42 @@
         Run Test
       </button>
     </div>
+
+    <!-- Test 7: getPKHByPath -->
+    <div class="test-card">
+      <h3>Test 7: getPKHByPath</h3>
+      <p>Derive PKH from a BIP32 path. Should return 40-char hex string.</p>
+      <button data-testid="test-get-pkh-by-path" onclick="testGetPKHByPath()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 8: getPKHByPath (different paths) -->
+    <div class="test-card">
+      <h3>Test 8: getPKHByPath Uniqueness</h3>
+      <p>Derive PKH from two different paths. Results should differ.</p>
+      <button data-testid="test-get-pkh-by-path-unique" onclick="testGetPKHByPathUnique()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 9: ECDH -->
+    <div class="test-card">
+      <h3>Test 9: ECDH Key Exchange</h3>
+      <p>Compute ECDH shared secret with a random external key.</p>
+      <button data-testid="test-ecdh" onclick="testECDH()">
+        Run Test
+      </button>
+    </div>
+
+    <!-- Test 10: SmallPay daily limit fallback -->
+    <div class="test-card">
+      <h3>Test 10: SmallPay Limit Fallback</h3>
+      <p>Call smallPay with an amount exceeding daily limit. Should fallback to signPsbt popup.</p>
+      <button data-testid="test-smallpay-fallback" onclick="testSmallPayFallback()">
+        Run Test
+      </button>
+    </div>
   </div>
 
   <!-- PSBT Input Section -->
@@ -490,6 +526,119 @@
 
         showModal('success', 'Success', 'PSBT signed successfully!\nSigned PSBT (first 100 chars):\n' + signedPsbt.substring(0, 100) + '...');
       } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 7: getPKHByPath
+    async function testGetPKHByPath() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling getPKHByPath with path m/100/0...\nPlease APPROVE if prompted.');
+
+      try {
+        const pkh = await window.opcat.getPKHByPath({ path: 'm/100/0' });
+
+        if (typeof pkh === 'string' && pkh.length === 40 && /^[0-9a-f]{40}$/.test(pkh)) {
+          showModal('success', 'Success', 'getPKHByPath returned valid PKH:\n' + pkh + '\nLength: ' + pkh.length + ' hex chars (20 bytes)');
+        } else {
+          showModal('fail', 'Failed', 'Expected 40-char hex string.\nGot: ' + JSON.stringify(pkh));
+        }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 8: getPKHByPath uniqueness
+    async function testGetPKHByPathUnique() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling getPKHByPath with two different paths...\nPlease APPROVE if prompted.');
+
+      try {
+        const pkh1 = await window.opcat.getPKHByPath({ path: 'm/100/0' });
+        const pkh2 = await window.opcat.getPKHByPath({ path: 'm/100/1' });
+
+        if (pkh1 !== pkh2 && pkh1.length === 40 && pkh2.length === 40) {
+          showModal('success', 'Success', 'Different paths produce different PKHs:\nPath m/100/0: ' + pkh1 + '\nPath m/100/1: ' + pkh2);
+        } else if (pkh1 === pkh2) {
+          showModal('fail', 'Failed', 'Both paths returned same PKH: ' + pkh1);
+        } else {
+          showModal('fail', 'Failed', 'Invalid PKH format.\npkh1: ' + pkh1 + '\npkh2: ' + pkh2);
+        }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 9: ECDH
+    async function testECDH() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Computing ECDH key exchange...\nPlease APPROVE if prompted.');
+
+      try {
+        // Generate a random external key pair using SubtleCrypto for the test
+        // We use a well-known test public key (compressed, 33 bytes)
+        const testExternalPubKey = '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798';
+
+        const result = await window.opcat.ecdh({ externalPubKey: testExternalPubKey });
+
+        if (result && result.sharedSecret && result.sharedSecret.length === 64 && result.ecdhPubKey) {
+          showModal('success', 'Success', 'ECDH key exchange successful!\nShared Secret: ' + result.sharedSecret + '\nECDH PubKey: ' + result.ecdhPubKey + '\nCreator PubKey: ' + (result.creatorPubkey || 'N/A'));
+        } else {
+          showModal('fail', 'Failed', 'Unexpected ECDH result:\n' + JSON.stringify(result, null, 2));
+        }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 10: SmallPay daily limit fallback to signPsbt
+    async function testSmallPayFallback() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Calling smallPay with amount exceeding limits...\nA signPsbt popup should appear. Please APPROVE it.');
+
+      try {
+        // Use the PSBT from the input field, or show error
+        const psbtHex = document.getElementById('psbt-input').value.trim();
+        if (!psbtHex) {
+          showModal('fail', 'Failed', 'Please enter a PSBT hex in the PSBT input field first.\nThe PSBT should have an amount that exceeds SmallPay limits to trigger the fallback popup.');
+          return;
+        }
+
+        // Call smallPay - if limit exceeded, it should fallback to signPsbt popup
+        const result = await window.opcat.smallPay({
+          psbtHex: psbtHex,
+          options: { autoFinalized: true }
+        });
+
+        if (result && result.status === 'success' && result.signedPsbtHex) {
+          const hasTxid = result.txid && result.txid.length > 0;
+          showModal('success', 'Success',
+            'SmallPay fallback to signPsbt worked!\n' +
+            'Status: ' + result.status + '\n' +
+            'Txid: ' + (hasTxid ? result.txid : '(none - sign only)') + '\n' +
+            'Signed PSBT (first 80 chars): ' + result.signedPsbtHex.substring(0, 80) + '...'
+          );
+        } else {
+          showModal('fail', 'Failed', 'Unexpected result:\n' + JSON.stringify(result, null, 2));
+        }
+      } catch (error) {
+        // This is also acceptable - if user rejects the fallback popup
         showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
       }
     }

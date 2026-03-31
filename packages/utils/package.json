@@ -30,7 +30,7 @@
     "build:cjs": "rimraf lib && cross-env BABEL_ENV=cjs gulp build",
     "build:esm": "rimraf es && cross-env BABEL_ENV=esm gulp build",
     "build:typed": "tsc --declaration --emitDeclarationOnly --noEmit false",
-    "test": "mocha -r ts-node/register test/**/*.ts --timeout 300000",
+    "test": "mocha -r ./node_modules/ts-node/register test/**/*.ts --timeout 300000",
     "prepublishOnly": "npm run build",
     "lint": "eslint ./src ./test"
   },
@@ -79,7 +79,7 @@
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "ts-loader": "^9.5.1",
-    "ts-node": "^10.4.0",
+    "ts-node": "^10.9.2",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^4.5.3",
     "watch": "^1.0.2",

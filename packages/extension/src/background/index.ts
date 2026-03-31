@@ -13,7 +13,8 @@ import {
   openapiService,
   permissionService,
   preferenceService,
-  sessionService
+  sessionService,
+  smallPayService
 } from './service';
 import { storage } from './webapi';
 import { browserRuntimeOnConnect, browserRuntimeOnInstalled } from './webapi/browser';
@@ -82,6 +83,7 @@ async function restoreAppState() {
   await openapiService.init();
   await permissionService.init();
   await contactBookService.init();
+  await smallPayService.init();
 
   // Configure side panel behavior after preferences are loaded
   await configureSidePanelBehavior();

@@ -81,13 +81,13 @@ const flowContext = flow
       mapMethod
     } = ctx;
     // if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-    if (!['getNetwork', 'switchNetwork', 'getChain', 'switchChain'].includes(mapMethod)) {
+    if (!['getNetwork', 'switchNetwork', 'getChain', 'switchChain', 'requestPermissions'].includes(mapMethod)) {
       if (!permissionService.hasPermission(origin)) {
         if (['getAccounts'].includes(mapMethod)) {
           return [];
         }
         ctx.request.requestedApproval = true;
-        await notificationService.requestApproval(
+        const connectResult = await notificationService.requestApproval(
           {
             params: {
               method: 'connect',
@@ -98,7 +98,13 @@ const flowContext = flow
           },
           { height: windowHeight }
         );
-        permissionService.addConnectedSite(origin, name, icon, ChainType.OPCAT_MAINNET);
+        // Use granular permissions if user selected any, otherwise just connect
+        const grantedPerms = connectResult?.grantedPermissions;
+        if (grantedPerms && Array.isArray(grantedPerms) && grantedPerms.length > 0) {
+          permissionService.connectWithPermissions(origin, name, icon, ChainType.OPCAT_MAINNET, grantedPerms);
+        } else {
+          permissionService.connectWithPermissions(origin, name, icon, ChainType.OPCAT_MAINNET, ['connect']);
+        }
       }
     }
 

@@ -217,6 +217,30 @@ export class OpcatProvider extends EventEmitter {
     });
   };
 
+  /**
+   * Request multiple permissions in one popup.
+   * @param params.permissions - Array of permission types: 'connect', 'ecdh', 'getPKHByPath', 'smallPay'
+   * @returns Object mapping each requested permission to granted (true/false)
+   */
+  requestPermissions = async (params: {
+    permissions: string[];
+  }): Promise<Record<string, boolean>> => {
+    return this[requestMethodKey]({
+      method: 'requestPermissions',
+      params
+    });
+  };
+
+  /**
+   * Get current granted permissions for this origin.
+   * @returns Object mapping permission types to granted status
+   */
+  getPermissions = async (): Promise<Record<string, boolean>> => {
+    return this[requestMethodKey]({
+      method: 'getPermissions'
+    });
+  };
+
   getNetwork = async () => {
     return this[requestMethodKey]({
       method: 'getNetwork'
@@ -395,6 +419,92 @@ export class OpcatProvider extends EventEmitter {
       delete utxo.atomicals
     });
     return utxos;
+  };
+
+  /**
+   * ECDH - Elliptic Curve Diffie-Hellman key exchange
+   * Compute a shared secret with an external public key using secp256k1
+   * @param externalPubKey - The external party's public key (hex, 02/03/04 prefix)
+   * @returns Object containing sharedSecret (hex), ecdhPubKey (hex), and creatorPubkey (hex)
+   */
+  ecdh = async (params: { externalPubKey: string }): Promise<{
+    sharedSecret: string;
+    ecdhPubKey: string;
+    creatorPubkey: string;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'ecdh',
+      params
+    });
+  };
+
+  /**
+   * Get PKH (Public Key Hash) derived from a custom BIP32 path
+   * PKH = RIPEMD160(SHA256(compressedPublicKey))
+   * @param params.path - BIP32 derivation path, e.g. "m/100/0"
+   * @returns PKH as hex string (40 hex chars)
+   */
+  getPKHByPath = async (params: { path: string }): Promise<string> => {
+    return this[requestMethodKey]({
+      method: 'getPKHByPath',
+      params
+    });
+  };
+
+  // ========== SmallPay Methods ==========
+
+  /**
+   * Get SmallPay status for the current origin
+   * Returns enabled status, approval status, limits, and remaining allowance
+   */
+  smallPayStatus = async (): Promise<{
+    isEnabled: boolean;
+    isApproved: boolean;
+    singlePaymentLimit: number;
+    dailyLimit: number;
+    maxFeeRate: number;
+    remaining24h: number;
+    spent24h: number;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'smallPayStatus'
+    });
+  };
+
+  /**
+   * Request SmallPay authorization for the current origin
+   * Will show an approval popup to the user
+   * @param params.logo - Optional logo URL to display in the approval popup
+   */
+  autoPayment = async (params?: { logo?: string }): Promise<{
+    status: 'approved' | 'rejected';
+    message: string;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'autoPayment',
+      params: params || {}
+    });
+  };
+
+  /**
+   * Execute a small payment (auto-approved if within limits)
+   * Validates origin whitelist, amount limits, fee rate, and 24h rolling limit
+   * @param params.psbtHex - The PSBT to sign and broadcast (hex format)
+   * @param params.options.autoFinalized - Whether to auto-finalize the PSBT (default: true)
+   */
+  smallPay = async (params: {
+    psbtHex: string;
+    options?: { autoFinalized?: boolean };
+  }): Promise<{
+    status: 'success' | 'error';
+    txid?: string;
+    signedPsbtHex?: string;
+    message?: string;
+  }> => {
+    return this[requestMethodKey]({
+      method: 'smallPay',
+      params
+    });
   };
 }
 

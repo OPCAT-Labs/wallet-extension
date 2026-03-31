@@ -1,5 +1,9 @@
+export { default as AutoPayment } from './AutoPayment';
 export { default as Connect } from './Connect';
+export { default as ECDH } from './ECDH';
+export { default as GetPKHByPath } from './GetPKHByPath';
 export { default as MultiSignMessage } from './MultiSignMessage';
+export { default as RequestPermissions } from './RequestPermissions';
 export { default as MultiSignPsbt } from './MultiSignPsbt';
 export { default as SignData } from './SignData';
 export { default as SignPsbt } from './SignPsbt';

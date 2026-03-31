@@ -57,16 +57,34 @@ interface Props {
   };
 }
 
+const OPTIONAL_PERMISSIONS = [
+  { key: 'ecdh', label: 'ECDH Key Exchange', desc: 'Compute shared secrets for encrypted communication' },
+  { key: 'getPKHByPath', label: 'Derive PKH', desc: 'Derive public key hashes from custom paths' },
+  { key: 'smallPay', label: 'SmallPay Auto-Payment', desc: 'Auto-sign small transactions within configured limits' }
+];
+
+const PERM_COLOR = '#4caf50';
+
 export default function Connect({ params: { session } }: Props) {
   const [_getApproval, resolveApproval, rejectApproval] = useApproval();
   const { t } = useI18n();
+
+  const [checkedPerms, setCheckedPerms] = useState<Record<string, boolean>>({});
+
+  const togglePerm = (key: string) => {
+    setCheckedPerms((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleCancel = () => {
     rejectApproval(t('user_rejected_the_request'));
   };
 
   const handleConnect = async () => {
-    resolveApproval();
+    const grantedPermissions = ['connect'];
+    for (const [key, val] of Object.entries(checkedPerms)) {
+      if (val) grantedPermissions.push(key);
+    }
+    resolveApproval({ grantedPermissions });
   };
 
   const wallet = useWallet();
@@ -167,6 +185,50 @@ export default function Connect({ params: { session } }: Props) {
 
           <Text text={currentKeyring.alianName} preset="sub" />
           <MyItem account={currentAccount} />
+
+          {/* Optional permissions */}
+          <Text text={t('permission_request') || 'Permissions'} preset="sub" mt="lg" />
+          {OPTIONAL_PERMISSIONS.map((perm) => {
+            const isChecked = checkedPerms[perm.key] ?? false;
+            return (
+              <Card
+                key={perm.key}
+                style={{
+                  marginTop: 12,
+                  cursor: 'pointer',
+                  opacity: isChecked ? 1 : 0.5,
+                  border: isChecked ? `1px solid ${PERM_COLOR}` : '1px solid #333',
+                  justifyContent: 'flex-start'
+                }}
+                onClick={() => togglePerm(perm.key)}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: 4,
+                      border: `2px solid ${isChecked ? PERM_COLOR : '#555'}`,
+                      background: isChecked ? PERM_COLOR : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      color: '#fff',
+                      flexShrink: 0,
+                      marginTop: 2
+                    }}
+                  >
+                    {isChecked ? '✓' : ''}
+                  </div>
+                  <div>
+                    <Text text={perm.label} preset="bold" size="sm" />
+                    <Text text={perm.desc} preset="sub" size="xxs" color="textDim" style={{ marginTop: 2 }} />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </Column>
       </Content>
 

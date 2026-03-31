@@ -2176,5 +2176,92 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "重要: 请不要转移此代币，因为存在临时索引不一致的问题。我们正在等待协议创始团队的解决方案。其他代币不受影响。"
+  },
+  "ecdh_request": {
+    "message": "ECDH 请求"
+  },
+  "this_site_is_requesting_to_compute_a_shared_secret": {
+    "message": "此网站请求使用您的钱包密钥计算共享密钥。这将生成一个您和对方都可以用于加密通信的密钥。"
+  },
+  "external_public_key": {
+    "message": "对方公钥"
+  },
+  "ecdh_warning": {
+    "message": "警告：仅在您信任此网站时才批准此请求。共享密钥可用于加密/解密您与对方之间的消息。"
+  },
+  "approve": {
+    "message": "批准"
+  },
+  "auto_payment_request": {
+    "message": "自动支付请求"
+  },
+  "auto_payment_description": {
+    "message": "此网站请求启用自动支付功能。启用后，在以下限额内的小额交易将自动签名，无需每次确认。"
+  },
+  "single_payment_limit": {
+    "message": "单笔支付限额"
+  },
+  "daily_limit_24h": {
+    "message": "24小时限额"
+  },
+  "max_fee_rate": {
+    "message": "最大手续费率"
+  },
+  "auto_payment_warning_title": {
+    "message": "安全提示"
+  },
+  "auto_payment_warning": {
+    "message": "启用此功能后，在限额内的交易将自动签名。仅对您信任的网站启用此功能。您可以随时在设置中撤销授权。"
+  },
+  "smallpay_settings": {
+    "message": "小额支付设置"
+  },
+  "smallpay_settings_desc": {
+    "message": "信任网站自动支付"
+  },
+  "smallpay_enabled": {
+    "message": "启用小额支付"
+  },
+  "smallpay_limits": {
+    "message": "支付限额"
+  },
+  "smallpay_whitelist": {
+    "message": "已授权网站"
+  },
+  "smallpay_history": {
+    "message": "支付历史"
+  },
+  "smallpay_no_whitelist": {
+    "message": "暂无已授权网站"
+  },
+  "smallpay_no_history": {
+    "message": "暂无支付记录"
+  },
+  "smallpay_clear_history": {
+    "message": "清除历史"
+  },
+  "smallpay_remove_site": {
+    "message": "移除"
+  },
+  "get_pkh_by_path_request": {
+    "message": "获取公钥哈希"
+  },
+  "get_pkh_by_path_description": {
+    "message": "此网站正在请求从以下路径派生公钥哈希："
+  },
+  "derivation_path": {
+    "message": "派生路径"
+  },
+  "get_pkh_by_path_warning": {
+    "message": "这将使用指定路径从您的钱包派生公钥哈希（PKH）。PKH 可用于在加密通信中标识您的身份。"
+  },
+  "permission_request": {
+    "message": "权限请求"
+  },
+  "permission_request_desc": {
+    "message": "此网站正在请求以下权限："
+  },
+  "permission_warning": {
+    "message": "仅为您信任的网站批准权限。"
   }
 }

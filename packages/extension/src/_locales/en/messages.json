@@ -2202,5 +2202,92 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "Important: Please do not transfer this token due to a temporary indexing discrepancy. We are awaiting resolution from the protocol's founding team. Other tokens unaffected."
+  },
+  "ecdh_request": {
+    "message": "ECDH Request"
+  },
+  "this_site_is_requesting_to_compute_a_shared_secret": {
+    "message": "This site is requesting to compute a shared secret using your wallet's key. This will derive a secret key that both you and the other party can use for encrypted communication."
+  },
+  "external_public_key": {
+    "message": "External Public Key"
+  },
+  "ecdh_warning": {
+    "message": "Warning: Only approve this request if you trust this site. The shared secret can be used to encrypt/decrypt messages between you and the other party."
+  },
+  "approve": {
+    "message": "Approve"
+  },
+  "auto_payment_request": {
+    "message": "SmallPay Authorization"
+  },
+  "auto_payment_description": {
+    "message": "This site is requesting permission to automatically sign small transactions without confirmation. Transactions will only be auto-signed if they are within the limits below."
+  },
+  "single_payment_limit": {
+    "message": "Single Payment Limit"
+  },
+  "daily_limit_24h": {
+    "message": "Daily Limit (24h)"
+  },
+  "max_fee_rate": {
+    "message": "Max Fee Rate"
+  },
+  "auto_payment_warning_title": {
+    "message": "Security Warning"
+  },
+  "auto_payment_warning": {
+    "message": "Only approve this for trusted sites. The site will be able to sign transactions automatically without showing you a confirmation popup, as long as they are within the configured limits."
+  },
+  "smallpay_settings": {
+    "message": "SmallPay Settings"
+  },
+  "smallpay_settings_desc": {
+    "message": "Auto-payment for trusted sites"
+  },
+  "smallpay_enabled": {
+    "message": "SmallPay Enabled"
+  },
+  "smallpay_limits": {
+    "message": "Payment Limits"
+  },
+  "smallpay_whitelist": {
+    "message": "Authorized Sites"
+  },
+  "smallpay_history": {
+    "message": "Payment History"
+  },
+  "smallpay_no_whitelist": {
+    "message": "No sites authorized"
+  },
+  "smallpay_no_history": {
+    "message": "No payment history"
+  },
+  "smallpay_clear_history": {
+    "message": "Clear History"
+  },
+  "smallpay_remove_site": {
+    "message": "Remove"
+  },
+  "get_pkh_by_path_request": {
+    "message": "Get PKH By Path"
+  },
+  "get_pkh_by_path_description": {
+    "message": "This site is requesting to derive a public key hash from the following path:"
+  },
+  "derivation_path": {
+    "message": "Derivation Path"
+  },
+  "get_pkh_by_path_warning": {
+    "message": "This will derive a public key hash (PKH) from your wallet using the specified path. The PKH can be used to identify you in encrypted communications."
+  },
+  "permission_request": {
+    "message": "Permission Request"
+  },
+  "permission_request_desc": {
+    "message": "This site is requesting the following permissions:"
+  },
+  "permission_warning": {
+    "message": "Only approve permissions for sites you trust."
   }
 }

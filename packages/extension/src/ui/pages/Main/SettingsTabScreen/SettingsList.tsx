@@ -222,7 +222,7 @@ export function SettingsList() {
   const connectedSitesGroup = toRenderSettings.filter((item) => item.action === SettingsAction.CONNECTED_SITES);
   const addressBookGroup = toRenderSettings.filter((item) => item.action === SettingsAction.CONTACTS);
   const addressTypeSettingsGroup = toRenderSettings.filter(
-    (item) => item.action === SettingsAction.ADDRESS_TYPE || item.action === SettingsAction.ADVANCED
+    (item) => item.action === SettingsAction.ADDRESS_TYPE || item.action === SettingsAction.ADVANCED || item.action === SettingsAction.SMALLPAY
   );
   const feedbackGroup = toRenderSettings.filter((item) =>
     [SettingsAction.FEEDBACK, SettingsAction.RATE_US, SettingsAction.ABOUT_US].includes(item.action)

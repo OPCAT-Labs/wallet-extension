@@ -12,7 +12,8 @@ export enum SettingsAction {
   ABOUT_US = 'about-us',
   FEEDBACK = 'feedback',
   RATE_US = 'rate-us',
-  SECTION_DIVIDER = 'section-divider'
+  SECTION_DIVIDER = 'section-divider',
+  SMALLPAY = 'smallpay'
 }
 
 export interface SettingsItemType {

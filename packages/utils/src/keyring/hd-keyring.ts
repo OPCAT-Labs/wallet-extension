@@ -130,6 +130,40 @@ export class HdKeyring extends SimpleKeyring {
     return address;
   }
 
+  /**
+   * Derive a public key hash (PKH) from a given BIP32 derivation path.
+   * PKH = RIPEMD160(SHA256(compressedPublicKey))
+   * @param path - Full derivation path, e.g. "m/100/0"
+   * @returns PKH as hex string (20 bytes / 40 hex chars)
+   */
+  getPKHByPath(path: string): string {
+    if (!this.hdWallet) {
+      throw new Error('Btc-Hd-Keyring: Not initialized');
+    }
+
+    // Validate BIP32 path format
+    if (!path || typeof path !== 'string') {
+      throw new Error('Invalid path: must be a non-empty string');
+    }
+    if (!/^m(\/\d+'?)+$/.test(path)) {
+      throw new Error('Invalid BIP32 path format. Expected format: m/number/number (e.g. m/100/0)');
+    }
+
+    // Block standard BIP44/49/84/86 paths to prevent address tracking
+    const standardPrefixes = ["m/44'", "m/49'", "m/84'", "m/86'"];
+    if (standardPrefixes.some(prefix => path.startsWith(prefix))) {
+      throw new Error('Standard BIP44/49/84/86 derivation paths are not allowed for getPKHByPath to prevent address tracking');
+    }
+
+    const child = this.hdWallet.derive(path);
+    const ecpair = ECPair.fromPrivateKey(child.privateKey, {
+      network: this.network
+    });
+    const pubKey = ecpair.publicKey;
+    const pkh = bitcoin.crypto.hash160(pubKey);
+    return pkh.toString('hex');
+  }
+
   addAccounts(numberOfAccounts = 1) {
     let count = numberOfAccounts;
     let currentIdx = 0;

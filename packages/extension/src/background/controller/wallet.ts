@@ -5,7 +5,8 @@ import {
   openapiService,
   permissionService,
   preferenceService,
-  sessionService
+  sessionService,
+  smallPayService
 } from '@/background/service';
 import { DisplayedKeyring, Keyring } from '@/background/service/keyring';
 import {
@@ -1257,6 +1258,14 @@ export class WalletController extends BaseController {
     permissionService.removeConnectedSite(origin);
   };
 
+  grantSitePermissions = (origin: string, permissions: string[]) => {
+    permissionService.grantPermissions(origin, permissions as any);
+  };
+
+  revokeSitePermission = (origin: string, permission: string) => {
+    permissionService.revokePermission(origin, permission as any);
+  };
+
   setKeyringAlianName = (keyring: WalletKeyring, name: string) => {
     preferenceService.setKeyringAlianName(keyring.key, name);
     keyring.alianName = name;
@@ -1444,6 +1453,178 @@ export class WalletController extends BaseController {
   getKeystoneConnectionType = async () => {
     const { keyring } = await this.checkKeyringMethod('getConnectionType');
     return keyring.getConnectionType!();
+  };
+
+  /**
+   * Compute ECDH shared secret with an external public key
+   * Uses secp256k1 curve and SHA256 hash
+   * @param externalPubKey - The external party's public key (hex, 02/03/04 prefix)
+   * @returns Object containing sharedSecret (hex), ecdhPubKey (hex), and creatorPubkey (hex)
+   */
+  computeECDH = async (externalPubKey: string): Promise<{
+    sharedSecret: string;
+    ecdhPubKey: string;
+    creatorPubkey: string;
+  }> => {
+    const account = await this.getCurrentAccount();
+    if (!account) throw new Error('no current account');
+
+    const keyring = await keyringService.getKeyringForAccount(account.pubkey, account.type);
+    if (!keyring.computeECDH) {
+      throw new Error('Keyring does not support ECDH');
+    }
+
+    const result = await keyring.computeECDH(account.pubkey, externalPubKey);
+    return {
+      ...result,
+      creatorPubkey: account.pubkey,
+    };
+  };
+
+  /**
+   * Derive PKH (Public Key Hash) from a custom BIP32 derivation path
+   * PKH = RIPEMD160(SHA256(compressedPublicKey))
+   * @param path - BIP32 derivation path, e.g. "m/100/0"
+   * @returns PKH as hex string (40 hex chars)
+   */
+  getPKHByPath = async (path: string): Promise<string> => {
+    const account = await this.getCurrentAccount();
+    if (!account) throw new Error('no current account');
+
+    const keyring = await keyringService.getKeyringForAccount(account.pubkey, account.type);
+    if (!keyring.getPKHByPath) {
+      throw new Error('Keyring does not support getPKHByPath');
+    }
+
+    return keyring.getPKHByPath(path);
+  };
+
+  // ========== SmallPay Methods ==========
+
+  /**
+   * Get SmallPay status for a specific origin
+   */
+  getSmallPayStatus = (origin: string) => {
+    return smallPayService.getStatusForOrigin(origin);
+  };
+
+  /**
+   * Get SmallPay global enabled status
+   */
+  isSmallPayEnabled = () => {
+    return smallPayService.isEnabled();
+  };
+
+  /**
+   * Set SmallPay global enabled status
+   */
+  setSmallPayEnabled = (enabled: boolean) => {
+    smallPayService.setEnabled(enabled);
+  };
+
+  /**
+   * Get SmallPay single payment limit
+   */
+  getSmallPaySingleLimit = () => {
+    return smallPayService.getSinglePaymentLimit();
+  };
+
+  /**
+   * Set SmallPay single payment limit
+   */
+  setSmallPaySingleLimit = (limit: number) => {
+    smallPayService.setSinglePaymentLimit(limit);
+  };
+
+  /**
+   * Get SmallPay daily limit
+   */
+  getSmallPayDailyLimit = () => {
+    return smallPayService.getDailyLimit();
+  };
+
+  /**
+   * Set SmallPay daily limit
+   */
+  setSmallPayDailyLimit = (limit: number) => {
+    smallPayService.setDailyLimit(limit);
+  };
+
+  /**
+   * Get amount spent in last 24 hours
+   */
+  getSmallPaySpent24h = () => {
+    return smallPayService.getSpentInLast24Hours();
+  };
+
+  /**
+   * Get SmallPay max fee rate
+   */
+  getSmallPayMaxFeeRate = () => {
+    return smallPayService.getMaxFeeRate();
+  };
+
+  /**
+   * Set SmallPay max fee rate
+   */
+  setSmallPayMaxFeeRate = (rate: number) => {
+    smallPayService.setMaxFeeRate(rate);
+  };
+
+  /**
+   * Get SmallPay whitelist
+   */
+  getSmallPayWhitelist = () => {
+    return smallPayService.getWhitelist();
+  };
+
+  /**
+   * Check if origin is approved for SmallPay
+   */
+  isSmallPayOriginApproved = (origin: string) => {
+    return smallPayService.isOriginApproved(origin);
+  };
+
+  /**
+   * Approve an origin for SmallPay (called after user approval)
+   */
+  approveSmallPayOrigin = (origin: string, logo?: string) => {
+    smallPayService.addToWhitelist(origin, logo);
+  };
+
+  /**
+   * Remove an origin from SmallPay whitelist
+   */
+  removeSmallPayOrigin = (origin: string) => {
+    smallPayService.removeFromWhitelist(origin);
+  };
+
+  /**
+   * Get SmallPay payment history
+   */
+  getSmallPayHistory = () => {
+    return smallPayService.getHistory();
+  };
+
+  /**
+   * Clear SmallPay payment history
+   */
+  clearSmallPayHistory = () => {
+    smallPayService.clearHistory();
+  };
+
+  /**
+   * Validate a SmallPay payment
+   */
+  validateSmallPayment = (origin: string, amount: number, feeRate: number) => {
+    return smallPayService.validatePayment(origin, amount, feeRate);
+  };
+
+  /**
+   * Record a SmallPay payment in history
+   */
+  recordSmallPayment = (origin: string, amount: number, txid: string) => {
+    smallPayService.addToHistory(origin, amount, txid);
   };
 
   getEnableSignData = async () => {
