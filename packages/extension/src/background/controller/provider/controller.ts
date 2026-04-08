@@ -10,7 +10,7 @@ import { ethErrors } from 'eth-rpc-errors';
 import BaseController from '../base';
 import wallet from '../wallet';
 
-import { psbtFromHex } from '@/background/utils/psbt';
+import { psbtFromHex, estimatePsbtFeeInfo } from '@/background/utils/psbt';
 import { formatPsbtHex } from '@/ui/utils/psbt-utils';
 
 
@@ -472,7 +472,7 @@ class ProviderController extends BaseController {
       throw new Error('SmallPay only supports P2PKH wallets');
     }
 
-    // Analyze inputs: calculate wallet input value
+    // Analyze inputs: calculate wallet input value and total input value
     // Uses ExtPsbt.getInputOutput() which handles opcat layer's custom UTXO encoding
     let walletInputValue = 0n;
     const walletScriptHex = walletScript.toString('hex');
@@ -532,11 +532,9 @@ class ProviderController extends BaseController {
     }
     const amount = Number(userNetCost);
 
-    // Estimate fee rate using P2PKH input size (148 bytes per input, 34 per output, 10 overhead)
+    // Estimate fee using ExtPsbt's proper size calculation (handles data/OP_RETURN outputs)
+    const { feeRate } = estimatePsbtFeeInfo(psbtHex);
     const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
-    const walletInputCount = toSignInputs.length;
-    const estimatedVsize = walletInputCount * 148 + psbt.txOutputs.length * 34 + 10;
-    const feeRate = amount > 0 ? amount / estimatedVsize : 0;
 
     // Validate the payment
     const validation = wallet.validateSmallPayment(origin, amount, feeRate);
@@ -579,6 +577,18 @@ class ProviderController extends BaseController {
     const autoFinalized = params.options?.autoFinalized !== false;
     await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
     const signedPsbtHex = psbt.toHex();
+
+    // Finalize any remaining unfinalized inputs (e.g., dApp-signed inputs)
+    for (let i = 0; i < psbt.data.inputs.length; i++) {
+      const input = psbt.data.inputs[i];
+      if (!input.finalScriptSig && !input.finalScriptWitness) {
+        try {
+          psbt.finalizeInput(i);
+        } catch {
+          // Input may not be ready to finalize — extractTransaction will catch this
+        }
+      }
+    }
 
     // Extract transaction and broadcast
     let txid: string;
