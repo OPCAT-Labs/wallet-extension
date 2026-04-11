@@ -78,7 +78,7 @@ jobs:
           echo "file=$ZIP_FILE" >> $GITHUB_OUTPUT
 
       - name: Upload to Chrome Web Store
-        run: npx chrome-webstore-upload-cli@3 upload --auto-publish
+        run: npx chrome-webstore-upload-cli@3 upload --source "$ZIP_FILE" --auto-publish
         env:
           EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
