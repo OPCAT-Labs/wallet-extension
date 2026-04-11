@@ -71,6 +71,21 @@ jobs:
           echo "$TAG_MESSAGE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Resolve zip file path
+        id: zip_path
+        run: |
+          ZIP_FILE=$(ls packages/extension/dist/catena-chrome-mv3-*.zip)
+          echo "file=$ZIP_FILE" >> $GITHUB_OUTPUT
+
+      - name: Upload to Chrome Web Store
+        run: npx chrome-webstore-upload-cli@3 upload --auto-publish
+        env:
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          ZIP_FILE: ${{ steps.zip_path.outputs.file }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
