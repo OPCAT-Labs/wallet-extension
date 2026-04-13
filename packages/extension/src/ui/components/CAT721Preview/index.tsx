@@ -68,9 +68,8 @@ export default function CAT721Preview({ collectionId, contentType, localId, onCl
     <Column gap="zero" onClick={onClick} style={{}} testid={TestIds.CAT721.NFT_ITEM} data-local-id={localId}>
       {contentType && contentType.includes('html') ? (
         <Iframe
-          disableSandbox
           preview={`${contentBaseUrl}/api/v1/collections/${collectionId}/localId/${localId}/content`}
-          style={$stylePresets[preset]}
+          style={{ ...$stylePresets[preset], pointerEvents: 'none' }}
         />
       ) : (
         <Image

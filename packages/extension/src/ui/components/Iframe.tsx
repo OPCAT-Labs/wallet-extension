@@ -12,7 +12,7 @@ const Iframe = ({ preview, style, ref, onLoad }: IframeProps) => {
         style={Object.assign({}, { pointerEvents: 'auto' }, style)}
         src={preview}
         onLoad={onLoad}
-        sandbox="allow-scripts allow-same-origin allow-forms"
+        sandbox="allow-same-origin"
         scrolling="no"
         loading="lazy"></iframe>
     ),
