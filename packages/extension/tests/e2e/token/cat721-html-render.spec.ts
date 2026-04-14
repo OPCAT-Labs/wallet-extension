@@ -155,7 +155,10 @@ async function deployAndMint(): Promise<string> {
   console.log(`NFT #1 minted, txId: ${mint1.mintTxId}`);
 
   // Wait for indexing
-  await waitForNftIndexing(collectionId, 2);
+  const indexed = await waitForNftIndexing(collectionId, 2);
+  if (!indexed) {
+    throw new Error(`Timed out waiting for ${2} NFT(s) to be indexed for collection ${collectionId}`);
+  }
   console.log('Waiting for UTXO confirmation (15s)...');
   await sleep(15_000);
 
@@ -209,8 +212,8 @@ test.describe('CAT721 HTML NFT Rendering', () => {
 
   // ---- Test 2: open NFT #1 HTML directly in browser, verify embedded image loads ----
   test('HTML NFT should render embedded image in browser', async ({ browser }) => {
-    context = await browser.newContext();
-    page = await context.newPage();
+    const browserContext = await browser.newContext();
+    page = await browserContext.newPage();
 
     const nft1Url = `${CONTENT_BASE_URL}/api/v1/collections/${collectionId}/localId/1/content`;
     console.log(`Opening NFT #1 directly: ${nft1Url}`);
@@ -231,6 +234,8 @@ test.describe('CAT721 HTML NFT Rendering', () => {
       path: 'test-results/artifacts/cat721-nft1-browser.png',
       fullPage: true,
     });
+
+    await browserContext.close();
   });
 
   // ---- Test 3: verify wallet extension renders the HTML NFT in an iframe ----

@@ -69,7 +69,7 @@ export default function CAT721Preview({ collectionId, contentType, localId, onCl
       {contentType && contentType.includes('html') ? (
         <Iframe
           preview={`${contentBaseUrl}/api/v1/collections/${collectionId}/localId/${localId}/content`}
-          style={{ ...$stylePresets[preset], pointerEvents: 'none' }}
+          style={{ width: style.width, height: style.height, borderTopLeftRadius: style.borderTopLeftRadius, borderTopRightRadius: style.borderTopRightRadius, pointerEvents: 'none' }}
         />
       ) : (
         <Image

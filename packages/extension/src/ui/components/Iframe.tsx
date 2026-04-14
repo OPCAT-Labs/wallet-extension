@@ -16,10 +16,8 @@ const Iframe = ({ preview, style, ref, onLoad }: IframeProps) => {
         scrolling="no"
         loading="lazy"></iframe>
     ),
-    [preview]
+    [preview, style, ref, onLoad]
   );
 };
 
-export default memo(Iframe, (p, n) => {
-  return p.preview === n.preview;
-});
+export default memo(Iframe);
