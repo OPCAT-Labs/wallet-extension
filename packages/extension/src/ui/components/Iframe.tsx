@@ -12,14 +12,12 @@ const Iframe = ({ preview, style, ref, onLoad }: IframeProps) => {
         style={Object.assign({}, { pointerEvents: 'auto' }, style)}
         src={preview}
         onLoad={onLoad}
-        sandbox="allow-scripts allow-same-origin allow-forms"
+        sandbox="allow-same-origin"
         scrolling="no"
         loading="lazy"></iframe>
     ),
-    [preview]
+    [preview, style, ref, onLoad]
   );
 };
 
-export default memo(Iframe, (p, n) => {
-  return p.preview === n.preview;
-});
+export default memo(Iframe);

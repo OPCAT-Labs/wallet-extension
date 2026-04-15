@@ -62,15 +62,13 @@ export function CAT721CollectionCard(props: CAT721CollectionCardProps) {
   const renderItem = useCallback(
     (key: string, localId: string, size: number) => {
       return isHTML ? (
-        <Iframe
-          key={key}
-          preview={`${contentBaseUrl}/api/v1/collections/${cat721Balance.collectionId}/localId/${localId}/content`}
-          style={{
-            width: size,
-            height: size,
-            margin: 4
-          }}
-        />
+        <div key={key} style={{ position: 'relative', width: size, height: size, margin: 4 }}>
+          <Iframe
+            preview={`${contentBaseUrl}/api/v1/collections/${cat721Balance.collectionId}/localId/${localId}/content`}
+            style={{ width: size, height: size }}
+          />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1 }} />
+        </div>
       ) : (
         <Image
           key={key}
