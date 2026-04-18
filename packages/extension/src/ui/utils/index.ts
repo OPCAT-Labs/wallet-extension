@@ -2,6 +2,9 @@ import { bech32 } from 'bech32';
 import BigNumber from 'bignumber.js';
 import { useLocation } from 'react-router-dom';
 
+import { isP2PKHAddress } from '@opcat-labs/wallet-sdk/lib/address';
+import { NetworkType } from '@opcat-labs/wallet-sdk/lib/network';
+
 export * from './hooks';
 export * from './WalletContext';
 export * from './test-ids';
@@ -116,9 +119,16 @@ export async function sleep(timeSec: number) {
   });
 }
 
-export function isValidAddress(address: string) {
+export function isValidAddress(address: string, networkType?: NetworkType) {
   if (!address) return false;
-  return true;
+  if (networkType !== undefined) {
+    return isP2PKHAddress(address, networkType);
+  }
+  // OPCAT layer only supports P2PKH; accept either network when not specified.
+  return (
+    isP2PKHAddress(address, NetworkType.MAINNET) ||
+    isP2PKHAddress(address, NetworkType.TESTNET)
+  );
 }
 
 export const copyToClipboard = (textToCopy: string | number) => {

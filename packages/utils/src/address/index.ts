@@ -58,6 +58,21 @@ export function isValidAddress(address: string, networkType: NetworkType = Netwo
   return !error;
 }
 
+/**
+ * Check if the address is a valid P2PKH address for the given network.
+ * OPCAT layer only accepts P2PKH addresses as transfer destinations.
+ */
+export function isP2PKHAddress(address: string, networkType: NetworkType = NetworkType.MAINNET) {
+  if (!address) return false;
+  const network = toPsbtNetwork(networkType);
+  try {
+    const decoded = bitcoin.address.fromBase58Check(address);
+    return decoded.version === network.pubKeyHash;
+  } catch {
+    return false;
+  }
+}
+
 export function decodeAddress(address: string) {
   const mainnet = bitcoin.networks.bitcoin;
   const testnet = bitcoin.networks.testnet;
