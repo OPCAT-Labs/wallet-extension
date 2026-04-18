@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { AddressType } from '../../src';
-import { decodeAddress, getAddressType, isValidAddress, publicKeyToAddress } from '../../src/address';
+import { decodeAddress, getAddressType, isP2PKHAddress, isValidAddress, publicKeyToAddress } from '../../src/address';
 import { NetworkType } from '../../src/network';
 import { LocalWallet } from '../../src/wallet';
 
@@ -134,5 +134,55 @@ describe('address', function () {
     expect(decodeAddress('bc1qxxx').addressType).eq(AddressType.UNKNOWN);
 
     expect(decodeAddress('').addressType).eq(AddressType.UNKNOWN);
+  });
+
+  describe('isP2PKHAddress (OPCAT layer transfer target constraint)', function () {
+    it('accepts P2PKH mainnet address on mainnet', function () {
+      expect(isP2PKHAddress(p2pkh_data.mainnet_address, NetworkType.MAINNET)).eq(true);
+    });
+
+    it('accepts P2PKH testnet address on testnet', function () {
+      expect(isP2PKHAddress(p2pkh_data.testnet_address, NetworkType.TESTNET)).eq(true);
+    });
+
+    it('rejects P2PKH mainnet address on testnet', function () {
+      expect(isP2PKHAddress(p2pkh_data.mainnet_address, NetworkType.TESTNET)).eq(false);
+    });
+
+    it('rejects P2PKH testnet address on mainnet', function () {
+      expect(isP2PKHAddress(p2pkh_data.testnet_address, NetworkType.MAINNET)).eq(false);
+    });
+
+    it('rejects P2SH mainnet address', function () {
+      expect(isP2PKHAddress(p2sh_data.mainnet_address, NetworkType.MAINNET)).eq(false);
+    });
+
+    it('rejects P2SH testnet address', function () {
+      expect(isP2PKHAddress(p2sh_data.testnet_address, NetworkType.TESTNET)).eq(false);
+    });
+
+    it('rejects P2WPKH (bech32) mainnet address', function () {
+      expect(isP2PKHAddress(p2wpkh_data.mainnet_address, NetworkType.MAINNET)).eq(false);
+    });
+
+    it('rejects P2WPKH (bech32) testnet address', function () {
+      expect(isP2PKHAddress(p2wpkh_data.testnet_address, NetworkType.TESTNET)).eq(false);
+    });
+
+    it('rejects P2TR (bech32m / taproot) mainnet address', function () {
+      expect(isP2PKHAddress(p2tr_data.mainnet_address, NetworkType.MAINNET)).eq(false);
+    });
+
+    it('rejects P2TR (bech32m / taproot) testnet address', function () {
+      expect(isP2PKHAddress(p2tr_data.testnet_address, NetworkType.TESTNET)).eq(false);
+    });
+
+    it('rejects empty string', function () {
+      expect(isP2PKHAddress('', NetworkType.MAINNET)).eq(false);
+    });
+
+    it('rejects garbage input', function () {
+      expect(isP2PKHAddress('not-an-address', NetworkType.MAINNET)).eq(false);
+    });
   });
 });

@@ -42,7 +42,7 @@ import {
 import { getChainInfo } from '@/shared/utils';
 import { psbtFromString } from '@/ui/utils/psbt-utils';
 import { txHelpers } from '@opcat-labs/wallet-sdk';
-import { isValidAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
+import { isP2PKHAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
 import { bitcoin, ECPair } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 import { ExtPsbt, Signer, SignOptions, SupportedNetwork, UTXO as ExtUtxo, Transaction, OpenApiProvider } from '@opcat-labs/scrypt-ts-opcat';
 import {mergeSendToken, singleSendNft, toTokenOwnerAddress} from '@opcat-labs/cat-sdk'
@@ -891,8 +891,8 @@ export class WalletController extends BaseController {
       throw new Error('Insufficient balance.');
     }
 
-    if (!isValidAddress(to, networkType)) {
-      throw new Error('Invalid address.');
+    if (!isP2PKHAddress(to, networkType)) {
+      throw new Error('Invalid address. OPCAT layer only supports P2PKH addresses.');
     }
     // Convert wallet UTXOs to ExtUtxo format
     const extUtxos: ExtUtxo[] = btcUtxos.map((utxo) => ({
@@ -967,8 +967,8 @@ export class WalletController extends BaseController {
       throw new Error('Insufficient balance.');
     }
 
-    if (!isValidAddress(to, networkType)) {
-      throw new Error('Invalid address.');
+    if (!isP2PKHAddress(to, networkType)) {
+      throw new Error('Invalid address. OPCAT layer only supports P2PKH addresses.');
     }
     // Convert wallet UTXOs to ExtUtxo format
     const extUtxos: ExtUtxo[] = btcUtxos.map((utxo) => ({
