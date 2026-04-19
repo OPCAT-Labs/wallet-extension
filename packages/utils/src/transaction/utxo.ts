@@ -43,7 +43,7 @@ function getAddedVirtualSize(addressType: AddressType) {
 }
 
 export function getUtxoDust(addressType: AddressType) {
-  return 546;
+  return 1;
 }
 
 // deprecated
