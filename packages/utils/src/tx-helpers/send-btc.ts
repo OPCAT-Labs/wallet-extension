@@ -1,4 +1,4 @@
-import { ChainType, UTXO_DUST, getChainTypeFromOpcatFlag } from '../constants';
+import { ChainType, UTXO_DUST, resolveChainType } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toOpcatNetwork } from '../network';
 import { Transaction } from '../transaction/transaction';
@@ -85,6 +85,7 @@ export async function sendBTC({
   networkType,
   changeAddress,
   feeRate,
+  chainType,
   isOpcat,
   enableRBF = true,
   memo,
@@ -98,13 +99,15 @@ export async function sendBTC({
   networkType: NetworkType;
   changeAddress: string;
   feeRate: number;
+  chainType?: ChainType;
+  /** @deprecated Use chainType instead. */
   isOpcat?: boolean;
   enableRBF?: boolean;
   memo?: string;
   memos?: string[];
 }) {
-  const chainType = getChainTypeFromOpcatFlag(isOpcat);
-  if (chainType === ChainType.OPCAT) {
+  const resolvedChainType = resolveChainType({ chainType, isOpcat });
+  if (resolvedChainType === ChainType.OPCAT) {
     return sendOpcatBtc({
       btcUtxos,
       tos,
@@ -121,7 +124,7 @@ export async function sendBTC({
 
   const tx = new Transaction();
   tx.setNetworkType(networkType);
-  tx.setChainType(chainType);
+  tx.setChainType(resolvedChainType);
   tx.setFeeRate(feeRate);
   tx.setEnableRBF(enableRBF);
   tx.setChangeAddress(changeAddress);
@@ -156,6 +159,7 @@ export async function sendAllBTC({
   toAddress,
   networkType,
   feeRate,
+  chainType,
   isOpcat,
   enableRBF = true
 }: {
@@ -163,11 +167,13 @@ export async function sendAllBTC({
   toAddress: string;
   networkType: NetworkType;
   feeRate: number;
+  chainType?: ChainType;
+  /** @deprecated Use chainType instead. */
   isOpcat?: boolean;
   enableRBF?: boolean;
 }) {
-  const chainType = getChainTypeFromOpcatFlag(isOpcat);
-  if (chainType === ChainType.OPCAT) {
+  const resolvedChainType = resolveChainType({ chainType, isOpcat });
+  if (resolvedChainType === ChainType.OPCAT) {
     return sendOpcatBtc({
       btcUtxos,
       tos: [],
@@ -183,7 +189,7 @@ export async function sendAllBTC({
 
   const tx = new Transaction();
   tx.setNetworkType(networkType);
-  tx.setChainType(chainType);
+  tx.setChainType(resolvedChainType);
   tx.setFeeRate(feeRate);
   tx.setEnableRBF(enableRBF);
   tx.addOutput(toAddress, UTXO_DUST);

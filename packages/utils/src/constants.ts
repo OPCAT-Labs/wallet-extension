@@ -13,6 +13,17 @@ export function getChainTypeFromOpcatFlag(isOpcat = false) {
   return isOpcat ? ChainType.OPCAT : ChainType.BITCOIN;
 }
 
+export function resolveChainType({
+  chainType,
+  isOpcat
+}: {
+  chainType?: ChainType;
+  /** @deprecated Use chainType instead. */
+  isOpcat?: boolean;
+} = {}) {
+  return chainType || getChainTypeFromOpcatFlag(isOpcat);
+}
+
 export function getUtxoDustThreshold(chainType: ChainType = ChainType.BITCOIN) {
   return chainType === ChainType.OPCAT ? OPCAT_UTXO_DUST : BITCOIN_UTXO_DUST;
 }

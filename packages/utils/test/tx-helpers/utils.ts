@@ -1,4 +1,5 @@
 import { sendAllBTC, sendBTC } from '../../src/tx-helpers';
+import { ChainType } from '../../src/constants';
 import { AddressType, UnspentOutput } from '../../src/types';
 import { LocalWallet } from '../../src/wallet';
 import { printPsbt } from '../utils';
@@ -57,6 +58,8 @@ export async function dummySendBTC({
   feeRate,
   dump,
   enableRBF,
+  chainType,
+  isOpcat,
   memo,
   memos
 }: {
@@ -66,6 +69,8 @@ export async function dummySendBTC({
   feeRate: number;
   dump?: boolean;
   enableRBF?: boolean;
+  chainType?: ChainType;
+  isOpcat?: boolean;
   memo?: string;
   memos?: string[];
 }) {
@@ -76,6 +81,8 @@ export async function dummySendBTC({
     changeAddress: wallet.address,
     feeRate,
     enableRBF,
+    chainType,
+    isOpcat,
     memo,
     memos
   });
@@ -104,7 +111,9 @@ export async function dummySendAllBTC({
   toAddress,
   feeRate,
   dump,
-  enableRBF
+  enableRBF,
+  chainType,
+  isOpcat
 }: {
   wallet: LocalWallet;
   btcUtxos: UnspentOutput[];
@@ -112,12 +121,16 @@ export async function dummySendAllBTC({
   feeRate: number;
   dump?: boolean;
   enableRBF?: boolean;
+  chainType?: ChainType;
+  isOpcat?: boolean;
 }) {
   const { psbt, toSignInputs } = await sendAllBTC({
     btcUtxos,
     toAddress,
     feeRate,
     enableRBF,
+    chainType,
+    isOpcat,
     networkType: wallet.networkType
   });
   await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any });

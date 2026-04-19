@@ -1,5 +1,5 @@
 import { AddressType, UnspentOutput } from '../../src';
-import { BITCOIN_UTXO_DUST } from '../../src/constants';
+import { BITCOIN_UTXO_DUST, ChainType } from '../../src/constants';
 import { ErrorCodes } from '../../src/error';
 import { NetworkType } from '../../src/network';
 import { LocalWallet } from '../../src/wallet';
@@ -36,6 +36,23 @@ describe('sendBTC', () => {
           btcUtxos: [genDummyUtxo(fromWallet, 603)],
           tos: [{ address: toWallet.address, satoshis: 200 }],
           feeRate: 1
+        });
+        const remainingAfterFee = 603 - 200 - ret.fee;
+
+        expect(ret.inputCount).eq(1);
+        expect(ret.outputCount).eq(1);
+        expect(ret.psbt.txOutputs[0].value).eq(200);
+        expect(remainingAfterFee).lt(BITCOIN_UTXO_DUST);
+      });
+
+      it('prefers chainType over the legacy OPCAT flag', async function () {
+        const ret = await dummySendBTC({
+          wallet: fromWallet,
+          btcUtxos: [genDummyUtxo(fromWallet, 603)],
+          tos: [{ address: toWallet.address, satoshis: 200 }],
+          feeRate: 1,
+          chainType: ChainType.BITCOIN,
+          isOpcat: true
         });
         const remainingAfterFee = 603 - 200 - ret.fee;
 

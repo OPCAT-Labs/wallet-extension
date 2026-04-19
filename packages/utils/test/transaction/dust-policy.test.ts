@@ -1,5 +1,11 @@
 import { AddressType, UnspentOutput } from '../../src';
-import { BITCOIN_UTXO_DUST, ChainType, OPCAT_UTXO_DUST, getUtxoDustThreshold } from '../../src/constants';
+import {
+  BITCOIN_UTXO_DUST,
+  ChainType,
+  OPCAT_UTXO_DUST,
+  getUtxoDustThreshold,
+  resolveChainType
+} from '../../src/constants';
 import { NetworkType } from '../../src/network';
 import { Transaction } from '../../src/transaction/transaction';
 import { LocalWallet } from '../../src/wallet';
@@ -95,6 +101,13 @@ describe('Transaction dust policy', function () {
     expect(getUtxoDustThreshold()).eq(BITCOIN_UTXO_DUST);
     expect(getUtxoDustThreshold(ChainType.BITCOIN)).eq(BITCOIN_UTXO_DUST);
     expect(getUtxoDustThreshold(ChainType.OPCAT)).eq(OPCAT_UTXO_DUST);
+  });
+
+  it('prefers explicit chain policy over the legacy OPCAT flag', function () {
+    expect(resolveChainType()).eq(ChainType.BITCOIN);
+    expect(resolveChainType({ isOpcat: true })).eq(ChainType.OPCAT);
+    expect(resolveChainType({ chainType: ChainType.OPCAT, isOpcat: false })).eq(ChainType.OPCAT);
+    expect(resolveChainType({ chainType: ChainType.BITCOIN, isOpcat: true })).eq(ChainType.BITCOIN);
   });
 
   it('keeps OPCAT small positive change instead of sweeping it to fees', async function () {
