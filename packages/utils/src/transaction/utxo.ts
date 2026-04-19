@@ -1,9 +1,10 @@
 import { decodeAddress } from '../address';
-import { UTXO_DUST } from '../constants';
+import { getUtxoDustThreshold } from '../constants';
 import { NetworkType } from '../network';
 import { AddressType, UnspentOutput } from '../types';
 
 function hasAnyAssets(utxos: UnspentOutput[]) {
+  void utxos;
   return false;
 }
 
@@ -43,14 +44,17 @@ function getAddedVirtualSize(addressType: AddressType) {
   throw new Error('unknown address type');
 }
 
-export function getUtxoDust(addressType: AddressType) {
-  return UTXO_DUST;
+export function getUtxoDust(addressType: AddressType, isOpcat = false) {
+  if (addressType === AddressType.P2PKH) {
+    return getUtxoDustThreshold(isOpcat);
+  }
+  return getUtxoDustThreshold(isOpcat);
 }
 
 // deprecated
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getAddressUtxoDust(address: string, networkType: NetworkType = NetworkType.MAINNET) {
-  return decodeAddress(address).dust;
+export function getAddressUtxoDust(address: string, networkType: NetworkType = NetworkType.MAINNET, isOpcat = false) {
+  return decodeAddress(address, isOpcat).dust;
 }
 
 export const utxoHelper = {

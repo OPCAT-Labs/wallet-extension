@@ -9,12 +9,7 @@ let dummyUtxoIndex = 0;
 /**
  * generate dummy utxos
  */
-export function genDummyUtxos(
-  wallet: LocalWallet,
-  satoshisArray: number[],
-  assetsArray?: {
-  }[]
-) {
+export function genDummyUtxos(wallet: LocalWallet, satoshisArray: number[], assetsArray?: {}[]) {
   return satoshisArray.map((v, index) =>
     genDummyUtxo(wallet, satoshisArray[index], assetsArray ? assetsArray[index] : undefined)
   );
@@ -26,8 +21,7 @@ export function genDummyUtxos(
 export function genDummyUtxo(
   wallet: LocalWallet,
   satoshis: number,
-  assets?: {
-  },
+  assets?: {},
   txid?: string,
   vout?: number
 ): UnspentOutput {
@@ -37,7 +31,7 @@ export function genDummyUtxo(
     satoshis: satoshis,
     scriptPk: wallet.scriptPk,
     addressType: wallet.addressType,
-    pubkey: wallet.pubkey,
+    pubkey: wallet.pubkey
   };
 }
 
@@ -86,7 +80,7 @@ export async function dummySendBTC({
     memos
   });
 
-  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any});
+  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any });
   const tx = psbt.extractTransaction(true) as any;
   const txid = tx.getId();
   const inputCount = psbt.txInputs.length;
@@ -126,7 +120,7 @@ export async function dummySendAllBTC({
     enableRBF,
     networkType: wallet.networkType
   });
-  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any});
+  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any });
 
   const inputCount = psbt.txInputs.length;
   const outputCount = psbt.txOutputs.length;

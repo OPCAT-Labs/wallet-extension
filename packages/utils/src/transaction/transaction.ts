@@ -27,7 +27,7 @@ interface TxOutput {
 /**
  * Convert UnspentOutput to PSBT TxInput
  */
-function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {  
+function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
   if (utxo.addressType === AddressType.P2PKH) {
     if (!utxo.rawtx || estimate) {
       const data = {
@@ -71,6 +71,7 @@ export class Transaction {
   private _cacheNetworkFee = 0;
   private _cacheBtcUtxos: UnspentOutput[] = [];
   private _cacheToSignInputs: ToSignInput[] = [];
+  private dustThreshold = UTXO_DUST;
   constructor() {}
 
   setNetworkType(network: NetworkType) {
@@ -87,6 +88,10 @@ export class Transaction {
 
   setChangeAddress(address: string) {
     this.changedAddress = address;
+  }
+
+  setDustThreshold(dustThreshold: number) {
+    this.dustThreshold = dustThreshold;
   }
 
   addInput(utxo: UnspentOutput) {
@@ -211,6 +216,7 @@ export class Transaction {
     tx.setFeeRate(this.feeRate);
     tx.setEnableRBF(this.enableRBF);
     tx.setChangeAddress(this.changedAddress);
+    tx.setDustThreshold(this.dustThreshold);
     tx.utxos = this.utxos.map((v) => Object.assign({}, v));
     tx.inputs = this.inputs.map((v) => v);
     tx.outputs = this.outputs.map((v) => v);
@@ -297,7 +303,7 @@ export class Transaction {
     }
 
     const changeAmount = this.getTotalInput() - this.getTotalOutput() - Math.ceil(this._cacheNetworkFee);
-    if (changeAmount >= UTXO_DUST) {
+    if (changeAmount >= this.dustThreshold) {
       this.removeChangeOutput();
       this.addChangeOutput(changeAmount);
     } else {

@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { AddressType, UnspentOutput } from '../../src';
+import { BITCOIN_UTXO_DUST } from '../../src/constants';
 import { ErrorCodes } from '../../src/error';
 import { NetworkType } from '../../src/network';
 import { LocalWallet } from '../../src/wallet';
@@ -10,9 +11,7 @@ describe('sendBTC', () => {
     // todo
   });
 
-  const testAddressTypes = [
-    AddressType.P2PKH,
-  ];
+  const testAddressTypes = [AddressType.P2PKH];
   testAddressTypes.forEach((addressType) => {
     const fromWallet = LocalWallet.fromRandom(addressType, NetworkType.MAINNET);
     const toWallet = LocalWallet.fromRandom(addressType, NetworkType.MAINNET);
@@ -31,23 +30,19 @@ describe('sendBTC', () => {
         expect(ret.psbt.txOutputs[0].value).eq(1000);
       });
 
-      it('keeps small positive change instead of sweeping it to fees', async function () {
+      it('uses the Bitcoin dust policy by default', async function () {
         const ret = await dummySendBTC({
           wallet: fromWallet,
           btcUtxos: [genDummyUtxo(fromWallet, 603)],
           tos: [{ address: toWallet.address, satoshis: 200 }],
           feeRate: 1
         });
-        const changeOutput = ret.psbt.txOutputs[1];
+        const remainingAfterFee = 603 - 200 - ret.fee;
 
         expect(ret.inputCount).eq(1);
-        expect(ret.outputCount).eq(2);
+        expect(ret.outputCount).eq(1);
         expect(ret.psbt.txOutputs[0].value).eq(200);
-        expect(changeOutput.address).eq(fromWallet.address);
-        expect(changeOutput.value).eq(603 - 200 - ret.fee);
-        expect(changeOutput.value).gt(0);
-        expect(changeOutput.value).lt(546);
-        expectFeeRate(addressType, ret.feeRate, 1);
+        expect(remainingAfterFee).lt(BITCOIN_UTXO_DUST);
       });
 
       it('send all balance', async function () {
