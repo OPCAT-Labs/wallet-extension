@@ -162,6 +162,9 @@ export class Transaction {
   }
 
   removeChangeOutput() {
+    if (this.changeOutputIndex < 0) {
+      return;
+    }
     this.outputs.splice(this.changeOutputIndex, 1);
     this.changeOutputIndex = -1;
   }
@@ -294,7 +297,7 @@ export class Transaction {
     }
 
     const changeAmount = this.getTotalInput() - this.getTotalOutput() - Math.ceil(this._cacheNetworkFee);
-    if (changeAmount > UTXO_DUST) {
+    if (changeAmount >= UTXO_DUST) {
       this.removeChangeOutput();
       this.addChangeOutput(changeAmount);
     } else {

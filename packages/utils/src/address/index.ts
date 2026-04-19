@@ -1,4 +1,5 @@
 import { bitcoin } from '../bitcoin-core';
+import { UTXO_DUST } from '../constants';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType } from '../types';
 
@@ -122,12 +123,12 @@ export function decodeAddress(address: string) {
   return {
     networkType: NetworkType.MAINNET,
     addressType: AddressType.UNKNOWN,
-    dust: 546
+    dust: UTXO_DUST
   };
 }
 
 function getAddressTypeDust(addressType: AddressType) {
-  return 546;
+  return UTXO_DUST;
 }
 
 /**

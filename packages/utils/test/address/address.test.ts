@@ -115,7 +115,7 @@ describe('address', function () {
   networks.forEach((networkType) => {
     describe('decodeAddress networkType: ' + networkNames[networkType], function () {
       const addressTypes = [AddressType.P2PKH];
-      const dusts = [546];
+      const dusts = [1];
       addressTypes.forEach((addressType, index) => {
         it(`should return ${networkNames[networkType]}`, function () {
           const address = LocalWallet.fromRandom(addressType, networkType).address;
@@ -130,6 +130,7 @@ describe('address', function () {
 
   it('decodeAddress UNKNOWN', function () {
     expect(decodeAddress('invalid address').addressType).eq(AddressType.UNKNOWN);
+    expect(decodeAddress('invalid address').dust).eq(1);
 
     expect(decodeAddress('bc1qxxx').addressType).eq(AddressType.UNKNOWN);
 

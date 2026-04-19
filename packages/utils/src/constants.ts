@@ -1,2 +1,2 @@
-// Default UTXO_DUST, this is usually sufficient, but for more precise cases, please use the getAddressUtxoDust method to obtain
-export const UTXO_DUST = 546;
+// OPCAT relay policy allows 1-sat UTXOs; do not use Bitcoin Core's 546-sat dust floor.
+export const UTXO_DUST = 1;

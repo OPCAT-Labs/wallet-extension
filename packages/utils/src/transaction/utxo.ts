@@ -1,4 +1,5 @@
 import { decodeAddress } from '../address';
+import { UTXO_DUST } from '../constants';
 import { NetworkType } from '../network';
 import { AddressType, UnspentOutput } from '../types';
 
@@ -43,7 +44,7 @@ function getAddedVirtualSize(addressType: AddressType) {
 }
 
 export function getUtxoDust(addressType: AddressType) {
-  return 546;
+  return UTXO_DUST;
 }
 
 // deprecated

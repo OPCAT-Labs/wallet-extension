@@ -92,12 +92,13 @@ export async function dummySendBTC({
   const inputCount = psbt.txInputs.length;
   const outputCount = psbt.txOutputs.length;
   const fee = psbt.getFee();
+  const feeNumber = Number(fee);
   const virtualSize = tx.virtualSize();
-  const finalFeeRate = parseFloat((Number(fee) / virtualSize).toFixed(1));
+  const finalFeeRate = parseFloat((feeNumber / virtualSize).toFixed(1));
   if (dump) {
     printPsbt(psbt as any);
   }
-  return { psbt, txid, inputCount, outputCount, feeRate: finalFeeRate };
+  return { psbt, txid, inputCount, outputCount, fee: feeNumber, feeRate: finalFeeRate };
 }
 
 /**

@@ -31,6 +31,25 @@ describe('sendBTC', () => {
         expect(ret.psbt.txOutputs[0].value).eq(1000);
       });
 
+      it('keeps small positive change instead of sweeping it to fees', async function () {
+        const ret = await dummySendBTC({
+          wallet: fromWallet,
+          btcUtxos: [genDummyUtxo(fromWallet, 603)],
+          tos: [{ address: toWallet.address, satoshis: 200 }],
+          feeRate: 1
+        });
+        const changeOutput = ret.psbt.txOutputs[1];
+
+        expect(ret.inputCount).eq(1);
+        expect(ret.outputCount).eq(2);
+        expect(ret.psbt.txOutputs[0].value).eq(200);
+        expect(changeOutput.address).eq(fromWallet.address);
+        expect(changeOutput.value).eq(603 - 200 - ret.fee);
+        expect(changeOutput.value).gt(0);
+        expect(changeOutput.value).lt(546);
+        expectFeeRate(addressType, ret.feeRate, 1);
+      });
+
       it('send all balance', async function () {
         const ret = await dummySendAllBTC({
           wallet: fromWallet,

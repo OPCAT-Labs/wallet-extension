@@ -12,7 +12,7 @@ describe('utxo', () => {
   });
   it('getUtxoDust', function () {
 
-    expect(utxoHelper.getUtxoDust(AddressType.P2PKH)).to.eq(546);
+    expect(utxoHelper.getUtxoDust(AddressType.P2PKH)).to.eq(1);
   });
 
   const networks = [
@@ -27,7 +27,7 @@ describe('utxo', () => {
       it('should return dust for P2PKH', function () {
         expect(
           utxoHelper.getAddressUtxoDust(LocalWallet.fromRandom(AddressType.P2PKH, networkType).address, networkType)
-        ).to.eq(546);
+        ).to.eq(1);
       });
     });
   });
