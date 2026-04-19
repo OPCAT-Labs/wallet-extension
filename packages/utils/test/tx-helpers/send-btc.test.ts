@@ -1,10 +1,10 @@
-import { expect } from 'chai';
 import { AddressType, UnspentOutput } from '../../src';
 import { BITCOIN_UTXO_DUST } from '../../src/constants';
 import { ErrorCodes } from '../../src/error';
 import { NetworkType } from '../../src/network';
 import { LocalWallet } from '../../src/wallet';
 import { dummySendAllBTC, dummySendBTC, expectFeeRate, genDummyUtxo, genDummyUtxos } from './utils';
+import { expect } from 'chai';
 
 describe('sendBTC', () => {
   beforeEach(() => {

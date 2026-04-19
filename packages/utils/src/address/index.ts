@@ -1,5 +1,5 @@
 import { bitcoin } from '../bitcoin-core';
-import { getUtxoDustThreshold } from '../constants';
+import { ChainType, getUtxoDustThreshold } from '../constants';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType } from '../types';
 
@@ -74,7 +74,7 @@ export function isP2PKHAddress(address: string, networkType: NetworkType = Netwo
   }
 }
 
-export function decodeAddress(address: string, isOpcat = false) {
+export function decodeAddress(address: string, chainType: ChainType = ChainType.BITCOIN) {
   const mainnet = bitcoin.networks.bitcoin;
   const testnet = bitcoin.networks.testnet;
   const regtest = bitcoin.networks.regtest;
@@ -95,7 +95,7 @@ export function decodeAddress(address: string, isOpcat = false) {
       return {
         networkType,
         addressType,
-        dust: getAddressTypeDust(addressType, isOpcat)
+        dust: getAddressTypeDust(addressType, chainType)
       };
     } catch (e) {}
   } else {
@@ -115,7 +115,7 @@ export function decodeAddress(address: string, isOpcat = false) {
       return {
         networkType,
         addressType,
-        dust: getAddressTypeDust(addressType, isOpcat)
+        dust: getAddressTypeDust(addressType, chainType)
       };
     } catch (e) {}
   }
@@ -123,15 +123,15 @@ export function decodeAddress(address: string, isOpcat = false) {
   return {
     networkType: NetworkType.MAINNET,
     addressType: AddressType.UNKNOWN,
-    dust: getUtxoDustThreshold(isOpcat)
+    dust: getUtxoDustThreshold(chainType)
   };
 }
 
-function getAddressTypeDust(addressType: AddressType, isOpcat = false) {
+function getAddressTypeDust(addressType: AddressType, chainType: ChainType = ChainType.BITCOIN) {
   if (addressType === AddressType.P2PKH) {
-    return getUtxoDustThreshold(isOpcat);
+    return getUtxoDustThreshold(chainType);
   }
-  return getUtxoDustThreshold(isOpcat);
+  return getUtxoDustThreshold(chainType);
 }
 
 /**

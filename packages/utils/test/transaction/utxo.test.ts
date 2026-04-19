@@ -1,9 +1,9 @@
-import { expect } from 'chai';
 import { AddressType } from '../../src';
-import { BITCOIN_UTXO_DUST, OPCAT_UTXO_DUST } from '../../src/constants';
+import { BITCOIN_UTXO_DUST, ChainType, OPCAT_UTXO_DUST } from '../../src/constants';
 import { NetworkType } from '../../src/network';
 import { utxoHelper } from '../../src/transaction/utxo';
 import { LocalWallet } from '../../src/wallet';
+import { expect } from 'chai';
 
 describe('utxo', () => {
   beforeEach(() => {
@@ -11,7 +11,7 @@ describe('utxo', () => {
   });
   it('getUtxoDust', function () {
     expect(utxoHelper.getUtxoDust(AddressType.P2PKH)).to.eq(BITCOIN_UTXO_DUST);
-    expect(utxoHelper.getUtxoDust(AddressType.P2PKH, true)).to.eq(OPCAT_UTXO_DUST);
+    expect(utxoHelper.getUtxoDust(AddressType.P2PKH, ChainType.OPCAT)).to.eq(OPCAT_UTXO_DUST);
   });
 
   const networks = [
@@ -33,7 +33,7 @@ describe('utxo', () => {
           utxoHelper.getAddressUtxoDust(
             LocalWallet.fromRandom(AddressType.P2PKH, networkType).address,
             networkType,
-            true
+            ChainType.OPCAT
           )
         ).to.eq(OPCAT_UTXO_DUST);
       });

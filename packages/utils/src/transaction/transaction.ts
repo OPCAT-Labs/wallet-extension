@@ -1,11 +1,12 @@
 import { addressToScriptPk } from '../address';
 import { bitcoin } from '../bitcoin-core';
-import { UTXO_DUST } from '../constants';
+import { ChainType, getUtxoDustThreshold } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType, ToSignInput, UnspentOutput } from '../types';
 import { EstimateWallet } from '../wallet';
 import { utxoHelper } from './utxo';
+
 interface TxInput {
   data: {
     hash: string;
@@ -71,7 +72,7 @@ export class Transaction {
   private _cacheNetworkFee = 0;
   private _cacheBtcUtxos: UnspentOutput[] = [];
   private _cacheToSignInputs: ToSignInput[] = [];
-  private dustThreshold = UTXO_DUST;
+  private chainType = ChainType.BITCOIN;
   constructor() {}
 
   setNetworkType(network: NetworkType) {
@@ -90,8 +91,8 @@ export class Transaction {
     this.changedAddress = address;
   }
 
-  setDustThreshold(dustThreshold: number) {
-    this.dustThreshold = dustThreshold;
+  setChainType(chainType: ChainType) {
+    this.chainType = chainType;
   }
 
   addInput(utxo: UnspentOutput) {
@@ -216,7 +217,7 @@ export class Transaction {
     tx.setFeeRate(this.feeRate);
     tx.setEnableRBF(this.enableRBF);
     tx.setChangeAddress(this.changedAddress);
-    tx.setDustThreshold(this.dustThreshold);
+    tx.setChainType(this.chainType);
     tx.utxos = this.utxos.map((v) => Object.assign({}, v));
     tx.inputs = this.inputs.map((v) => v);
     tx.outputs = this.outputs.map((v) => v);
@@ -303,7 +304,7 @@ export class Transaction {
     }
 
     const changeAmount = this.getTotalInput() - this.getTotalOutput() - Math.ceil(this._cacheNetworkFee);
-    if (changeAmount >= this.dustThreshold) {
+    if (changeAmount >= getUtxoDustThreshold(this.chainType)) {
       this.removeChangeOutput();
       this.addChangeOutput(changeAmount);
     } else {

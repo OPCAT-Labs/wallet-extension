@@ -1,8 +1,8 @@
-import { expect } from 'chai';
 import { sendAllBTC, sendBTC } from '../../src/tx-helpers';
 import { AddressType, UnspentOutput } from '../../src/types';
 import { LocalWallet } from '../../src/wallet';
 import { printPsbt } from '../utils';
+import { expect } from 'chai';
 
 let dummyUtxoIndex = 0;
 

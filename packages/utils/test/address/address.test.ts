@@ -1,9 +1,9 @@
-import { expect } from 'chai';
 import { AddressType } from '../../src';
 import { decodeAddress, getAddressType, isP2PKHAddress, isValidAddress, publicKeyToAddress } from '../../src/address';
-import { BITCOIN_UTXO_DUST, OPCAT_UTXO_DUST } from '../../src/constants';
+import { BITCOIN_UTXO_DUST, ChainType, OPCAT_UTXO_DUST } from '../../src/constants';
 import { NetworkType } from '../../src/network';
 import { LocalWallet } from '../../src/wallet';
+import { expect } from 'chai';
 
 const p2wpkh_data = {
   pubkey: '02b602ad190efb7b4f520068e3f8ecf573823d9e2557c5229231b4e14b79bbc0d8',
@@ -127,7 +127,7 @@ describe('address', function () {
 
         it(`should return OPCAT dust for ${networkNames[networkType]} when requested`, function () {
           const address = LocalWallet.fromRandom(addressType, networkType).address;
-          const addressInfo = decodeAddress(address, true);
+          const addressInfo = decodeAddress(address, ChainType.OPCAT);
           expect(addressInfo.networkType).to.eq(networkType);
           expect(addressInfo.addressType).to.eq(addressType);
           expect(addressInfo.dust).to.eq(OPCAT_UTXO_DUST);
@@ -139,7 +139,7 @@ describe('address', function () {
   it('decodeAddress UNKNOWN', function () {
     expect(decodeAddress('invalid address').addressType).eq(AddressType.UNKNOWN);
     expect(decodeAddress('invalid address').dust).eq(BITCOIN_UTXO_DUST);
-    expect(decodeAddress('invalid address', true).dust).eq(OPCAT_UTXO_DUST);
+    expect(decodeAddress('invalid address', ChainType.OPCAT).dust).eq(OPCAT_UTXO_DUST);
 
     expect(decodeAddress('bc1qxxx').addressType).eq(AddressType.UNKNOWN);
 
