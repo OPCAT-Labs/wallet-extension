@@ -1,6 +1,6 @@
 import { addressToScriptPk } from '../address';
 import { bitcoin } from '../bitcoin-core';
-import { ChainType, getUtxoDustThreshold } from '../constants';
+import { ChainType, RBF_SEQUENCE, getUtxoDustThreshold } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType, ToSignInput, UnspentOutput } from '../types';
@@ -191,7 +191,7 @@ export class Transaction {
       }
       psbt.data.addInput(v.data);
       if (this.enableRBF) {
-        psbt.setInputSequence(index, 0xfffffffd);
+        psbt.setInputSequence(index, RBF_SEQUENCE);
       }
     });
     this.outputs.forEach((v) => {

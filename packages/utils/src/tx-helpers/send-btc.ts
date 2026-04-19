@@ -1,4 +1,4 @@
-import { ChainType, UTXO_DUST, resolveChainType } from '../constants';
+import { ChainType, FINAL_SEQUENCE, RBF_SEQUENCE, UTXO_DUST, resolveChainType } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toOpcatNetwork } from '../network';
 import { Transaction } from '../transaction/transaction';
@@ -23,6 +23,7 @@ function sendOpcatBtc({
   networkType,
   changeAddress,
   feeRate,
+  enableRBF,
   memo,
   memos
 }: {
@@ -34,6 +35,7 @@ function sendOpcatBtc({
   networkType: NetworkType;
   changeAddress: string;
   feeRate: number;
+  enableRBF: boolean;
   memo?: string;
   memos?: string[];
 }) {
@@ -55,6 +57,10 @@ function sendOpcatBtc({
       data: v.data || ''
     }))
   );
+  const sequence = enableRBF ? RBF_SEQUENCE : FINAL_SEQUENCE;
+  extPsbt.txInputs.forEach((_, index) => {
+    extPsbt.setInputSequence(index, sequence);
+  });
 
   if (tos.length > 0) {
     extPsbt.addOutput({
@@ -114,6 +120,7 @@ export async function sendBTC({
       networkType,
       changeAddress,
       feeRate,
+      enableRBF,
       memo,
       memos
     });
@@ -179,7 +186,8 @@ export async function sendAllBTC({
       tos: [],
       networkType,
       changeAddress: toAddress,
-      feeRate
+      feeRate,
+      enableRBF
     });
   }
 

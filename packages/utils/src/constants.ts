@@ -1,5 +1,7 @@
 export const BITCOIN_UTXO_DUST = 546;
 export const OPCAT_UTXO_DUST = 1;
+export const RBF_SEQUENCE = 0xfffffffd;
+export const FINAL_SEQUENCE = 0xffffffff;
 
 export enum ChainType {
   BITCOIN = 'bitcoin',
