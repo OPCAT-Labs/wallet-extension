@@ -532,6 +532,7 @@ const config = (env) => {
         http: require.resolve('stream-http'),
         https: require.resolve('https-browserify'),
         buffer: require.resolve('buffer/'),
+        vm: require.resolve('vm-browserify'),
       },
       extensions: ['.js', '.cjs', 'jsx', '.ts', '.tsx']
     },
