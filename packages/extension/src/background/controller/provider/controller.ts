@@ -1,4 +1,4 @@
-import { notificationService, permissionService, sessionService } from '@/background/service';
+import { notificationService, permissionService, sessionService, smallPayService } from '@/background/service';
 import { CHAINS, CHAINS_MAP, NETWORK_TYPES, VERSION } from '@/shared/constant';
 import { NetworkType, RequestMethodSendBitcoinParams, RequestMethodSignMessageParams, RequestMethodSignMessagesParams, RequestMethodSignPsbtParams, RequestMethodSignPsbtsParams } from '@/shared/types';
 import { getChainInfo } from '@/shared/utils';
@@ -92,10 +92,20 @@ class ProviderController extends BaseController {
 
   /**
    * Get current permissions for the calling origin (SAFE - no approval needed)
+   *
+   * smallPay status reflects both the per-site permission AND the global
+   * SmallPay state: enabled + origin must be in the SmallPay whitelist.
    */
   @Reflect.metadata('SAFE', true)
   getPermissions = async ({ session: { origin } }) => {
-    return permissionService.getSitePermissions(origin);
+    const perms = permissionService.getSitePermissions(origin);
+    // smallPay must also respect global SmallPay state
+    if (perms.smallPay) {
+      if (!smallPayService.isEnabled() || !smallPayService.isOriginApproved(origin)) {
+        delete perms.smallPay;
+      }
+    }
+    return perms;
   };
 
   @Reflect.metadata('SAFE', true)
