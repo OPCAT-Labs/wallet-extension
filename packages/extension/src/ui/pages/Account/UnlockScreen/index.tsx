@@ -25,10 +25,15 @@ export default function UnlockScreen() {
   const isUnlocked = useIsUnlocked();
 
   useEffect(() => {
-    if (isUnlocked) {
+    // Only auto-advance to the wallet home in popup mode. In notification mode
+    // the unlock flow must route through BoostScreen (via the unlock callback's
+    // navigate('/')), which shows any pending approval or closes the window;
+    // navigating to MainScreen here races that and can leave the approval
+    // window stranded open on the wallet home after unlock.
+    if (isUnlocked && !isInNotification) {
       navigate('MainScreen');
     }
-  }, [isUnlocked, navigate]);
+  }, [isUnlocked, isInNotification, navigate]);
 
   const [loading, setLoading] = useState(false);
 
@@ -46,13 +51,14 @@ export default function UnlockScreen() {
         return;
       }
 
+      // In notification mode, the unlock callback resolves the pending unlock
+      // gate and then navigates to BoostScreen, which shows the next approval
+      // or closes the window. Doing our own getApproval()-based routing here
+      // races that resolve and could strand the approval window open on the
+      // wallet home after unlock (the "window doesn't auto-close" bug), so let
+      // BoostScreen own the routing — same as every other approval screen.
       if (isInNotification) {
-        // In notification mode, check if there's a pending approval request
-        const approval = await wallet.getApproval();
-        if (approval) {
-          navigate('ApprovalScreen');
-          return;
-        }
+        return;
       }
 
       navigate('MainScreen');
