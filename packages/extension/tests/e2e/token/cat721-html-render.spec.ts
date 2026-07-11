@@ -310,18 +310,24 @@ test.describe('CAT721 HTML NFT Rendering', () => {
     });
     console.log('NFT #1 detail page loaded');
 
-    // Verify iframe exists and the embedded image loaded
-    const iframe = page.frameLocator('iframe').first();
-    const img = iframe.locator('#nft-image');
-    await expect(img).toBeVisible({ timeout: 30_000 });
-
-    await expect(async () => {
-      const w = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
-      expect(w).toBeGreaterThan(0);
-    }).toPass({ timeout: 60_000 });
-
-    const naturalWidth = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
-    console.log(`NFT #1: embedded image naturalWidth: ${naturalWidth}`);
+    // Verify the HTML NFT renders in an iframe pointing at the right content.
+    //
+    // The NFT iframe is intentionally `sandbox="allow-same-origin"` WITHOUT
+    // `allow-scripts` (security hardening, see #31). Playwright cannot inject
+    // its evaluation script into a script-less sandboxed frame, so we cannot
+    // reach into `contentFrame()` to query `#nft-image` — that always reports
+    // "element(s) not found" regardless of whether the image loaded. The
+    // embedded-image rendering is already fully covered by the "HTML NFT
+    // should render embedded image in browser" test above, so here we only
+    // assert what is observable from the parent page.
+    const iframe = page.locator('iframe').first();
+    await expect(iframe).toBeVisible({ timeout: 30_000 });
+    await expect(iframe).toHaveAttribute(
+      'src',
+      new RegExp(`/api/v1/collections/${collectionId}/localId/1/content`),
+      { timeout: 30_000 },
+    );
+    console.log('NFT #1: HTML content iframe rendered with correct src');
 
     await page.screenshot({
       path: 'test-results/artifacts/cat721-nft1-detail.png',
