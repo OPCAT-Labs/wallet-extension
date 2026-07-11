@@ -310,24 +310,23 @@ test.describe('CAT721 HTML NFT Rendering', () => {
     });
     console.log('NFT #1 detail page loaded');
 
-    // Verify the HTML NFT renders in an iframe pointing at the right content.
+    // Verify the detail screen renders NFT #1's content element pointing at the
+    // correct content endpoint.
     //
-    // The NFT iframe is intentionally `sandbox="allow-same-origin"` WITHOUT
-    // `allow-scripts` (security hardening, see #31). Playwright cannot inject
-    // its evaluation script into a script-less sandboxed frame, so we cannot
-    // reach into `contentFrame()` to query `#nft-image` — that always reports
-    // "element(s) not found" regardless of whether the image loaded. The
-    // embedded-image rendering is already fully covered by the "HTML NFT
-    // should render embedded image in browser" test above, so here we only
-    // assert what is observable from the parent page.
-    const iframe = page.locator('iframe').first();
-    await expect(iframe).toBeVisible({ timeout: 30_000 });
-    await expect(iframe).toHaveAttribute(
-      'src',
-      new RegExp(`/api/v1/collections/${collectionId}/localId/1/content`),
-      { timeout: 30_000 },
+    // The detail screen (CAT721NFTScreen) passes the *collection* contentType to
+    // CAT721Preview, so an HTML NFT is rendered via an <img> here (not the
+    // iframe used on the collection list). We therefore assert on the content
+    // element's src rather than assuming a specific tag, and we do not reach
+    // into any frame DOM (the list iframe is sandboxed without allow-scripts,
+    // which Playwright cannot introspect anyway). The embedded-image rendering
+    // of the HTML itself is fully covered by the "HTML NFT should render
+    // embedded image in browser" test above.
+    const contentUrlPart = `/collections/${collectionId}/localId/1/content`;
+    const content = page.locator(
+      `img[src*="${contentUrlPart}"], iframe[src*="${contentUrlPart}"]`,
     );
-    console.log('NFT #1: HTML content iframe rendered with correct src');
+    await expect(content).toBeVisible({ timeout: 30_000 });
+    console.log('NFT #1: detail preview rendered with correct content src');
 
     await page.screenshot({
       path: 'test-results/artifacts/cat721-nft1-detail.png',
