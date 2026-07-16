@@ -525,6 +525,9 @@
   "collection_id": {
     "message": "コレクションID"
   },
+  "attributes": {
+    "message": "属性"
+  },
   "collection": {
     "message": "コレクション"
   },

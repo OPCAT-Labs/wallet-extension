@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { CAT721CollectionInfo } from '@/shared/types';
@@ -7,7 +8,10 @@ import { Line } from '@/ui/components/Line';
 import { Section } from '@/ui/components/Section';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
+import { useCAT721NFTContentBaseUrl } from '@/ui/state/settings/hooks';
 import { TestIds } from '@/ui/utils/test-ids';
+
+import { fetchNftTraits, NftTrait } from './nftTraits';
 
 export default function CAT721NFTScreen() {
   const { state } = useLocation();
@@ -19,6 +23,23 @@ export default function CAT721NFTScreen() {
 
   const collectionInfo = props.collectionInfo;
   const localId = props.localId;
+
+  const contentBaseUrl = useCAT721NFTContentBaseUrl();
+  const [traits, setTraits] = useState<NftTrait[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchNftTraits(contentBaseUrl, collectionInfo.collectionId, localId)
+      .then(result => {
+        if (!cancelled) setTraits(result);
+      })
+      .catch(() => {
+        if (!cancelled) setTraits([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [contentBaseUrl, collectionInfo.collectionId, localId]);
 
   const navigate = useNavigate();
 
@@ -50,6 +71,23 @@ export default function CAT721NFTScreen() {
             <Section title={t('collection')} value={collectionInfo.name} />
           </Column>
         </Card>
+
+        {traits.length > 0 && (
+          <Card style={{ borderRadius: 15 }} testid={TestIds.CAT721.NFT_ATTRIBUTES}>
+            <Column fullX my="sm">
+              <Row px="md">
+                <Text text={t('attributes')} preset="bold" />
+              </Row>
+              <Line />
+              {traits.map((trait, index) => (
+                <Column key={`${trait.trait}-${index}`} gap="zero">
+                  {index > 0 && <Line />}
+                  <Section title={trait.trait} value={trait.value} />
+                </Column>
+              ))}
+            </Column>
+          </Card>
+        )}
         <Button
           preset="primary"
           text={t('send')}
