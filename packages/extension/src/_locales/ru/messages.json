@@ -525,6 +525,9 @@
   "collection_id": {
     "message": "ID Коллекции"
   },
+  "attributes": {
+    "message": "Атрибуты"
+  },
   "collection": {
     "message": "Коллекция"
   },

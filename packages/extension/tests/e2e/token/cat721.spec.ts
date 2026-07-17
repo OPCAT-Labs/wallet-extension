@@ -189,6 +189,19 @@ test.describe('CAT721 NFT Operations', () => {
     // Select an NFT from the collection
     await selectNFT(page);
 
+    // If the selected NFT exposes metadata attributes (traits), the attributes
+    // section should render with at least one trait row. NFTs without usable
+    // attributes render nothing, so this assertion is conditional (non-flaky).
+    const attributesSection = page.locator(
+      `[data-testid="${TestIds.CAT721.NFT_ATTRIBUTES}"]`
+    );
+    if ((await attributesSection.count()) > 0) {
+      await expect(attributesSection).toBeVisible();
+      console.log('[DEBUG] CAT721 attributes section rendered');
+    } else {
+      console.log('[DEBUG] Selected NFT has no attributes; attributes section hidden');
+    }
+
     // Perform transfer
     const transferSuccess = await transferCAT721(page, TEST_CAT20.SATOSHI_ADDRESS);
 

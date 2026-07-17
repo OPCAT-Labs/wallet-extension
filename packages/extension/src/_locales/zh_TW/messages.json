@@ -526,6 +526,9 @@
   "collection_id": {
     "message": "合集ID"
   },
+  "attributes": {
+    "message": "屬性"
+  },
   "collection": {
     "message": "合集"
   },

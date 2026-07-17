@@ -26,6 +26,7 @@
     "fix:modules": "node scripts/fix-modules.js",
     "format": "prettier --write \"src/**/*.{js,jsx,json,md,ts,tsx}\" --plugin-search-dir=./node_modules/ --plugin=./node_modules/@trivago/prettier-plugin-sort-imports/ ",
     "prepare": "npm run fix:modules",
+    "test": "jest",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
