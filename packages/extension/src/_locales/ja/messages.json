@@ -2201,5 +2201,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "重要: 一時的なインデックス作成の不一致のため、このトークンを転送しないでください。プロトコルの創設チームからの解決を待っています。他のトークンは影響を受けません。"
+  },
+  "search_by_id_or_trait": {
+    "message": "#IDまたは属性で検索"
+  },
+  "search_collections": {
+    "message": "コレクションを検索"
+  },
+  "clear_filters": {
+    "message": "フィルターをクリア"
+  },
+  "no_matches": {
+    "message": "一致する項目がありません"
+  },
+  "loading_traits": {
+    "message": "属性を読み込み中"
   }
 }

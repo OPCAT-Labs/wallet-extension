@@ -2292,5 +2292,20 @@
   },
   "permission_warning": {
     "message": "Only approve permissions for sites you trust."
+  },
+  "search_by_id_or_trait": {
+    "message": "Search by #ID or trait"
+  },
+  "search_collections": {
+    "message": "Search collections"
+  },
+  "clear_filters": {
+    "message": "Clear filters"
+  },
+  "no_matches": {
+    "message": "No matches"
+  },
+  "loading_traits": {
+    "message": "Loading traits"
   }
 }

@@ -2193,5 +2193,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "Importante: No transferas este token debido a una discrepancia temporal en el índice. Esperamos la resolución del equipo fundador del protocolo. Otros tokens no afectados."
+  },
+  "search_by_id_or_trait": {
+    "message": "Buscar por #ID o atributo"
+  },
+  "search_collections": {
+    "message": "Buscar colecciones"
+  },
+  "clear_filters": {
+    "message": "Borrar filtros"
+  },
+  "no_matches": {
+    "message": "Sin coincidencias"
+  },
+  "loading_traits": {
+    "message": "Cargando atributos"
   }
 }

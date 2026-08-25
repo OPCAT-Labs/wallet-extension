@@ -2201,5 +2201,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "Важно: Не переводите этот токен из-за временной несогласованности индексации. Мы ожидаем решения от команды основателей протокола. Другие токены не затронуты."
+  },
+  "search_by_id_or_trait": {
+    "message": "Поиск по #ID или атрибуту"
+  },
+  "search_collections": {
+    "message": "Поиск коллекций"
+  },
+  "clear_filters": {
+    "message": "Сбросить фильтры"
+  },
+  "no_matches": {
+    "message": "Нет совпадений"
+  },
+  "loading_traits": {
+    "message": "Загрузка атрибутов"
   }
 }

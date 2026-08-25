@@ -185,6 +185,19 @@ export const TestIds = {
     NFT_NAME: 'cat721-nft-name',
     NFT_ATTRIBUTES: 'cat721-nft-attributes',
     SEND_BUTTON: 'cat721-send-button',
+    // Collection screen filters (search / sort / traits)
+    FILTER_SEARCH_INPUT: 'cat721-filter-search-input',
+    FILTER_SEARCH_CLEAR: 'cat721-filter-search-clear',
+    FILTER_SORT_TOGGLE: 'cat721-filter-sort-toggle',
+    FILTER_TRAIT_CHIP: 'cat721-trait-chip',
+    FILTER_TRAIT_VALUE: 'cat721-trait-value',
+    FILTER_VALUE_PANEL: 'cat721-trait-value-panel',
+    FILTER_CLEAR_TRAITS: 'cat721-filter-clear-traits',
+    FILTER_TRAITS_PROGRESS: 'cat721-traits-progress',
+    FILTER_RESET: 'cat721-filter-reset',
+    // Collections list search (home NFTs tab)
+    LIST_SEARCH_INPUT: 'cat721-list-search-input',
+    LIST_SEARCH_CLEAR: 'cat721-list-search-clear',
     // Send CAT721 Screen
     SEND_SCREEN: 'send-cat721-screen',
     SEND_RECIPIENT_INPUT: 'send-cat721-address-input',
