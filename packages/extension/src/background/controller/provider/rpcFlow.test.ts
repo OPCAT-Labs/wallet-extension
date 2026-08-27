@@ -18,7 +18,8 @@ jest.mock('./controller', () => ({
   __esModule: true,
   default: {
     getPermissions: jest.fn().mockResolvedValue({ connect: true }),
-    getAccounts: jest.fn().mockResolvedValue([])
+    getAccounts: jest.fn().mockResolvedValue([]),
+    getBalance: jest.fn().mockResolvedValue({ confirmed: 0, unconfirmed: 0, total: 0 })
   }
 }));
 
@@ -56,5 +57,16 @@ describe('rpcFlow getPermissions exemption', () => {
     });
 
     expect(mockRequestApproval).not.toHaveBeenCalled();
+  });
+
+  it('pops a Connect approval for a non-exempt method when the site is not connected (positive control)', async () => {
+    mockHasPermission.mockReturnValue(false);
+
+    await rpcFlow({
+      data: { method: 'getBalance', params: {} },
+      session: { origin: 'https://clawchats.app', name: 'ClawChat', icon: 'icon.png' }
+    });
+
+    expect(mockRequestApproval).toHaveBeenCalled();
   });
 });
