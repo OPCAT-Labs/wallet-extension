@@ -84,4 +84,26 @@ describe('permissionService.connectWithPermissions', () => {
       ecdh: true
     });
   });
+
+  it('makes an explicit uncheck durable when revokePermission is applied after a merge-write (mirrors requestPermissions in controller.ts)', () => {
+    // dApp requests ['ecdh', 'smallPay'], user grants only ['connect', 'ecdh']
+    // in the approval popup (smallPay left unchecked).
+    const requested: Array<'ecdh' | 'smallPay'> = ['ecdh', 'smallPay'];
+    const grantedPerms = ['connect', 'ecdh'];
+
+    permissionService.connectWithPermissions(ORIGIN, 'ClawChat', 'icon.png', ChainType.OPCAT_MAINNET, grantedPerms);
+
+    // Mirrors the fix in controller.ts requestPermissions: revoke anything
+    // requested but not actually granted (excluding 'connect').
+    for (const p of requested) {
+      if (p !== 'connect' && !grantedPerms.includes(p)) {
+        permissionService.revokePermission(ORIGIN, p);
+      }
+    }
+
+    expect(permissionService.getSitePermissions(ORIGIN)).toEqual({
+      connect: true,
+      ecdh: true
+    });
+  });
 });

@@ -82,6 +82,17 @@ class ProviderController extends BaseController {
       wallet.approveSmallPayOrigin(origin, session.icon);
     }
 
+    // Explicitly revoke any permission that was part of this request but that
+    // the user did NOT check. connectWithPermissions only merges grants in,
+    // so an unchecked-but-previously-granted permission would otherwise
+    // silently survive. 'connect' is excluded since it's always implicitly
+    // granted once connected.
+    for (const p of params.permissions) {
+      if (p !== 'connect' && !grantedPerms.includes(p)) {
+        permissionService.revokePermission(origin, p);
+      }
+    }
+
     // Return which permissions were granted
     const result: Record<string, boolean> = {};
     for (const p of params.permissions) {
