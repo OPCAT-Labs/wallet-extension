@@ -51,6 +51,25 @@ describe('permissionService.connectWithPermissions', () => {
     });
   });
 
+  it('does not resurrect permissions of a disconnected site on reconnect', () => {
+    permissionService.connectWithPermissions(ORIGIN, 'ClawChat', 'icon.png', ChainType.OPCAT_MAINNET, [
+      'ecdh',
+      'smallPay'
+    ]);
+
+    // User disconnects the site via the Connected Sites screen. This only
+    // flips isConnected to false; site.permissions stays intact internally.
+    permissionService.removeConnectedSite(ORIGIN);
+
+    // Site reconnects and the user approves the Connect popup with nothing
+    // checked, so only 'connect' is requested.
+    permissionService.connectWithPermissions(ORIGIN, 'ClawChat', 'icon.png', ChainType.OPCAT_MAINNET, ['connect']);
+
+    expect(permissionService.getSitePermissions(ORIGIN)).toEqual({
+      connect: true
+    });
+  });
+
   it('grants exactly what was requested for a brand-new site', () => {
     permissionService.connectWithPermissions(
       'https://new-site.example',
