@@ -288,16 +288,22 @@ class PermissionService {
     if (!this.lruCache) return;
 
     const now = Date.now();
-    const permissions: Partial<Record<PermissionType, PermissionGrant>> = {};
+    const existingSite = this.lruCache.get(origin);
+    // Only carry over previously granted permissions if the site is still
+    // connected. A disconnected site's stale grants must not be resurrected
+    // on reconnect (removeConnectedSite only flips isConnected, it does not
+    // clear permissions).
+    const permissions: Partial<Record<PermissionType, PermissionGrant>> = existingSite?.isConnected
+      ? { ...existingSite.permissions }
+      : {};
     for (const perm of permissionTypes) {
       permissions[perm] = { granted: true, grantedAt: now };
     }
     // Always grant connect
-    if (!permissions.connect) {
+    if (!permissions.connect?.granted) {
       permissions.connect = { granted: true, grantedAt: now };
     }
 
-    const existingSite = this.lruCache.get(origin);
     this.lruCache.set(origin, {
       origin,
       name,
