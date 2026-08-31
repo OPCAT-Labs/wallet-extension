@@ -2206,5 +2206,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "Important: Veuillez ne pas transférer ce jeton en raison d'une anomalie temporaire d'indexation. Nous attendons la résolution du projet fondateur. Les autres jetons ne sont pas affectés."
+  },
+  "search_by_id_or_trait": {
+    "message": "Rechercher par #ID ou attribut"
+  },
+  "search_collections": {
+    "message": "Rechercher des collections"
+  },
+  "clear_filters": {
+    "message": "Effacer les filtres"
+  },
+  "no_matches": {
+    "message": "Aucun résultat"
+  },
+  "loading_traits": {
+    "message": "Chargement des attributs"
   }
 }

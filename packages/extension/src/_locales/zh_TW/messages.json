@@ -2205,5 +2205,20 @@
   },
   "important_to_not_transfer_this_token": {
     "message": "重要: 請不要轉移此代幣，因為存在臨時索引不一致的問題。我們正在等待協議創始團隊的解決方案。其他代幣不受影響。"
+  },
+  "search_by_id_or_trait": {
+    "message": "按 #ID 或屬性搜尋"
+  },
+  "search_collections": {
+    "message": "搜尋收藏集"
+  },
+  "clear_filters": {
+    "message": "清除篩選"
+  },
+  "no_matches": {
+    "message": "無符合結果"
+  },
+  "loading_traits": {
+    "message": "屬性載入中"
   }
 }

@@ -2263,5 +2263,20 @@
   },
   "permission_warning": {
     "message": "仅为您信任的网站批准权限。"
+  },
+  "search_by_id_or_trait": {
+    "message": "按 #ID 或属性搜索"
+  },
+  "search_collections": {
+    "message": "搜索收藏集"
+  },
+  "clear_filters": {
+    "message": "清除筛选"
+  },
+  "no_matches": {
+    "message": "无匹配结果"
+  },
+  "loading_traits": {
+    "message": "属性加载中"
   }
 }
