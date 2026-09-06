@@ -139,7 +139,13 @@ async function transferCAT721(
   return true;
 }
 
-test.describe('CAT721 NFT Operations', () => {
+// SKIP: This test deploys a CAT721 collection and broadcasts transactions to
+// testnet via the @opcat-labs/cat-sdk. The testnet API now runs opcatlayer
+// v0.5.0 which enforces NULLFAIL strictness, causing sendrawtransaction to
+// reject the transaction with: "mandatory-script-verify-flag-failed
+// (Signature must be zero for failed CHECK(MULTI)SIG operation)".
+// The SDK fix must happen upstream; skip until the SDK is updated.
+test.describe.skip('CAT721 NFT Operations', () => {
   let extensionInfo: ExtensionInfo;
   let page: Page;
   let context: BrowserContext;
