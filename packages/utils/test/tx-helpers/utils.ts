@@ -1,20 +1,16 @@
-import { expect } from 'chai';
 import { sendAllBTC, sendBTC } from '../../src/tx-helpers';
+import { ChainType } from '../../src/constants';
 import { AddressType, UnspentOutput } from '../../src/types';
 import { LocalWallet } from '../../src/wallet';
 import { printPsbt } from '../utils';
+import { expect } from 'chai';
 
 let dummyUtxoIndex = 0;
 
 /**
  * generate dummy utxos
  */
-export function genDummyUtxos(
-  wallet: LocalWallet,
-  satoshisArray: number[],
-  assetsArray?: {
-  }[]
-) {
+export function genDummyUtxos(wallet: LocalWallet, satoshisArray: number[], assetsArray?: {}[]) {
   return satoshisArray.map((v, index) =>
     genDummyUtxo(wallet, satoshisArray[index], assetsArray ? assetsArray[index] : undefined)
   );
@@ -26,8 +22,7 @@ export function genDummyUtxos(
 export function genDummyUtxo(
   wallet: LocalWallet,
   satoshis: number,
-  assets?: {
-  },
+  assets?: {},
   txid?: string,
   vout?: number
 ): UnspentOutput {
@@ -37,7 +32,7 @@ export function genDummyUtxo(
     satoshis: satoshis,
     scriptPk: wallet.scriptPk,
     addressType: wallet.addressType,
-    pubkey: wallet.pubkey,
+    pubkey: wallet.pubkey
   };
 }
 
@@ -63,6 +58,8 @@ export async function dummySendBTC({
   feeRate,
   dump,
   enableRBF,
+  chainType,
+  isOpcat,
   memo,
   memos
 }: {
@@ -72,6 +69,8 @@ export async function dummySendBTC({
   feeRate: number;
   dump?: boolean;
   enableRBF?: boolean;
+  chainType?: ChainType;
+  isOpcat?: boolean;
   memo?: string;
   memos?: string[];
 }) {
@@ -82,22 +81,25 @@ export async function dummySendBTC({
     changeAddress: wallet.address,
     feeRate,
     enableRBF,
+    chainType,
+    isOpcat,
     memo,
     memos
   });
 
-  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any});
+  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any });
   const tx = psbt.extractTransaction(true) as any;
   const txid = tx.getId();
   const inputCount = psbt.txInputs.length;
   const outputCount = psbt.txOutputs.length;
   const fee = psbt.getFee();
+  const feeNumber = Number(fee);
   const virtualSize = tx.virtualSize();
-  const finalFeeRate = parseFloat((Number(fee) / virtualSize).toFixed(1));
+  const finalFeeRate = parseFloat((feeNumber / virtualSize).toFixed(1));
   if (dump) {
     printPsbt(psbt as any);
   }
-  return { psbt, txid, inputCount, outputCount, feeRate: finalFeeRate };
+  return { psbt, txid, inputCount, outputCount, fee: feeNumber, feeRate: finalFeeRate };
 }
 
 /**
@@ -109,7 +111,9 @@ export async function dummySendAllBTC({
   toAddress,
   feeRate,
   dump,
-  enableRBF
+  enableRBF,
+  chainType,
+  isOpcat
 }: {
   wallet: LocalWallet;
   btcUtxos: UnspentOutput[];
@@ -117,15 +121,19 @@ export async function dummySendAllBTC({
   feeRate: number;
   dump?: boolean;
   enableRBF?: boolean;
+  chainType?: ChainType;
+  isOpcat?: boolean;
 }) {
   const { psbt, toSignInputs } = await sendAllBTC({
     btcUtxos,
     toAddress,
     feeRate,
     enableRBF,
+    chainType,
+    isOpcat,
     networkType: wallet.networkType
   });
-  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any});
+  await wallet.signPsbt(psbt as any, { autoFinalized: true, toSignInputs: toSignInputs as any });
 
   const inputCount = psbt.txInputs.length;
   const outputCount = psbt.txOutputs.length;

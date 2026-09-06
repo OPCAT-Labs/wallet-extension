@@ -1,18 +1,18 @@
-import { expect } from 'chai';
 import { AddressType, UnspentOutput } from '../../src';
+import { BITCOIN_UTXO_DUST, ChainType, FINAL_SEQUENCE, RBF_SEQUENCE } from '../../src/constants';
 import { ErrorCodes } from '../../src/error';
 import { NetworkType } from '../../src/network';
+import { sendAllBTC, sendBTC } from '../../src/tx-helpers';
 import { LocalWallet } from '../../src/wallet';
 import { dummySendAllBTC, dummySendBTC, expectFeeRate, genDummyUtxo, genDummyUtxos } from './utils';
+import { expect } from 'chai';
 
 describe('sendBTC', () => {
   beforeEach(() => {
     // todo
   });
 
-  const testAddressTypes = [
-    AddressType.P2PKH,
-  ];
+  const testAddressTypes = [AddressType.P2PKH];
   testAddressTypes.forEach((addressType) => {
     const fromWallet = LocalWallet.fromRandom(addressType, NetworkType.MAINNET);
     const toWallet = LocalWallet.fromRandom(addressType, NetworkType.MAINNET);
@@ -29,6 +29,70 @@ describe('sendBTC', () => {
         expect(ret.outputCount).eq(2);
         expectFeeRate(addressType, ret.feeRate, 1);
         expect(ret.psbt.txOutputs[0].value).eq(1000);
+      });
+
+      it('uses the Bitcoin dust policy by default', async function () {
+        const ret = await dummySendBTC({
+          wallet: fromWallet,
+          btcUtxos: [genDummyUtxo(fromWallet, 603)],
+          tos: [{ address: toWallet.address, satoshis: 200 }],
+          feeRate: 1
+        });
+        const remainingAfterFee = 603 - 200 - ret.fee;
+
+        expect(ret.inputCount).eq(1);
+        expect(ret.outputCount).eq(1);
+        expect(ret.psbt.txOutputs[0].value).eq(200);
+        expect(remainingAfterFee).lt(BITCOIN_UTXO_DUST);
+      });
+
+      it('prefers chainType over the legacy OPCAT flag', async function () {
+        const ret = await dummySendBTC({
+          wallet: fromWallet,
+          btcUtxos: [genDummyUtxo(fromWallet, 603)],
+          tos: [{ address: toWallet.address, satoshis: 200 }],
+          feeRate: 1,
+          chainType: ChainType.BITCOIN,
+          isOpcat: true
+        });
+        const remainingAfterFee = 603 - 200 - ret.fee;
+
+        expect(ret.inputCount).eq(1);
+        expect(ret.outputCount).eq(1);
+        expect(ret.psbt.txOutputs[0].value).eq(200);
+        expect(remainingAfterFee).lt(BITCOIN_UTXO_DUST);
+      });
+
+      [
+        { enableRBF: true, expectedSequence: RBF_SEQUENCE },
+        { enableRBF: false, expectedSequence: FINAL_SEQUENCE }
+      ].forEach(({ enableRBF, expectedSequence }) => {
+        it(`applies ${enableRBF ? 'RBF' : 'final'} sequence on OPCAT send`, async function () {
+          const ret = await sendBTC({
+            btcUtxos: [genDummyUtxo(fromWallet, 10000)],
+            tos: [{ address: toWallet.address, satoshis: 1000 }],
+            networkType: fromWallet.networkType,
+            changeAddress: fromWallet.address,
+            feeRate: 1,
+            chainType: ChainType.OPCAT,
+            enableRBF
+          });
+
+          expect((ret.psbt as any).getSequence(0)).eq(expectedSequence);
+        });
+
+        it(`applies ${enableRBF ? 'RBF' : 'final'} sequence on OPCAT send-all`, async function () {
+          const ret = await sendAllBTC({
+            btcUtxos: [genDummyUtxo(fromWallet, 10000)],
+            toAddress: toWallet.address,
+            networkType: fromWallet.networkType,
+            feeRate: 1,
+            chainType: ChainType.OPCAT,
+            enableRBF
+          });
+
+          expect((ret.psbt as any).getSequence(0)).eq(expectedSequence);
+        });
       });
 
       it('send all balance', async function () {

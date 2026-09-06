@@ -1,11 +1,12 @@
 import { addressToScriptPk } from '../address';
 import { bitcoin } from '../bitcoin-core';
-import { UTXO_DUST } from '../constants';
+import { ChainType, RBF_SEQUENCE, getUtxoDustThreshold } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType, ToSignInput, UnspentOutput } from '../types';
 import { EstimateWallet } from '../wallet';
 import { utxoHelper } from './utxo';
+
 interface TxInput {
   data: {
     hash: string;
@@ -27,7 +28,7 @@ interface TxOutput {
 /**
  * Convert UnspentOutput to PSBT TxInput
  */
-function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {  
+function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
   if (utxo.addressType === AddressType.P2PKH) {
     if (!utxo.rawtx || estimate) {
       const data = {
@@ -71,6 +72,7 @@ export class Transaction {
   private _cacheNetworkFee = 0;
   private _cacheBtcUtxos: UnspentOutput[] = [];
   private _cacheToSignInputs: ToSignInput[] = [];
+  private chainType = ChainType.BITCOIN;
   constructor() {}
 
   setNetworkType(network: NetworkType) {
@@ -87,6 +89,10 @@ export class Transaction {
 
   setChangeAddress(address: string) {
     this.changedAddress = address;
+  }
+
+  setChainType(chainType: ChainType) {
+    this.chainType = chainType;
   }
 
   addInput(utxo: UnspentOutput) {
@@ -162,6 +168,9 @@ export class Transaction {
   }
 
   removeChangeOutput() {
+    if (this.changeOutputIndex < 0) {
+      return;
+    }
     this.outputs.splice(this.changeOutputIndex, 1);
     this.changeOutputIndex = -1;
   }
@@ -182,7 +191,7 @@ export class Transaction {
       }
       psbt.data.addInput(v.data);
       if (this.enableRBF) {
-        psbt.setInputSequence(index, 0xfffffffd);
+        psbt.setInputSequence(index, RBF_SEQUENCE);
       }
     });
     this.outputs.forEach((v) => {
@@ -208,6 +217,7 @@ export class Transaction {
     tx.setFeeRate(this.feeRate);
     tx.setEnableRBF(this.enableRBF);
     tx.setChangeAddress(this.changedAddress);
+    tx.setChainType(this.chainType);
     tx.utxos = this.utxos.map((v) => Object.assign({}, v));
     tx.inputs = this.inputs.map((v) => v);
     tx.outputs = this.outputs.map((v) => v);
@@ -294,7 +304,7 @@ export class Transaction {
     }
 
     const changeAmount = this.getTotalInput() - this.getTotalOutput() - Math.ceil(this._cacheNetworkFee);
-    if (changeAmount > UTXO_DUST) {
+    if (changeAmount >= getUtxoDustThreshold(this.chainType)) {
       this.removeChangeOutput();
       this.addChangeOutput(changeAmount);
     } else {

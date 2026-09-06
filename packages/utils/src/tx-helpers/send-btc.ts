@@ -1,13 +1,11 @@
-import { UTXO_DUST } from '../constants';
+import { ChainType, FINAL_SEQUENCE, RBF_SEQUENCE, UTXO_DUST, resolveChainType } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType, toOpcatNetwork } from '../network';
 import { Transaction } from '../transaction/transaction';
 import { utxoHelper } from '../transaction/utxo';
 import { ToSignInput, UnspentOutput } from '../types';
-
 // import * as scryptOpCat from '@opcat-labs/scrypt-ts-opcat';
 // const { ExtPsbt, intToByteString, len } = scryptOpCat;
-
 import { ExtPsbt, intToByteString, len } from '@opcat-labs/scrypt-ts-opcat';
 
 function hexifyMemos(memos: string[]) {
@@ -25,8 +23,7 @@ function sendOpcatBtc({
   networkType,
   changeAddress,
   feeRate,
-  isOpcat,
-  enableRBF = true,
+  enableRBF,
   memo,
   memos
 }: {
@@ -38,50 +35,54 @@ function sendOpcatBtc({
   networkType: NetworkType;
   changeAddress: string;
   feeRate: number;
-  isOpcat?: boolean
-  enableRBF?: boolean;
+  enableRBF: boolean;
   memo?: string;
   memos?: string[];
 }) {
   const memoArr = memo ? [memo] : memos;
-  let memoStr = ''
+  let memoStr = '';
   if (memoArr && memoArr.length > 0 && memoArr[0]) {
-    let hexMemos = hexifyMemos(memoArr)
-    hexMemos.forEach(hexMemo => {
-      memoStr += intToByteString(len(hexMemo), BigInt(4)) + hexMemo
-    })
+    let hexMemos = hexifyMemos(memoArr);
+    hexMemos.forEach((hexMemo) => {
+      memoStr += intToByteString(len(hexMemo), BigInt(4)) + hexMemo;
+    });
   }
 
-  const extPsbt = new ExtPsbt({network: toOpcatNetwork(networkType)})
-    .spendUTXO(btcUtxos.map(v => ({
+  const extPsbt = new ExtPsbt({ network: toOpcatNetwork(networkType) }).spendUTXO(
+    btcUtxos.map((v) => ({
       txId: v.txid,
       outputIndex: v.vout,
       satoshis: v.satoshis,
       script: v.scriptPk,
       data: v.data || ''
-    })))
-  
+    }))
+  );
+  const sequence = enableRBF ? RBF_SEQUENCE : FINAL_SEQUENCE;
+  extPsbt.txInputs.forEach((_, index) => {
+    extPsbt.setInputSequence(index, sequence);
+  });
+
   if (tos.length > 0) {
     extPsbt.addOutput({
       address: tos[0].address,
       value: BigInt(tos[0].satoshis),
       data: Buffer.from(memoStr, 'hex')
-    })
+    });
   }
-    
-  tos.slice(1).forEach(v => {
+
+  tos.slice(1).forEach((v) => {
     extPsbt.addOutput({
       address: v.address,
       value: BigInt(v.satoshis),
       data: Buffer.alloc(0)
-    })
-  })
-  extPsbt.change(changeAddress, feeRate).seal()
+    });
+  });
+  extPsbt.change(changeAddress, feeRate).seal();
   const signInputs = extPsbt.psbtOptions().toSignInputs;
-  signInputs.forEach(v => {
-    v.publicKey = btcUtxos[v.index].pubkey
-  })
-  return {psbt: extPsbt, toSignInputs: signInputs}
+  signInputs.forEach((v) => {
+    v.publicKey = btcUtxos[v.index].pubkey;
+  });
+  return { psbt: extPsbt, toSignInputs: signInputs };
 }
 
 export async function sendBTC({
@@ -90,6 +91,7 @@ export async function sendBTC({
   networkType,
   changeAddress,
   feeRate,
+  chainType,
   isOpcat,
   enableRBF = true,
   memo,
@@ -103,23 +105,25 @@ export async function sendBTC({
   networkType: NetworkType;
   changeAddress: string;
   feeRate: number;
-  isOpcat?: boolean
+  chainType?: ChainType;
+  /** @deprecated Use chainType instead. */
+  isOpcat?: boolean;
   enableRBF?: boolean;
   memo?: string;
   memos?: string[];
 }) {
-  if (isOpcat) {
+  const resolvedChainType = resolveChainType({ chainType, isOpcat });
+  if (resolvedChainType === ChainType.OPCAT) {
     return sendOpcatBtc({
       btcUtxos,
       tos,
       networkType,
       changeAddress,
       feeRate,
-      isOpcat,
       enableRBF,
       memo,
       memos
-    })
+    });
   }
   if (utxoHelper.hasAnyAssets(btcUtxos)) {
     throw new WalletUtilsError(ErrorCodes.NOT_SAFE_UTXOS);
@@ -127,6 +131,7 @@ export async function sendBTC({
 
   const tx = new Transaction();
   tx.setNetworkType(networkType);
+  tx.setChainType(resolvedChainType);
   tx.setFeeRate(feeRate);
   tx.setEnableRBF(enableRBF);
   tx.setChangeAddress(changeAddress);
@@ -161,6 +166,7 @@ export async function sendAllBTC({
   toAddress,
   networkType,
   feeRate,
+  chainType,
   isOpcat,
   enableRBF = true
 }: {
@@ -168,20 +174,21 @@ export async function sendAllBTC({
   toAddress: string;
   networkType: NetworkType;
   feeRate: number;
+  chainType?: ChainType;
+  /** @deprecated Use chainType instead. */
   isOpcat?: boolean;
   enableRBF?: boolean;
 }) {
-
-  if (isOpcat) {
+  const resolvedChainType = resolveChainType({ chainType, isOpcat });
+  if (resolvedChainType === ChainType.OPCAT) {
     return sendOpcatBtc({
       btcUtxos,
       tos: [],
       networkType,
       changeAddress: toAddress,
       feeRate,
-      isOpcat,
       enableRBF
-    })
+    });
   }
 
   if (utxoHelper.hasAnyAssets(btcUtxos)) {
@@ -190,6 +197,7 @@ export async function sendAllBTC({
 
   const tx = new Transaction();
   tx.setNetworkType(networkType);
+  tx.setChainType(resolvedChainType);
   tx.setFeeRate(feeRate);
   tx.setEnableRBF(enableRBF);
   tx.addOutput(toAddress, UTXO_DUST);
