@@ -122,12 +122,12 @@ export function decodeAddress(address: string) {
   return {
     networkType: NetworkType.MAINNET,
     addressType: AddressType.UNKNOWN,
-    dust: 546
+    dust: 1
   };
 }
 
 function getAddressTypeDust(addressType: AddressType) {
-  return 546;
+  return 1;
 }
 
 /**
