@@ -408,8 +408,8 @@
   "active_addresses_24h": {
     "message": "アクティブアドレス (24時間)"
   },
-  "go_to_unisat_explorer": {
-    "message": "UniScanへ移動"
+  "go_to_explorer": {
+    "message": "エクスプローラーへ移動"
   },
   "search_address_and_txids": {
     "message": "アドレスとTXIDを検索"
@@ -852,7 +852,7 @@
   "your_access_to_this_page_has_been_restricted_by_un": {
     "message": "安全でない可能性があるため、このページへのアクセスはCatena Walletによって制限されています。"
   },
-  "reject_blocked_by_unisat_wallet": {
+  "reject_blocked_by_wallet": {
     "message": "拒否 (Catena Walletによりブロック)"
   },
   "warning": {
@@ -861,7 +861,7 @@
   "i_am_aware_of_the_risks": {
     "message": "リスクを承知しています"
   },
-  "connect_with_unisat_wallet": {
+  "connect_with_wallet": {
     "message": "Catena Walletに接続"
   },
   "select_the_account_to_use_on_this_site": {
@@ -1167,9 +1167,6 @@
   "confirm": {
     "message": "確認"
   },
-  "unisat": {
-    "message": "UNISAT"
-  },
   "try_again": {
     "message": "再試行"
   },
@@ -1365,7 +1362,7 @@
   "danger_potential_phishing_website_detected": {
     "message": "危険！潜在的なフィッシングウェブサイトが検出されました"
   },
-  "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
+  "this_website_has_been_identified_as_malicious_and_may": {
     "message": "このウェブサイトはCatenaによって悪意があると特定されており、以下の可能性があります："
   },
   "steal_your_private_keys_or_seed_phrases": {
@@ -1521,9 +1518,6 @@
   "date": {
     "message": "日付"
   },
-  "view_on_unisat_explorer": {
-    "message": "Opcat Explorerで表示"
-  },
   "view_on_okx_explorer": {
     "message": "OKX Explorerで表示"
   },
@@ -1677,7 +1671,7 @@
   "address_or_name_fb": {
     "message": "アドレス"
   },
-  "address_or_name_sats_unisat_etc": {
+  "address_or_name": {
     "message": "アドレス"
   },
   "does_not_exist": {
