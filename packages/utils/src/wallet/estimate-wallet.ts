@@ -100,15 +100,10 @@ export class EstimateWallet implements AbstractWallet {
         if (script && !isSigned) {
           const address = scriptPkToAddress(script, this.networkType);
           if (accountAddress === address) {
-            // Never adopt a sighash type declared in the PSBT: a SIGHASH_NONE / SINGLE / ANYONECANPAY
-            // signature would not commit to the outputs the caller was shown.
-            if (v.sighashType !== undefined && v.sighashType !== bitcoin.Transaction.SIGHASH_ALL) {
-              throw new Error(`input ${index} declares sighash type ${v.sighashType}; only SIGHASH_ALL is supported`);
-            }
             toSignInputs.push({
               index,
               publicKey: accountPubkey,
-              sighashTypes: [bitcoin.Transaction.SIGHASH_ALL]
+              sighashTypes: v.sighashType ? [v.sighashType] : undefined
             });
           }
         }

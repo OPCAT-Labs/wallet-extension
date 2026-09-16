@@ -11,7 +11,7 @@ import BaseController from '../base';
 import wallet from '../wallet';
 
 import { psbtFromHex, estimatePsbtFeeInfo } from '@/background/utils/psbt';
-import { assertSignRequestSighashAllowed } from '@/background/utils/toSignInputs';
+import { findSighashNoneInputs } from '@/background/utils/toSignInputs';
 import { formatPsbtHex } from '@/ui/utils/psbt-utils';
 
 
@@ -257,8 +257,6 @@ class ProviderController extends BaseController {
     }
 
     params.psbtHex = formatPsbtHex(params.psbtHex);
-    // Refuse non-SIGHASH_ALL requests before an approval window opens.
-    assertSignRequestSighashAllowed(psbtFromHex(params.psbtHex), params.options?.toSignInputs);
   }])
   signPsbt = async ({ data: { params: { psbtHex, options } }, approvalRes }) => {
     if (approvalRes && approvalRes.signed==true) {
@@ -280,9 +278,6 @@ class ProviderController extends BaseController {
     })
 
     params.psbtHexs = params.psbtHexs.map(psbtHex => formatPsbtHex(psbtHex));
-    params.psbtHexs.forEach((psbtHex, i) =>
-      assertSignRequestSighashAllowed(psbtFromHex(psbtHex), params.options?.[i]?.toSignInputs)
-    );
   }])
   multiSignPsbt = async ({ data: { params: { psbtHexs, options } } }) => {
     const account = await wallet.getCurrentAccount();
@@ -552,6 +547,11 @@ class ProviderController extends BaseController {
     // Estimate fee using ExtPsbt's proper size calculation (handles data/OP_RETURN outputs)
     const { feeRate } = estimatePsbtFeeInfo(psbtHex);
     const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
+    // No approval screen can warn the user here, and a SIGHASH_NONE signature commits to none of the
+    // outputs the limit checks above were computed from, so it is refused outright.
+    if (findSighashNoneInputs(psbt.data.inputs, toSignInputs).length > 0) {
+      throw new Error('SmallPay does not auto-sign SIGHASH_NONE inputs');
+    }
 
     // Validate the payment
     const validation = wallet.validateSmallPayment(origin, amount, feeRate);
