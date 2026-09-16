@@ -11,6 +11,7 @@ import BaseController from '../base';
 import wallet from '../wallet';
 
 import { psbtFromHex, estimatePsbtFeeInfo } from '@/background/utils/psbt';
+import { assertSignRequestSighashAllowed } from '@/background/utils/toSignInputs';
 import { formatPsbtHex } from '@/ui/utils/psbt-utils';
 
 
@@ -256,6 +257,8 @@ class ProviderController extends BaseController {
     }
 
     params.psbtHex = formatPsbtHex(params.psbtHex);
+    // Refuse non-SIGHASH_ALL requests before an approval window opens.
+    assertSignRequestSighashAllowed(psbtFromHex(params.psbtHex), params.options?.toSignInputs);
   }])
   signPsbt = async ({ data: { params: { psbtHex, options } }, approvalRes }) => {
     if (approvalRes && approvalRes.signed==true) {
@@ -277,6 +280,9 @@ class ProviderController extends BaseController {
     })
 
     params.psbtHexs = params.psbtHexs.map(psbtHex => formatPsbtHex(psbtHex));
+    params.psbtHexs.forEach((psbtHex, i) =>
+      assertSignRequestSighashAllowed(psbtFromHex(psbtHex), params.options?.[i]?.toSignInputs)
+    );
   }])
   multiSignPsbt = async ({ data: { params: { psbtHexs, options } } }) => {
     const account = await wallet.getCurrentAccount();

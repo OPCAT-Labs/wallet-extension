@@ -20,7 +20,6 @@ import {
   WalletConfig,
   UTXO
 } from '@/shared/types';
-import { ToSignInput } from '@opcat-labs/wallet-sdk';
 import {UTXO as SDK_UTXO} from '@opcat-labs/scrypt-ts-opcat'
 
 import { preferenceService } from '.';
@@ -468,24 +467,6 @@ export class OpenApiService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async decodeContracts(contracts: any[], account: any): Promise<any> {
     return this.httpPost('/v5/tx/decode-contracts', { contracts, account });
-  }
-
-  async createSendCoinBypassHeadOffsets(
-    address: string,
-    pubkey: string,
-    tos: { address: string; satoshis: number }[],
-    feeRate: number
-  ): Promise<{
-    psbtBase64: string;
-    toSignInputs: ToSignInput[];
-  }> {
-    return this.httpPost('/v5/tx/create-send-btc', {
-      fromAddress: address,
-      fromPubkey: pubkey,
-      tos,
-      feeRate,
-      bypassHeadOffsets: true
-    });
   }
 }
 

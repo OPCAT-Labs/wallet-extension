@@ -231,14 +231,6 @@ export const WALLETCONNECT_STATUS_MAP = {
   FAILD: 6
 };
 
-export const INTERNAL_REQUEST_ORIGIN = 'https://unisat.io';
-
-export const INTERNAL_REQUEST_SESSION = {
-  name: 'UniSat Wallet',
-  origin: INTERNAL_REQUEST_ORIGIN,
-  icon: './images/logo/logo@128x.png'
-};
-
 export const EVENTS = {
   broadcastToUI: 'broadcastToUI',
   broadcastToBackground: 'broadcastToBackground',
