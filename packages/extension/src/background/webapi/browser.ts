@@ -159,6 +159,10 @@ export function browserRuntimeOnConnect(listener) {
   browser.runtime.onConnect.addListener(listener);
 }
 
+export function browserRuntimeId(): string {
+  return browser.runtime.id;
+}
+
 export function browserRuntimeOnInstalled(listener) {
   browser.runtime.onInstalled.addListener(listener);
 }

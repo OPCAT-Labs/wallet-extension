@@ -196,7 +196,6 @@ export default function WalletTabScreen() {
 
           <BalanceCard
             accountBalance={accountBalance}
-            disableUtxoTools={walletConfig.disableUtxoTools}
             enableRefresh={isSidePanel}
           />
 

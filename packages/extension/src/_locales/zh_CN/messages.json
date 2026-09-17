@@ -60,8 +60,8 @@
   "active_addresses_24h": {
     "message": "活跃地址 (24h)"
   },
-  "go_to_unisat_explorer": {
-    "message": "前往 UniScan"
+  "go_to_explorer": {
+    "message": "前往区块浏览器"
   },
   "search_address_and_txids": {
     "message": "搜索地址和交易ID"
@@ -859,7 +859,7 @@
   "your_access_to_this_page_has_been_restricted_by_un": {
     "message": "您对此页面的访问已被 Catena 钱包限制，因为它可能不安全。"
   },
-  "reject_blocked_by_unisat_wallet": {
+  "reject_blocked_by_wallet": {
     "message": "拒绝（被 Catena 钱包阻止）"
   },
   "this_token_only_supports_up_to": {
@@ -922,7 +922,7 @@
   "i_am_aware_of_the_risks": {
     "message": "我已了解风险"
   },
-  "connect_with_unisat_wallet": {
+  "connect_with_wallet": {
     "message": "连接 Catena 钱包"
   },
   "select_the_account_to_use_on_this_site": {
@@ -1232,9 +1232,6 @@
   "confirm": {
     "message": "确认"
   },
-  "unisat": {
-    "message": "UNISAT"
-  },
   "try_again": {
     "message": "重试"
   },
@@ -1445,7 +1442,7 @@
   "danger_potential_phishing_website_detected": {
     "message": "危险！检测到潜在的钓鱼网站"
   },
-  "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
+  "this_website_has_been_identified_as_malicious_and_may": {
     "message": "此网站已被 Catena 识别为恶意网站，可能："
   },
   "steal_your_private_keys_or_seed_phrases": {
@@ -1507,9 +1504,6 @@
   },
   "date": {
     "message": "日期"
-  },
-  "view_on_unisat_explorer": {
-    "message": "在 Opcat Explorer 上查看"
   },
   "view_on_okx_explorer": {
     "message": "在 OKX Explorer 上查看"
@@ -1652,7 +1646,7 @@
   "address_or_name_fb": {
     "message": "地址"
   },
-  "address_or_name_sats_unisat_etc": {
+  "address_or_name": {
     "message": "地址"
   },
   "does_not_exist": {

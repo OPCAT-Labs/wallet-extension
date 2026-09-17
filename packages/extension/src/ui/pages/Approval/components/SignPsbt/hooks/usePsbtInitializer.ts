@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 
 import { KEYRING_TYPE } from '@/shared/constant';
-import { TxType } from '@/shared/types';
+import { RiskType, TxType } from '@/shared/types';
+import { findSighashNoneInputs } from '@/background/utils/toSignInputs';
 
 export const usePsbtInitializer = (setTxInfo, setLoading, tools) => {
   const initializePsbt = useCallback(
@@ -66,6 +67,22 @@ export const usePsbtInitializer = (setTxInfo, setLoading, tools) => {
           }));
         } else {
           toSignInputs = await wallet.formatOptionsToSignInputs(finalPsbtHex, options);
+        }
+
+        // The backend only sees the sighash declared on the PSBT input; a page can also pick the
+        // type through options.toSignInputs[].sighashTypes. Flag SIGHASH_NONE from either source so
+        // the risk popover forces an explicit acknowledgement before signing.
+        const sighashNoneInputs = findSighashNoneInputs(decodedPsbt.inputInfos, toSignInputs);
+        if (sighashNoneInputs.length > 0 && !decodedPsbt.risks.some((r) => r.type === RiskType.SIGHASH_NONE)) {
+          decodedPsbt.risks.push({
+            type: RiskType.SIGHASH_NONE,
+            level: 'danger',
+            title: 'SIGHASH_NONE signature requested',
+            desc:
+              `Input ${sighashNoneInputs.join(', ')} will be signed with SIGHASH_NONE. ` +
+              'Such a signature does not commit to any output: whoever holds it can move the full value of that input to any address, ' +
+              'regardless of the outputs shown on this screen.'
+          });
         }
 
         // handle contract information

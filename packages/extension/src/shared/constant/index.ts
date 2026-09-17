@@ -123,7 +123,7 @@ export const ADDRESS_TYPES: {
 
 export const getRestoreWallets = (): { value: RestoreWalletType; name: string; addressTypes: AddressType[] }[] => [
   {
-    value: RestoreWalletType.UNISAT,
+    value: RestoreWalletType.CATENA,
     name: 'Catena Wallet',
     addressTypes: [
       AddressType.P2PKH
@@ -150,13 +150,11 @@ export type TypeChain = {
   networkType: NetworkType;
   endpoints: string[];
   mempoolSpaceUrl: string;
-  unisatUrl: string;
-  unisatExplorerUrl: string;
   okxExplorerUrl: string;
   isViewTxHistoryInternally?: boolean;
   disable?: boolean;
   showPrice: boolean;
-  defaultExplorer: 'mempool-space' | 'unisat-explorer';
+  defaultExplorer: 'mempool-space';
 };
 
 export const CHAINS_MAP: { [key: string]: TypeChain } = {
@@ -169,8 +167,6 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
     networkType: NetworkType.MAINNET,
     endpoints: ['https://wallet-api.opcatlabs.io'],
     mempoolSpaceUrl: 'https://mempool.opcatlabs.io',
-    unisatUrl: '',
-    unisatExplorerUrl: '',
     okxExplorerUrl: '',
     isViewTxHistoryInternally: false,
     showPrice: false,
@@ -186,8 +182,6 @@ export const CHAINS_MAP: { [key: string]: TypeChain } = {
     endpoints: ['https://testnet-wallet-api.opcatlabs.io'],
     // endpoints: ['http://127.0.0.1:3000'],
     mempoolSpaceUrl: 'https://testnet.opcatlabs.io',
-    unisatUrl: '',
-    unisatExplorerUrl: '',
     okxExplorerUrl: '',
     isViewTxHistoryInternally: false,
     showPrice: false,
@@ -229,14 +223,6 @@ export const WALLETCONNECT_STATUS_MAP = {
   SIBMITTED: 4,
   REJECTED: 5,
   FAILD: 6
-};
-
-export const INTERNAL_REQUEST_ORIGIN = 'https://unisat.io';
-
-export const INTERNAL_REQUEST_SESSION = {
-  name: 'UniSat Wallet',
-  origin: INTERNAL_REQUEST_ORIGIN,
-  icon: './images/logo/logo@128x.png'
 };
 
 export const EVENTS = {

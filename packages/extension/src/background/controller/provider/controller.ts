@@ -11,6 +11,7 @@ import BaseController from '../base';
 import wallet from '../wallet';
 
 import { psbtFromHex, estimatePsbtFeeInfo } from '@/background/utils/psbt';
+import { findSighashNoneInputs } from '@/background/utils/toSignInputs';
 import { formatPsbtHex } from '@/ui/utils/psbt-utils';
 
 
@@ -546,6 +547,11 @@ class ProviderController extends BaseController {
     // Estimate fee using ExtPsbt's proper size calculation (handles data/OP_RETURN outputs)
     const { feeRate } = estimatePsbtFeeInfo(psbtHex);
     const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
+    // No approval screen can warn the user here, and a SIGHASH_NONE signature commits to none of the
+    // outputs the limit checks above were computed from, so it is refused outright.
+    if (findSighashNoneInputs(psbt.data.inputs, toSignInputs).length > 0) {
+      throw new Error('SmallPay does not auto-sign SIGHASH_NONE inputs');
+    }
 
     // Validate the payment
     const validation = wallet.validateSmallPayment(origin, amount, feeRate);

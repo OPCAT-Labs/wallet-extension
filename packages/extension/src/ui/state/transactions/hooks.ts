@@ -5,7 +5,6 @@ import { RawTxInfo, ToAddressInfo, UTXO } from '@/shared/types';
 import { useTools } from '@/ui/components/ActionComponent';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { satoshisToBTC, sleep, useWallet } from '@/ui/utils';
-import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 
 import { psbtFromHex } from '@/background/utils/psbt';
 import { AppState } from '..';
@@ -106,56 +105,6 @@ export function usePrepareSendBTCCallback() {
       return rawTxInfo;
     },
     [dispatch, wallet, fromAddress, utxos, fetchUtxos]
-  );
-}
-
-export function usePrepareSendBypassHeadOffsetsCallback() {
-  const dispatch = useAppDispatch();
-  const wallet = useWallet();
-  const fromAddress = useAccountAddress();
-  const account = useCurrentAccount();
-  return useCallback(
-    async ({
-      toAddressInfo,
-      toAmount,
-      feeRate
-    }: {
-      toAddressInfo: ToAddressInfo;
-      toAmount: number;
-      feeRate: number;
-    }) => {
-      const psbtHex = await wallet.sendCoinBypassHeadOffsets(
-        [
-          {
-            address: toAddressInfo.address,
-            satoshis: toAmount
-          }
-        ],
-        feeRate
-      );
-
-      const psbt = bitcoin.Psbt.fromHex(psbtHex);
-
-      const rawtx = account.type === KEYRING_TYPE.KeystoneKeyring ? '' : psbt.extractTransaction(true).toHex();
-      const fee = account.type === KEYRING_TYPE.KeystoneKeyring ? 0 : psbt.getFee();
-
-      dispatch(
-        transactionsActions.updateBitcoinTx({
-          rawtx,
-          psbtHex,
-          fromAddress,
-          feeRate
-        })
-      );
-      const rawTxInfo: RawTxInfo = {
-        psbtHex,
-        rawtx,
-        toAddressInfo,
-        fee
-      };
-      return rawTxInfo;
-    },
-    [dispatch, wallet, fromAddress]
   );
 }
 

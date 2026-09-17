@@ -405,8 +405,8 @@
   "active_addresses_24h": {
     "message": "Direcciones Activas (24h)"
   },
-  "go_to_unisat_explorer": {
-    "message": "Ir al UniScan"
+  "go_to_explorer": {
+    "message": "Ir al explorador"
   },
   "search_address_and_txids": {
     "message": "Buscar Dirección y TXIDs"
@@ -852,7 +852,7 @@
   "your_access_to_this_page_has_been_restricted_by_un": {
     "message": "Tu acceso a esta página ha sido restringido por Catena Wallet ya que podría ser inseguro."
   },
-  "reject_blocked_by_unisat_wallet": {
+  "reject_blocked_by_wallet": {
     "message": "Rechazar (bloqueado por Catena Wallet)"
   },
   "warning": {
@@ -861,7 +861,7 @@
   "i_am_aware_of_the_risks": {
     "message": "Soy consciente de los riesgos"
   },
-  "connect_with_unisat_wallet": {
+  "connect_with_wallet": {
     "message": "Conectar con Catena Wallet"
   },
   "select_the_account_to_use_on_this_site": {
@@ -1168,9 +1168,6 @@
   "confirm": {
     "message": "Confirmar"
   },
-  "unisat": {
-    "message": "UNISAT"
-  },
   "try_again": {
     "message": "Intentar de nuevo"
   },
@@ -1366,7 +1363,7 @@
   "danger_potential_phishing_website_detected": {
     "message": "¡Peligro! Detectado sitio web de phishing potencial"
   },
-  "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
+  "this_website_has_been_identified_as_malicious_and_may": {
     "message": "Este sitio web ha sido identificado como malicioso por Catena y puede:"
   },
   "steal_your_private_keys_or_seed_phrases": {
@@ -1522,9 +1519,6 @@
   "date": {
     "message": "Fecha"
   },
-  "view_on_unisat_explorer": {
-    "message": "Ver en Explorador Opcat"
-  },
   "view_on_okx_explorer": {
     "message": "Ver en Explorador OKX"
   },
@@ -1678,7 +1672,7 @@
   "address_or_name_fb": {
     "message": "Dirección"
   },
-  "address_or_name_sats_unisat_etc": {
+  "address_or_name": {
     "message": "Dirección"
   },
   "does_not_exist": {

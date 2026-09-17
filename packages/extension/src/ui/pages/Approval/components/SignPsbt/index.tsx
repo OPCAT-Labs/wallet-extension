@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { KEYRING_TYPE } from '@/shared/constant';
 import { KeystoneSignEnum } from '@/shared/constant/KeystoneSignType';
-import { TxType } from '@/shared/types';
-import { Column, Content, Footer, Header, Layout } from '@/ui/components';
+import { RiskType, TxType } from '@/shared/types';
+import { Column, Content, Footer, Header, Icon, Layout, Row, Text } from '@/ui/components';
 import { useTools } from '@/ui/components/ActionComponent';
 import { ContractPopover } from '@/ui/components/ContractPopover';
 import LoadingPage from '@/ui/components/LoadingPage';
@@ -123,6 +123,11 @@ export default function SignPsbt({
     [txInfo.decodedPsbt, txInfo.toSignInputs]
   );
 
+  const hasSighashNoneRisk = useMemo(
+    () => txInfo.decodedPsbt.risks.some((r) => r.type === RiskType.SIGHASH_NONE),
+    [txInfo.decodedPsbt]
+  );
+
   const canChanged = useMemo(() => {
     let val = true;
     txInfo.decodedPsbt.inputInfos.forEach((v) => {
@@ -168,6 +173,16 @@ export default function SignPsbt({
       {header}
       <Content>
         <Column gap="xl">
+          {hasSighashNoneRisk && (
+            <Row itemsCenter gap="sm">
+              <Icon icon="alert" color="danger" />
+              <Text
+                text="This request asks for a SIGHASH_NONE signature: the signature will not commit to the outputs below, so the requester can spend the signed input however it likes."
+                color="danger"
+                preset="sub"
+              />
+            </Row>
+          )}
           {detailsComponent}
           <div />
 

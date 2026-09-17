@@ -66,7 +66,6 @@ export const svgRegistry = {
   merge: '/images/icons/merge.svg',
   paused: '/images/icons/paused.svg',
 
-  unisat: './images/icons/unisat.svg',
   gas: './images/icons/gas.svg',
   fb: './images/icons/fb.svg',
   trade: './images/icons/trade.svg',

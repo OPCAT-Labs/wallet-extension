@@ -6,11 +6,10 @@ import { RawTxInfo } from '@/shared/types';
 import { Button, Card, Column, Content, Header, Icon, Image, Input, Layout, Row, Text } from '@/ui/components';
 import { useTools } from '@/ui/components/ActionComponent';
 import { BtcUsd } from '@/ui/components/BtcUsd';
-import { getSpecialLocale, useI18n } from '@/ui/hooks/useI18n';
-import { useUtxoTools } from '@/ui/hooks/useUtxoTools';
+import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { useAccountBalance } from '@/ui/state/accounts/hooks';
-import { useBTCUnit, useChain, useWalletConfig } from '@/ui/state/settings/hooks';
+import { useBTCUnit, useChain } from '@/ui/state/settings/hooks';
 import { useBitcoinTx, useFetchUtxosCallback, usePrepareSendBTCCallback } from '@/ui/state/transactions/hooks';
 import { useUiTxCreateScreen, useUpdateUiTxCreateScreen } from '@/ui/state/ui/hooks';
 import { colors } from '@/ui/theme/colors';
@@ -24,12 +23,6 @@ export default function TxCreateScreen() {
   const navigate = useNavigate();
   const bitcoinTx = useBitcoinTx();
   const btcUnit = useBTCUnit();
-  const [isSpecialLocale, setIsSpecialLocale] = useState(false);
-  useEffect(() => {
-    getSpecialLocale().then(({ isSpecialLocale }) => {
-      setIsSpecialLocale(isSpecialLocale);
-    });
-  }, []);
   const [disabled, setDisabled] = useState(true);
 
   const setUiState = useUpdateUiTxCreateScreen();
@@ -73,7 +66,6 @@ export default function TxCreateScreen() {
   const showUnavailable = false;
 
   const chain = useChain();
-  const { openUtxoTools } = useUtxoTools(chain);
   useEffect(() => {
     setError('');
     setDisabled(true);
@@ -124,19 +116,10 @@ export default function TxCreateScreen() {
       });
   }, [toInfo, inputAmount, feeRate, enableRBF]);
 
-  const walletConfig = useWalletConfig();
-
-  const unavailableTipText = useMemo(() => {
-    let tipText = '';
-    tipText += t('unavailable_tooltip');
-
-    if (walletConfig.disableUtxoTools) {
-      tipText += t('future_versions_will_support_spending_these_assets');
-    } else {
-      tipText += t('you_can_unlock_these_assets_by_using_the_utxos_tools');
-    }
-    return tipText;
-  }, [chain.enum]);
+  const unavailableTipText = useMemo(
+    () => t('unavailable_tooltip') + t('future_versions_will_support_spending_these_assets'),
+    [chain.enum]
+  );
 
   return (
     <Layout>
@@ -241,18 +224,6 @@ export default function TxCreateScreen() {
                     <Text text={`${unavailableAmount}`} size="sm" />
                     <Text text={btcUnit} size="sm" color="textDim" />
                   </Row>
-                  {walletConfig.disableUtxoTools ? null : (
-                    <Button
-                      preset="minimal"
-                      text={t('unlock')}
-                      textStyle={{
-                        fontSize: isSpecialLocale ? '8px' : '14px'
-                      }}
-                      onClick={() => {
-                        openUtxoTools();
-                      }}
-                    />
-                  )}
                 </Row>
               </Row>
             ) : null}

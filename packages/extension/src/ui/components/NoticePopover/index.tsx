@@ -13,7 +13,7 @@ import { Row } from '../Row';
 import { Text } from '../Text';
 
 /**
- * this component is from unisat wallet, currently we don't have this feature.
+ * inherited from the upstream wallet; currently we don't have this feature.
  * but we still keep it here for future reference.
  * we disable it by commenting all `setShowSafeNotice(true)`
  */
