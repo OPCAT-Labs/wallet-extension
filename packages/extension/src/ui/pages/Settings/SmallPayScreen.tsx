@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { SmallPayHistoryItem } from '@/background/service/smallPay';
 import { Button, Card, Column, Content, Header, Layout, Row, Text } from '@/ui/components';
+import { useTools } from '@/ui/components/ActionComponent';
 import { Empty } from '@/ui/components/Empty';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { colors } from '@/ui/theme/colors';
@@ -11,6 +12,7 @@ import { useWallet } from '@/ui/utils';
 
 export default function SmallPayScreen() {
   const wallet = useWallet();
+  const tools = useTools();
   const { t } = useI18n();
   const chain = useChain();
 
@@ -53,22 +55,32 @@ export default function SmallPayScreen() {
     setEnabled(newValue);
   };
 
+  // Persist first and reflect the value only once the background accepted it, so a rejected
+  // value (negative, fractional, single > daily) snaps back instead of showing as saved.
   const handleSingleLimitChange = async (value: number | null) => {
     if (value == null || value < 0) return;
-    setSingleLimit(value);
-    await wallet.setSmallPaySingleLimit(value);
+    try {
+      await wallet.setSmallPaySingleLimit(value);
+      setSingleLimit(value);
+    } catch (e) {
+      tools.toastError((e as Error).message);
+    }
   };
 
   const handleDailyLimitChange = async (value: number | null) => {
     if (value == null || value < 0) return;
-    setDailyLimit(value);
-    await wallet.setSmallPayDailyLimit(value);
+    try {
+      await wallet.setSmallPayDailyLimit(value);
+      setDailyLimit(value);
+    } catch (e) {
+      tools.toastError((e as Error).message);
+    }
   };
 
+  // Entries still inside the 24h window are kept by the background; reload rather than assume empty.
   const handleClearHistory = async () => {
     await wallet.clearSmallPayHistory();
-    setHistory([]);
-    setSpent24h(0);
+    await loadData();
   };
 
   const formatSats = (sats: number) => {
@@ -220,6 +232,7 @@ export default function SmallPayScreen() {
                   preset="default"
                   onClick={handleClearHistory}
                 />
+                <Text text={t('smallpay_clear_history_note')} preset="sub" size="xxs" color="textDim" textCenter />
               </>
             ) : (
               <Card style={{ borderRadius: 10 }}>

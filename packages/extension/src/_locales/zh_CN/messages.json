@@ -2234,6 +2234,9 @@
   "smallpay_clear_history": {
     "message": "清除历史"
   },
+  "smallpay_clear_history_note": {
+    "message": "最近 24 小时内的支付记录会保留，以保证每日限额准确。"
+  },
   "smallpay_remove_site": {
     "message": "移除"
   },

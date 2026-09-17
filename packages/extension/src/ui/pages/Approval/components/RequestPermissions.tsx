@@ -53,13 +53,14 @@ export default function RequestPermissions({ params: { data, session } }: Props)
   const { t } = useI18n();
   const requestedPerms = data.permissions || [];
 
-  // Track which permissions user has checked (connect always on)
+  // Track which permissions user has checked. Only 'connect' starts checked: the others —
+  // smallPay in particular — are opt-in, as on the Connect screen.
   const [checked, setChecked] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const initial: Record<string, boolean> = {};
     for (const p of requestedPerms) {
-      initial[p] = true;
+      initial[p] = p === 'connect';
     }
     initial['connect'] = true; // always required
     setChecked(initial);

@@ -1,5 +1,7 @@
 import { createPersistStore } from '@/background/utils';
 
+import permissionService from './permission';
+
 export interface SmallPayWhitelistItem {
   origin: string;
   logo?: string;
@@ -20,13 +22,41 @@ export interface SmallPayStore {
   maxFeeRate: number; // sat/byteyte
   whitelist: SmallPayWhitelistItem[];
   history: SmallPayHistoryItem[];
+  version?: number;
+}
+
+interface PendingPayment {
+  id: number;
+  origin: string;
+  amount: number;
 }
 
 // Default values
 const DEFAULT_SINGLE_PAYMENT_LIMIT = 10000; // 10,000 sats
 const DEFAULT_DAILY_LIMIT = 5000000; // 5,000,000 sats (0.05 BTC)
 const DEFAULT_MAX_FEE_RATE = 0.01; // 0.01 sat/byte
+const LEGACY_DEFAULT_MAX_FEE_RATE = 1000; // sat/vB default before the 0.01 sat/byte default
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+const MAX_HISTORY_ENTRIES = 1000;
+const STORE_VERSION = 1;
+
+function assertSats(value: number, what: string) {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new Error(`${what} must be a non-negative integer number of sats`);
+  }
+}
+
+/**
+ * One-shot schema migrations keyed on store.version, so they never re-run on a later
+ * service-worker start (the fee-rate reset used to run on every init and wiped user settings).
+ */
+export function migrateStore(store: SmallPayStore) {
+  const version = store.version ?? 0;
+  if (version < 1 && store.maxFeeRate === LEGACY_DEFAULT_MAX_FEE_RATE) {
+    store.maxFeeRate = DEFAULT_MAX_FEE_RATE;
+  }
+  store.version = STORE_VERSION;
+}
 
 class SmallPayService {
   store!: SmallPayStore;
@@ -40,7 +70,8 @@ class SmallPayService {
         dailyLimit: DEFAULT_DAILY_LIMIT,
         maxFeeRate: DEFAULT_MAX_FEE_RATE,
         whitelist: [],
-        history: []
+        history: [],
+        version: STORE_VERSION
       }
     });
 
@@ -57,17 +88,20 @@ class SmallPayService {
     if (typeof this.store.maxFeeRate !== 'number') {
       this.store.maxFeeRate = DEFAULT_MAX_FEE_RATE;
     }
-    // Migrate old default fee rate (1000 sat/vB) to new default (0.01 sat/byte)
-    if (this.store.maxFeeRate >= 1) {
-      this.store.maxFeeRate = DEFAULT_MAX_FEE_RATE;
-    }
     if (!Array.isArray(this.store.whitelist)) {
       this.store.whitelist = [];
     }
     if (!Array.isArray(this.store.history)) {
       this.store.history = [];
     }
+    migrateStore(this.store);
   };
+
+  // In-flight payments: counted against the 24h limit from the moment they are validated until
+  // they are recorded or abandoned, so concurrent smallPay requests cannot all pass against the
+  // same pre-spend total. Not persisted: a request does not survive a service-worker restart either.
+  private pending: PendingPayment[] = [];
+  private nextReservationId = 1;
 
   // Enable/Disable SmallPay
   isEnabled = (): boolean => {
@@ -84,6 +118,10 @@ class SmallPayService {
   };
 
   setSinglePaymentLimit = (limit: number) => {
+    assertSats(limit, 'single payment limit');
+    if (limit > this.store.dailyLimit) {
+      throw new Error('single payment limit cannot exceed the daily limit');
+    }
     this.store.singlePaymentLimit = limit;
   };
 
@@ -93,6 +131,10 @@ class SmallPayService {
   };
 
   setDailyLimit = (limit: number) => {
+    assertSats(limit, 'daily limit');
+    if (limit < this.store.singlePaymentLimit) {
+      throw new Error('daily limit cannot be lower than the single payment limit');
+    }
     this.store.dailyLimit = limit;
   };
 
@@ -102,6 +144,9 @@ class SmallPayService {
   };
 
   setMaxFeeRate = (rate: number) => {
+    if (!Number.isFinite(rate) || rate < 0) {
+      throw new Error('max fee rate must be a non-negative number');
+    }
     this.store.maxFeeRate = rate;
   };
 
@@ -137,32 +182,68 @@ class SmallPayService {
   };
 
   addToHistory = (origin: string, amount: number, txid: string) => {
-    this.store.history = [
-      ...this.store.history,
-      {
-        origin,
-        amount,
-        timestamp: Date.now(),
-        txid
-      }
-    ];
-    // Clean up old history (keep last 1000 entries)
-    if (this.store.history.length > 1000) {
-      this.store.history = this.store.history.slice(-1000);
-    }
+    const now = Date.now();
+    const history = [...this.store.history, { origin, amount, timestamp: now, txid }];
+    // Cap the log, but never evict an entry that still counts toward the 24h limit.
+    const cutoff = now - TWENTY_FOUR_HOURS_MS;
+    const firstFresh = history.findIndex((item) => item.timestamp >= cutoff);
+    const old = firstFresh === -1 ? history : history.slice(0, firstFresh);
+    const fresh = firstFresh === -1 ? [] : history.slice(firstFresh);
+    const keepOld = Math.max(0, MAX_HISTORY_ENTRIES - fresh.length);
+    this.store.history = [...(keepOld > 0 ? old.slice(-keepOld) : []), ...fresh];
   };
 
+  // Only drops entries that no longer count toward the 24h limit, so the enforced budget cannot
+  // be reset from the settings screen.
   clearHistory = () => {
-    this.store.history = [];
+    const cutoff = Date.now() - TWENTY_FOUR_HOURS_MS;
+    this.store.history = this.store.history.filter((item) => item.timestamp >= cutoff);
   };
 
-  // Calculate spent amount in last 24 hours
+  // Calculate spent amount in last 24 hours, including payments still in flight
   getSpentInLast24Hours = (): number => {
     const now = Date.now();
     const cutoff = now - TWENTY_FOUR_HOURS_MS;
-    return this.store.history
+    const recorded = this.store.history
       .filter((item) => item.timestamp >= cutoff)
       .reduce((sum, item) => sum + item.amount, 0);
+    const inFlight = this.pending.reduce((sum, item) => sum + item.amount, 0);
+    return recorded + inFlight;
+  };
+
+  /**
+   * Validate a payment and, if it passes, count it against the 24h limit immediately. Call
+   * settleReservation once the transaction is broadcast, or releaseReservation if it is not.
+   */
+  reservePayment = (
+    origin: string,
+    amount: number,
+    feeRate: number
+  ): { valid: true; reservationId: number } | { valid: false; error: string } => {
+    const check = this.validatePayment(origin, amount, feeRate);
+    if (!check.valid) {
+      return { valid: false, error: check.error as string };
+    }
+    const id = this.nextReservationId++;
+    this.pending.push({ id, origin, amount });
+    return { valid: true, reservationId: id };
+  };
+
+  settleReservation = (reservationId: number, txid: string) => {
+    const reservation = this.takePending(reservationId);
+    if (reservation) {
+      this.addToHistory(reservation.origin, reservation.amount, txid);
+    }
+  };
+
+  releaseReservation = (reservationId: number) => {
+    this.takePending(reservationId);
+  };
+
+  private takePending = (reservationId: number): PendingPayment | undefined => {
+    const index = this.pending.findIndex((item) => item.id === reservationId);
+    if (index === -1) return undefined;
+    return this.pending.splice(index, 1)[0];
   };
 
   // Get remaining daily allowance
@@ -182,7 +263,11 @@ class SmallPayService {
       return { valid: false, error: 'SmallPay is not enabled' };
     }
 
-    // Check if origin is approved
+    // The granular permission is the source of truth for authorization; the whitelist only
+    // carries display data and is cleared whenever the permission is revoked.
+    if (!permissionService.hasSitePermission(origin, 'smallPay')) {
+      return { valid: false, error: 'Origin does not hold the smallPay permission' };
+    }
     if (!this.isOriginApproved(origin)) {
       return { valid: false, error: 'Origin is not approved for SmallPay' };
     }
@@ -219,7 +304,7 @@ class SmallPayService {
   getStatusForOrigin = (origin: string) => {
     return {
       isEnabled: this.store.enabled,
-      isApproved: this.isOriginApproved(origin),
+      isApproved: this.isOriginApproved(origin) && permissionService.hasSitePermission(origin, 'smallPay'),
       singlePaymentLimit: this.store.singlePaymentLimit,
       dailyLimit: this.store.dailyLimit,
       maxFeeRate: this.store.maxFeeRate,
