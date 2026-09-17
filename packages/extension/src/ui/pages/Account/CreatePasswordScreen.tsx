@@ -24,7 +24,7 @@ export default function CreatePasswordScreen() {
       state[key] = value;
     });
   }
-  const { isNewAccount, isKeystone } = state as { isNewAccount: boolean; isKeystone: boolean };
+  const { isNewAccount } = state as { isNewAccount: boolean };
   const [newPassword, setNewPassword] = useState('');
   const { t } = useI18n();
 
@@ -35,9 +35,7 @@ export default function CreatePasswordScreen() {
   const tools = useTools();
   const [run] = useWalletRequest(wallet.boot, {
     onSuccess() {
-      if (isKeystone) {
-        navigate('CreateKeystoneWalletScreen', { fromUnlock: true });
-      } else if (isNewAccount) {
+      if (isNewAccount) {
         navigate('CreateHDWalletScreen', { isImport: false, fromUnlock: true });
       } else {
         navigate('CreateHDWalletScreen', { isImport: true, fromUnlock: true });
@@ -49,7 +47,10 @@ export default function CreatePasswordScreen() {
   });
 
   const btnClick = () => {
-    run(newPassword.trim());
+    // Boot with exactly the string that was validated above: trimming here stored a password the
+    // user could never type again on the unlock screen (which does not trim), and let an
+    // all-whitespace input through the minimum-length check as an empty vault password.
+    run(newPassword);
   };
 
   useEffect(() => {

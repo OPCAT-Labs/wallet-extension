@@ -77,15 +77,18 @@ class NotificationService extends Events {
     this.emit('reject', err);
   };
 
-  // currently it only support one approval at the same time
+  // Only one approval can be pending at a time. A second request is refused rather than allowed
+  // to replace the pending one: overriding it dropped the first requester's promise (it never
+  // settled) and swapped the window under the user's cursor, so a click meant for one origin's
+  // request could land on another's.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requestApproval = async (data: any, winProps?: any): Promise<any> => {
-    // if (preferenceService.getPopupOpen()) {
-    //   this.approval = null;
-    //   throw ethErrors.provider.userRejectedRequest('please request after user close current popup');
-    // }
+    if (this.approval) {
+      throw ethErrors.provider.userRejectedRequest(
+        'please request after the current approval is resolved'
+      );
+    }
 
-    // We will just override the existing open approval with the new one coming in
     return new Promise((resolve, reject) => {
       this.approval = {
         data,
@@ -121,9 +124,15 @@ class NotificationService extends Events {
       winMgr.remove(this.notifiWindowId);
       this.notifiWindowId = 0;
     }
-    winMgr.openNotification(winProps).then((winId) => {
-      this.notifiWindowId = winId!;
-    });
+    winMgr.openNotification(winProps)
+      .then((winId) => {
+        this.notifiWindowId = winId!;
+      })
+      .catch((e) => {
+        // Never leave a pending approval behind that no window can resolve: it would block every
+        // later request.
+        this.rejectApproval(String(e), false, true);
+      });
   };
 }
 
