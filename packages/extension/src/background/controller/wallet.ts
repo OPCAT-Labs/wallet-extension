@@ -1167,6 +1167,7 @@ export class WalletController extends BaseController {
   removeConnectedSite = (origin: string) => {
     sessionService.broadcastEvent('accountsChanged', [], origin);
     permissionService.removeConnectedSite(origin);
+    smallPayService.removeFromWhitelist(origin);
   };
 
   grantSitePermissions = (origin: string, permissions: string[]) => {
@@ -1175,6 +1176,9 @@ export class WalletController extends BaseController {
 
   revokeSitePermission = (origin: string, permission: string) => {
     permissionService.revokePermission(origin, permission as any);
+    if (permission === 'smallPay' || permission === 'connect') {
+      smallPayService.removeFromWhitelist(origin);
+    }
   };
 
   setKeyringAlianName = (keyring: WalletKeyring, name: string) => {
@@ -1519,17 +1523,24 @@ export class WalletController extends BaseController {
   };
 
   /**
-   * Validate a SmallPay payment
+   * Validate a SmallPay payment and count it against the 24h limit while it is in flight
    */
-  validateSmallPayment = (origin: string, amount: number, feeRate: number) => {
-    return smallPayService.validatePayment(origin, amount, feeRate);
+  reserveSmallPayment = (origin: string, amount: number, feeRate: number) => {
+    return smallPayService.reservePayment(origin, amount, feeRate);
   };
 
   /**
-   * Record a SmallPay payment in history
+   * Record a reserved SmallPay payment in history once it is broadcast
    */
-  recordSmallPayment = (origin: string, amount: number, txid: string) => {
-    smallPayService.addToHistory(origin, amount, txid);
+  settleSmallPayment = (reservationId: number, txid: string) => {
+    smallPayService.settleReservation(reservationId, txid);
+  };
+
+  /**
+   * Drop a reserved SmallPay payment that was not broadcast
+   */
+  releaseSmallPayment = (reservationId: number) => {
+    smallPayService.releaseReservation(reservationId);
   };
 
   getEnableSignData = async () => {

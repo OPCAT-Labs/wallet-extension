@@ -1,6 +1,6 @@
 import { notificationService, permissionService, sessionService } from '@/background/service';
-import { CHAINS, CHAINS_MAP, NETWORK_TYPES, VERSION } from '@/shared/constant';
-import { NetworkType, RequestMethodSendBitcoinParams, RequestMethodSignMessageParams, RequestMethodSignMessagesParams, RequestMethodSignPsbtParams, RequestMethodSignPsbtsParams } from '@/shared/types';
+import { CHAINS, CHAINS_MAP, KEYRING_TYPE, NETWORK_TYPES, VERSION } from '@/shared/constant';
+import { NetworkType, RequestMethodSendBitcoinParams, RequestMethodSignMessageParams, RequestMethodSignMessagesParams, RequestMethodSignPsbtParams, RequestMethodSignPsbtsParams, TxType } from '@/shared/types';
 import { getChainInfo } from '@/shared/utils';
 import { amountToSatoshis } from '@/ui/utils';
 import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
@@ -259,7 +259,10 @@ class ProviderController extends BaseController {
     params.psbtHex = formatPsbtHex(params.psbtHex);
   }])
   signPsbt = async ({ data: { params: { psbtHex, options } }, approvalRes }) => {
-    if (approvalRes && approvalRes.signed==true) {
+    // Only the Keystone flow produces a signed PSBT inside the approval UI; the `signed` flag is
+    // derived from page-supplied params there, so it is never trusted for software keyrings.
+    const account = await wallet.getCurrentAccount();
+    if (approvalRes?.signed === true && account?.type === KEYRING_TYPE.KeystoneKeyring) {
       return approvalRes.psbtHex
     }
     const psbt = psbtFromHex(psbtHex)
@@ -553,23 +556,24 @@ class ProviderController extends BaseController {
       throw new Error('SmallPay does not auto-sign SIGHASH_NONE inputs');
     }
 
-    // Validate the payment
-    const validation = wallet.validateSmallPayment(origin, amount, feeRate);
-    if (!validation.valid) {
-      // Fallback to signPsbt approval popup when SmallPay limits exceeded
+    // Reserve the amount against the 24h limit before the first await, so concurrent requests
+    // cannot all validate against the same pre-spend total.
+    const reservation = wallet.reserveSmallPayment(origin, amount, feeRate);
+    if (!reservation.valid) {
+      // Fallback to signPsbt approval popup when SmallPay cannot auto-sign
       const approvalRes = await notificationService.requestApproval({
         approvalComponent: 'SignPsbt',
         params: {
           method: 'signPsbt',
-          data: { psbtHex: params.psbtHex, options: params.options },
+          data: { psbtHex: params.psbtHex, options: params.options, type: TxType.SIGN_TX },
           session: { origin: session.origin, name: session.name, icon: session.icon }
         },
         origin: session.origin
       });
 
-      // Sign the PSBT after user approval
+      // Only the Keystone flow signs inside the approval UI; software keyrings sign here.
       let fallbackSignedHex: string;
-      if (approvalRes && approvalRes.signed === true) {
+      if (approvalRes?.signed === true && account.type === KEYRING_TYPE.KeystoneKeyring) {
         fallbackSignedHex = approvalRes.psbtHex;
       } else {
         const fallbackPsbt = psbtFromHex(formatPsbtHex(params.psbtHex));
@@ -588,44 +592,49 @@ class ProviderController extends BaseController {
       };
     }
 
-    // P2PKH wallet check already done above — safe to sign
+    try {
+      // P2PKH wallet check already done above — safe to sign
 
-    // Sign the PSBT (reuse signPsbt logic)
-    const autoFinalized = params.options?.autoFinalized !== false;
-    await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
-    const signedPsbtHex = psbt.toHex();
+      // Sign the PSBT (reuse signPsbt logic)
+      const autoFinalized = params.options?.autoFinalized !== false;
+      await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
+      const signedPsbtHex = psbt.toHex();
 
-    // Finalize any remaining unfinalized inputs (e.g., dApp-signed inputs)
-    for (let i = 0; i < psbt.data.inputs.length; i++) {
-      const input = psbt.data.inputs[i];
-      if (!input.finalScriptSig && !input.finalScriptWitness) {
-        try {
-          psbt.finalizeInput(i);
-        } catch {
-          // Input may not be ready to finalize — extractTransaction will catch this
+      // Finalize any remaining unfinalized inputs (e.g., dApp-signed inputs)
+      for (let i = 0; i < psbt.data.inputs.length; i++) {
+        const input = psbt.data.inputs[i];
+        if (!input.finalScriptSig && !input.finalScriptWitness) {
+          try {
+            psbt.finalizeInput(i);
+          } catch {
+            // Input may not be ready to finalize — extractTransaction will catch this
+          }
         }
       }
-    }
 
-    // Extract transaction and broadcast
-    let txid: string;
-    try {
-      const tx = psbt.extractTransaction(true);
-      const rawtx = tx.toHex();
-      txid = tx.id;
-      await wallet.pushTx(rawtx);
+      // Extract transaction and broadcast
+      let txid: string;
+      try {
+        const tx = psbt.extractTransaction(true);
+        const rawtx = tx.toHex();
+        txid = tx.id;
+        await wallet.pushTx(rawtx);
+      } catch (e) {
+        throw new Error(`Failed to broadcast transaction: ${(e as Error).message}`);
+      }
+
+      // Record the payment in history
+      wallet.settleSmallPayment(reservation.reservationId, txid);
+
+      return {
+        status: 'success',
+        txid,
+        signedPsbtHex
+      };
     } catch (e) {
-      throw new Error(`Failed to broadcast transaction: ${(e as Error).message}`);
+      wallet.releaseSmallPayment(reservation.reservationId);
+      throw e;
     }
-
-    // Record the payment in history
-    wallet.recordSmallPayment(origin, amount, txid);
-
-    return {
-      status: 'success',
-      txid,
-      signedPsbtHex
-    };
   };
 }
 

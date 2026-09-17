@@ -2263,6 +2263,9 @@
   "smallpay_clear_history": {
     "message": "Clear History"
   },
+  "smallpay_clear_history_note": {
+    "message": "Payments from the last 24 hours are kept so the daily limit stays accurate."
+  },
   "smallpay_remove_site": {
     "message": "Remove"
   },

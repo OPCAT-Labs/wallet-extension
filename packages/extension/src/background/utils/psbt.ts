@@ -38,6 +38,9 @@ export function estimatePsbtFeeInfo(psbtHex: string): {
   const extPsbt = ExtPsbt.fromHex(psbtHex);
   const estimatedSize = extPsbt.estimateSize();
   const actualFee = Number(extPsbt.inputAmount - extPsbt.outputAmount);
+  if (actualFee < 0) {
+    throw new Error('Invalid PSBT: outputs exceed inputs');
+  }
   const feeRate = estimatedSize > 0 ? actualFee / estimatedSize : 0;
   return { estimatedSize, actualFee, feeRate };
 }
