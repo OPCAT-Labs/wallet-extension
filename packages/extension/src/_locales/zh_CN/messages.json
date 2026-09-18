@@ -919,9 +919,6 @@
   "warning": {
     "message": "警告"
   },
-  "i_am_aware_of_the_risks": {
-    "message": "我已了解风险"
-  },
   "connect_with_wallet": {
     "message": "连接 Catena 钱包"
   },

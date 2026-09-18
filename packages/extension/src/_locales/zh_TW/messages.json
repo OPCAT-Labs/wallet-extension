@@ -861,9 +861,6 @@
   "warning": {
     "message": "警告"
   },
-  "i_am_aware_of_the_risks": {
-    "message": "我已了解相關風險"
-  },
   "connect_with_wallet": {
     "message": "連接 Catena 錢包"
   },

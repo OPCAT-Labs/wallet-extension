@@ -143,35 +143,6 @@ export default function Connect({ params: { session } }: Props) {
     );
   }
 
-  if (warning) {
-    return (
-      <Layout>
-        <Header>
-          <WebsiteBar session={session} />
-        </Header>
-        <Content>
-          <Column>
-            <Text text={t('warning')} preset="title-bold" textCenter mt="xxl" />
-            <Text text={warning} mt="md" />
-          </Column>
-        </Content>
-
-        <Footer>
-          <Row full>
-            <Button
-              text={t('i_am_aware_of_the_risks')}
-              preset="danger"
-              onClick={() => {
-                setWarning('');
-              }}
-              full
-            />
-          </Row>
-        </Footer>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <Header>
@@ -182,6 +153,15 @@ export default function Connect({ params: { session } }: Props) {
           <Text text={t('connect_with_wallet')} preset="title-bold" textCenter mt="lg" />
           <Text text={t('select_the_account_to_use_on_this_site')} textCenter mt="md" />
           <Text text={t('only_connect_with_sites_you_trust')} preset="sub" textCenter mt="md" />
+
+          {/* Shown inline rather than as a separate acknowledge-first screen: the user should see
+              what they are approving and the warning at the same time. */}
+          {warning && (
+            <Row itemsCenter gap="sm" mt="md">
+              <Icon icon="alert" color="warning" />
+              <Text text={warning} color="warning" preset="sub" />
+            </Row>
+          )}
 
           <Text text={currentKeyring.alianName} preset="sub" />
           <MyItem account={currentAccount} />

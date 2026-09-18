@@ -862,9 +862,6 @@
   "warning": {
     "message": "Avertissement"
   },
-  "i_am_aware_of_the_risks": {
-    "message": "Je suis conscient des risques"
-  },
   "connect_with_wallet": {
     "message": "Connecter avec Catena Wallet"
   },
