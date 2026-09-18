@@ -21,7 +21,7 @@ async function getCAT20Balance(address: string, tokenId: string): Promise<number
 async function navigateToCAT20Token(
   page: Page,
   test: typeof import('@playwright/test').test,
-  tokenName: string
+  tokenId: string
 ): Promise<void> {
   // CAT tab and CAT20 sub-tab are selected by default
   // Just wait for the token list to load and click the token
@@ -43,8 +43,10 @@ async function navigateToCAT20Token(
     console.log('[DEBUG] CAT20 token item found');
   });
 
-  await test.step(`Click token: ${tokenName}`, async () => {
-    const tokenCard = page.locator(`[data-testid="${TestIds.CAT20.TOKEN_ITEM}"][data-token-name="${tokenName}"]`);
+  await test.step(`Click token: ${tokenId}`, async () => {
+    // By token id, not name: the test wallet can hold several tokens that share a name, and the
+    // balance assertions below are about this specific token.
+    const tokenCard = page.locator(`[data-testid="${TestIds.CAT20.TOKEN_ITEM}"][data-token-id="${tokenId}"]`);
     await tokenCard.waitFor({ timeout: 10000 });
     await tokenCard.click();
   });
@@ -152,7 +154,7 @@ test.describe('CAT20 Token', () => {
     let initialBalance: number;
 
     await test.step('Navigate to CAT20 token screen', async () => {
-      await navigateToCAT20Token(page, test, TEST_CAT20.NAME);
+      await navigateToCAT20Token(page, test, testTokenId);
     });
 
     await test.step('Get initial balance', async () => {
