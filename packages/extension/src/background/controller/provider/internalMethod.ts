@@ -1,4 +1,4 @@
-import { keyringService } from '@/background/service';
+import { keyringService, permissionService } from '@/background/service';
 
 import wallet from '../wallet';
 
@@ -23,12 +23,14 @@ const tabCheckin = ({
 
 const getProviderState = async (req) => {
   const {
-    session: { origin: _origin }
+    session: { origin }
   } = req;
 
   const isUnlocked = keyringService.memStore.getState().isUnlocked;
   const accounts: string[] = [];
-  if (isUnlocked) {
+  // Mirror getAccounts: an origin that has not been connected learns nothing about the wallet's
+  // accounts. This method is dispatched before rpcFlow, so it has no other permission gate.
+  if (isUnlocked && permissionService.hasPermission(origin)) {
     const currentAccount = await wallet.getCurrentAccount();
     if (currentAccount) {
       accounts.push(currentAccount.address);

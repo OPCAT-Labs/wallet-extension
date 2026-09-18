@@ -532,20 +532,28 @@ function defineUnwritablePropertyIfPossible(o: any, p: string, value: any) {
 }
 
 const provider = new OpcatProvider();
+
+// EventEmitter reads these through the proxy when a page calls provider.on(...).
+const EVENT_EMITTER_INTERNALS = ['_events', '_eventsCount', '_maxListeners'];
+
+const isPrivateProperty = (prop: string | symbol) =>
+  !EVENT_EMITTER_INTERNALS.includes(prop as string) &&
+  ((typeof prop === 'string' && prop.startsWith('_')) || prop === requestMethodKey);
+
 const providerProxy = new Proxy(provider, {
   deleteProperty: () => true,
   get: (target, prop) => {
-    if (prop === '_events' || prop === '_eventsCount' || prop === '_maxListeners') {
-      return target[prop];
-    }
-
-    // Block access to methods starting with underscore or Symbol methods
-    if ((typeof prop === 'string' && prop.startsWith('_')) || prop === requestMethodKey) {
+    if (isPrivateProperty(prop)) {
       console.warn(`[${WALLET_NAME}] Attempted access to private method: ${String(prop)} is not allowed for security reasons`);
       return undefined;
     }
     return target[prop];
-  }
+  },
+  // Without these, Object.getOwnPropertyDescriptor(window.opcat, '_request').value hands out the
+  // very function the get trap hides (class fields are own properties of the instance).
+  getOwnPropertyDescriptor: (target, prop) => (isPrivateProperty(prop) ? undefined : Reflect.getOwnPropertyDescriptor(target, prop)),
+  ownKeys: (target) => Reflect.ownKeys(target).filter((prop) => !isPrivateProperty(prop)),
+  has: (target, prop) => (isPrivateProperty(prop) ? false : Reflect.has(target, prop))
 });
 
 defineUnwritablePropertyIfPossible(window, PAGE_PROVIDER_VARIABLE_NAME, providerProxy);

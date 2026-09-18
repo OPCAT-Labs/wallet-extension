@@ -15,6 +15,7 @@ import { shortAddress, useApproval, useWallet } from '@/ui/utils';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import MultiSignDisclaimerModal from '../MultiSignPsbt/MultiSignDisclaimerModal';
+import { approvedIndexesOf, SignState } from '../MultiSignPsbt/signStates';
 
 interface Props {
   header?: React.ReactNode;
@@ -31,12 +32,6 @@ interface Props {
   };
   handleCancel?: () => void;
   handleConfirm?: () => void;
-}
-
-enum SignState {
-  PENDING,
-  SUCCESS,
-  FAILED
 }
 
 // Message info container
@@ -129,8 +124,16 @@ export default function MultiSignMessage({
 
   if (!handleConfirm) {
     handleConfirm = () => {
+      // Messages the user opened and rejected are reported to the background so no signature is
+      // produced for them; rejecting every one of them is a rejection of the whole request.
+      const approvedIndexes = approvedIndexesOf(signStates, messageInfo.messages.length);
+      if (approvedIndexes.length === 0) {
+        rejectApproval();
+        return;
+      }
       resolveApproval({
-        messages: messageInfo.messages
+        messages: messageInfo.messages,
+        approvedIndexes
       });
     };
   }
@@ -354,7 +357,7 @@ export default function MultiSignMessage({
       </Footer>
       {disclaimerVisible && (
         <MultiSignDisclaimerModal
-          txCount={messageInfo.messages.length}
+          txCount={approvedIndexesOf(signStates, messageInfo.messages.length).length}
           onContinue={() => {
             handleConfirm();
           }}

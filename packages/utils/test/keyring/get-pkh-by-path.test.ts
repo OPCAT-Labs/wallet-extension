@@ -160,5 +160,46 @@ describe('getPKHByPath', () => {
         expect(pkh, `Expected valid PKH for path: ${path}`).to.match(/^[0-9a-f]{40}$/);
       }
     });
+
+    it('should block a leading-zero spelling of a standard path', () => {
+      // hdkey parses components with parseInt, so "m/044'/..." derives the blocked node; the old
+      // textual startsWith() guard returned the wallet's real first account PKH here.
+      let error: Error | null = null;
+      try {
+        keyring.getPKHByPath("m/044'/0'/0'/0/0");
+      } catch (e) {
+        error = e as Error;
+      }
+      expect(error).to.not.be.null;
+    });
+
+    it("should block the keyring's own account tree when it uses a custom hd path", () => {
+      const custom = new HdKeyring({
+        mnemonic: sampleMnemonic,
+        hdPath: "m/0'/0'/0'/0",
+        activeIndexes: [0]
+      });
+
+      let error: Error | null = null;
+      try {
+        custom.getPKHByPath("m/0'/0'/0'/0/0");
+      } catch (e) {
+        error = e as Error;
+      }
+      expect(error).to.not.be.null;
+      expect(error!.message).to.include('own account tree');
+
+      expect(custom.getPKHByPath('m/100/0')).to.match(/^[0-9a-f]{40}$/);
+    });
+
+    it('should reject an unbounded path', () => {
+      let error: Error | null = null;
+      try {
+        keyring.getPKHByPath('m' + '/0'.repeat(1000));
+      } catch (e) {
+        error = e as Error;
+      }
+      expect(error).to.not.be.null;
+    });
   });
 });
