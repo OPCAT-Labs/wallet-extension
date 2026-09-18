@@ -141,6 +141,14 @@ function AmountInput(props: InputProps) {
     onAmountInputChange(validAmount);
   }, [validAmount]);
 
+  // The field kept its mount-time copy, so pressing Max changed the amount used for the send while
+  // the visible text stayed on whatever had been typed.
+  useEffect(() => {
+    const next = props.value || '';
+    setInputValue((current) => (current === next ? current : next));
+    setValidAmount((current) => (current === next ? current : next));
+  }, [props.value]);
+
   const handleInputAmount = (e) => {
     const value = e.target.value;
     if (disableDecimal) {
