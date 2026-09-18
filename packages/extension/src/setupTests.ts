@@ -30,5 +30,10 @@ globalThis.chrome = {
   runtime: {
     onConnect: { addListener: () => {} },
     onInstalled: { addListener: () => {} }
+  },
+  alarms: {
+    create: () => {},
+    clear: () => {},
+    onAlarm: { addListener: () => {} }
   }
 } as unknown as typeof chrome;

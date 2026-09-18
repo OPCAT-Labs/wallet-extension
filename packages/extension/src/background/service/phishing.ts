@@ -42,10 +42,48 @@ interface PhishingConfig {
 }
 
 const STORE_KEY = 'phishing';
+
+/**
+ * MV3 service workers are torn down after ~30s idle, so setTimeout/setInterval schedules never
+ * fire. chrome.alarms survives the teardown and wakes the worker (the permission is declared in
+ * the manifest).
+ */
+const UPDATE_ALARM_NAME = 'phishing:update-list';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const VERSION = 2;
 const RETRY_DELAY = 60 * 60 * 1000; // 1 hour retry delay
 const MAX_RETRIES = 3;
+
+/**
+ * Levenshtein distance, abandoned as soon as it exceeds `max` (the caller only cares whether the
+ * hostname is within `tolerance` of a fuzzylist entry).
+ */
+function levenshteinWithin(a: string, b: string, max: number): number {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const current = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(current[j - 1] + 1, previous[j] + 1, previous[j - 1] + cost);
+      rowMin = Math.min(rowMin, current[j]);
+    }
+    if (rowMin > max) return max + 1;
+    previous = current;
+  }
+  return previous[b.length];
+}
+
+/** Every parent suffix of a hostname, longest first, down to the registrable two-label form. */
+function hostnameSuffixes(hostname: string): string[] {
+  const labels = hostname.split('.');
+  const suffixes: string[] = [];
+  for (let i = 0; i <= labels.length - 2; i++) {
+    suffixes.push(labels.slice(i).join('.'));
+  }
+  return suffixes.length > 0 ? suffixes : [hostname];
+}
 
 const initConfig: PhishingConfig = {
   version: VERSION,
@@ -92,12 +130,46 @@ class PhishingService {
   private retryCount = 0;
 
   /**
-   * Reference to the scheduled update timer
+   * True once a config (cached or freshly fetched) has been loaded into the sets
    */
-  private updateTimer: NodeJS.Timeout | null = null;
+  private loaded = false;
+
+  /**
+   * Called whenever the lists or the session whitelist change, so the declarative rules the
+   * controller maintains can be rebuilt. Nothing rebuilt them before: the controller built rules
+   * once at startup while this service was still loading, and the 24h setInterval never fired.
+   */
+  private changeListeners: Array<() => void> = [];
 
   constructor() {
+    // Registered at module load, which is what MV3 requires for the alarm to wake the worker.
+    chrome.alarms?.onAlarm.addListener((alarm) => {
+      if (alarm.name === UPDATE_ALARM_NAME) {
+        this.updatePhishingList();
+      }
+    });
     this.init();
+  }
+
+  /**
+   * Subscribe to list / whitelist changes. Fires immediately when a config is already loaded, so
+   * the subscriber does not depend on winning a race with this service's async init.
+   */
+  public onChange(listener: () => void) {
+    this.changeListeners.push(listener);
+    if (this.loaded) {
+      listener();
+    }
+  }
+
+  private notifyChanged() {
+    this.changeListeners.forEach((listener) => {
+      try {
+        listener();
+      } catch (error) {
+        console.error('[PhishingService] change listener failed:', error);
+      }
+    });
   }
 
   /**
@@ -123,6 +195,7 @@ class PhishingService {
           };
 
           this.updateSets();
+          this.notifyChanged();
         }
       } else {
         // No stored config, use initial config
@@ -131,29 +204,26 @@ class PhishingService {
         await this.updatePhishingList();
       }
 
-      // Schedule periodic updates instead of using setInterval
       this.scheduleNextUpdate();
+
     } catch (error) {
       console.error('[PhishingService] Init error:', error);
       this.config = { ...initConfig };
       this.updateSets();
 
       // Retry after initialization failure
-      setTimeout(() => this.updatePhishingList(), RETRY_DELAY);
+      this.scheduleNextUpdate(RETRY_DELAY);
     }
   }
 
   /**
    * Schedule the next update based on cache expiration
    */
-  private scheduleNextUpdate() {
-    if (this.updateTimer) {
-      clearTimeout(this.updateTimer);
-    }
-
-    const nextUpdateTime = Math.max(0, this.config.lastFetchTime + this.config.cacheExpireTime - Date.now());
-
-    this.updateTimer = setTimeout(() => this.updatePhishingList(), nextUpdateTime);
+  private scheduleNextUpdate(delayMs?: number) {
+    const ms = delayMs ?? Math.max(0, this.config.lastFetchTime + this.config.cacheExpireTime - Date.now());
+    // chrome.alarms clamps sub-minute delays in release builds; asking for less is pointless.
+    const delayInMinutes = Math.max(1, Math.ceil(ms / 60000));
+    chrome.alarms?.create(UPDATE_ALARM_NAME, { delayInMinutes });
   }
 
   /**
@@ -162,17 +232,18 @@ class PhishingService {
   private updateSets() {
     this.blacklistSet = new Set(this.config.blacklist);
     this.whitelistSet = new Set(this.config.whitelist);
+    this.loaded = true;
   }
 
   /**
    * Update the phishing list from remote source
    */
-  private async updatePhishingList() {
+  private async updatePhishingList(forceRefresh = false) {
     if (this.updating) return;
 
     try {
       this.updating = true;
-      const newConfig = await fetchPhishingList();
+      const newConfig = await fetchPhishingList(forceRefresh);
 
       // Ensure domains in default whitelist are not in the blacklist
       const defaultWhitelist = new Set(initConfig.whitelist);
@@ -216,13 +287,14 @@ class PhishingService {
       this.updateSets();
       this.retryCount = 0;
       this.scheduleNextUpdate();
+      this.notifyChanged();
     } catch (error) {
       console.error('[PhishingService] Update error:', error);
 
       // Retry logic after update failure
       if (this.retryCount < MAX_RETRIES) {
         this.retryCount++;
-        setTimeout(() => this.updatePhishingList(), RETRY_DELAY / this.retryCount);
+        this.scheduleNextUpdate(RETRY_DELAY / this.retryCount);
       } else {
         // After reaching max retries, continue trying at normal interval
         this.scheduleNextUpdate();
@@ -237,7 +309,9 @@ class PhishingService {
    */
   public async forceUpdate() {
     this.retryCount = 0;
-    return this.updatePhishingList();
+    // Actually force it: without the flag the fetch returns the <12h cache and "force update"
+    // silently did nothing.
+    return this.updatePhishingList(true);
   }
 
   /**
@@ -248,7 +322,8 @@ class PhishingService {
   public checkPhishing(hostname: string): boolean {
     if (!hostname) return false;
 
-    const cleanHostname = hostname.replace(/^www\./, '').toLowerCase();
+    // A trailing dot is the same host to the browser but a different string to a Set.
+    const cleanHostname = hostname.toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
 
     try {
       // Skip checks for extension pages
@@ -266,26 +341,43 @@ class PhishingService {
         return false;
       }
 
-      // Check temporary whitelist (fastest check first)
+      // Check temporary whitelist (the user chose "proceed anyway" this session)
       if (this.temporaryWhitelist.has(cleanHostname)) {
         return false;
       }
 
-      // Check permanent whitelist - enhanced check including subdomains
-      if (this.whitelistSet.has(cleanHostname)) {
+      // An exact blacklist hit wins over a parent-domain whitelist entry.
+      if (this.blacklistSet.has(cleanHostname)) {
+        return true;
+      }
+
+      const suffixes = hostnameSuffixes(cleanHostname);
+
+      if (suffixes.some((suffix) => this.whitelistSet.has(suffix))) {
         return false;
       }
 
-      // Then check if it's a subdomain of a whitelisted domain
-      const domainParts = cleanHostname.split('.');
-      if (domainParts.length > 2) {
-        const mainDomain = domainParts.slice(domainParts.length - 2).join('.');
-        if (this.whitelistSet.has(mainDomain)) {
-          return false;
+      // The lists name apex domains and the declarative rules match subdomains (`||domain/`), so
+      // the message-based check has to walk the label suffixes too — otherwise login.evil.com is
+      // reported safe while evil.com is blocked.
+      if (suffixes.some((suffix) => this.blacklistSet.has(suffix))) {
+        return true;
+      }
+
+      // Look-alike domains: the fuzzylist and its tolerance were fetched and stored but never
+      // consulted, so 0pcatlabs.io was never flagged for a fuzzylist entry of opcatlabs.io.
+      // Distance 0 means the hostname is the legitimate domain itself.
+      const tolerance = this.config.tolerance || 0;
+      if (tolerance > 0 && Array.isArray(this.config.fuzzylist)) {
+        for (const entry of this.config.fuzzylist) {
+          const distance = levenshteinWithin(cleanHostname, entry, tolerance);
+          if (distance > 0 && distance <= tolerance) {
+            return true;
+          }
         }
       }
 
-      return this.blacklistSet.has(cleanHostname);
+      return false;
     } catch (error) {
       console.error('[PhishingService] Check error:', error);
       // Default to safe on error
@@ -299,8 +391,18 @@ class PhishingService {
    */
   public addToWhitelist(hostname: string) {
     if (!hostname) return;
-    const cleanHostname = hostname.replace(/^www\./, '').toLowerCase();
+    const cleanHostname = hostname.toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
     this.temporaryWhitelist.add(cleanHostname);
+    // The declarative rules do not consult this list, so the rule for that host has to go or
+    // "proceed anyway" would redirect straight back to the warning page.
+    this.notifyChanged();
+  }
+
+  /**
+   * Hosts the user chose to proceed to during this session.
+   */
+  public getTemporaryWhitelist(): string[] {
+    return Array.from(this.temporaryWhitelist);
   }
 
   /**

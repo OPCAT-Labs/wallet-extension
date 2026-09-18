@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { COIN_DUST } from '@/shared/constant';
 import { RawTxInfo } from '@/shared/types';
@@ -59,8 +59,13 @@ export default function TxCreateScreen() {
   const dustAmount = useMemo(() => satoshisToAmount(COIN_DUST), [COIN_DUST]);
 
   const [rawTxInfo, setRawTxInfo] = useState<RawTxInfo>();
+  const prepareRequestId = useRef(0);
 
-  const availableAmount = satoshisToAmount(+accountBalance.amount * 1e8);
+  // BigNumber, not `+amount * 1e8`: the float product rounds down for many balances (0.29 ->
+  // 28999999.999999996), which made the guard below reject the user's own full balance and left
+  // the Max button dead.
+  const availableSatoshis = useMemo(() => amountToSatoshis(accountBalance.amount), [accountBalance.amount]);
+  const availableAmount = satoshisToAmount(availableSatoshis);
   const unavailableAmount = satoshisToAmount(0);
 
   const showUnavailable = false;
@@ -81,7 +86,7 @@ export default function TxCreateScreen() {
       return;
     }
 
-    if (toSatoshis > +accountBalance.amount * 1e8) {
+    if (toSatoshis > availableSatoshis) {
       setError(t('amount_exceeds_your_available_balance'));
       return;
     }
@@ -101,20 +106,22 @@ export default function TxCreateScreen() {
       return;
     }
 
+    // Each edit supersedes the one before it: without this token a slower earlier call could
+    // resolve last and re-enable Next with a transaction for inputs no longer on screen.
+    prepareRequestId.current += 1;
+    const requestId = prepareRequestId.current;
     prepareSendBTC({ toAddressInfo: toInfo, toAmount: toSatoshis, feeRate, enableRBF })
       .then((data) => {
-        // if (data.fee < data.estimateFee) {
-        //   setError(`Network fee must be at leat ${data.estimateFee}`);
-        //   return;
-        // }
+        if (requestId !== prepareRequestId.current) return;
         setRawTxInfo(data);
         setDisabled(false);
       })
       .catch((e) => {
+        if (requestId !== prepareRequestId.current) return;
         console.log(e);
         setError(e.message);
       });
-  }, [toInfo, inputAmount, feeRate, enableRBF]);
+  }, [toInfo, inputAmount, feeRate, enableRBF, availableSatoshis]);
 
   const unavailableTipText = useMemo(
     () => t('unavailable_tooltip') + t('future_versions_will_support_spending_these_assets'),
