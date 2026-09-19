@@ -113,8 +113,12 @@ class PhishingController {
           }
 
           phishingService.addToWhitelist(message.hostname);
-          sendResponse({ success: true });
-          return false;
+          // addToWhitelist queues the removal of that host's redirect rule. Acknowledging before
+          // it lands sends the navigation that follows straight back to the warning page.
+          this.pendingRuleUpdate
+            .catch(() => undefined)
+            .then(() => sendResponse({ success: true }));
+          return true;
         }
 
         case PhishingMessageType.FORCE_UPDATE_PHISHING_LIST: {

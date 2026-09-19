@@ -1,4 +1,16 @@
+import { fetchPhishingList } from '@/background/utils/fetch';
+
 import phishingService from './phishing';
+
+jest.mock('@/background/utils/fetch', () => ({
+  fetchPhishingList: jest.fn()
+}));
+
+jest.mock('@/background/webapi', () => ({
+  storage: { get: jest.fn().mockResolvedValue(null), set: jest.fn().mockResolvedValue(undefined) }
+}));
+
+const mockFetchPhishingList = fetchPhishingList as jest.MockedFunction<typeof fetchPhishingList>;
 
 type Config = {
   blacklist: string[];
@@ -112,5 +124,30 @@ describe('onChange', () => {
     const onChange = jest.fn();
     phishingService.onChange(onChange);
     expect(onChange).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('list refresh', () => {
+  beforeEach(() => {
+    seed({});
+    mockFetchPhishingList.mockReset().mockResolvedValue({
+      version: 2,
+      tolerance: 1,
+      fuzzylist: [],
+      whitelist: [],
+      blacklist: ['evil.example']
+    });
+  });
+
+  it('forces a remote fetch only when asked to', async () => {
+    await phishingService.forceUpdate();
+    expect(mockFetchPhishingList).toHaveBeenCalledWith(true);
+  });
+
+  it('leaves the cache in charge on the startup path', async () => {
+    // restoreAppState runs on every MV3 worker start; forcing here re-downloaded several MB
+    // each time, ignoring both the cache and the daily alarm.
+    await phishingService.ensureUpToDate();
+    expect(mockFetchPhishingList).toHaveBeenCalledWith(false);
   });
 });

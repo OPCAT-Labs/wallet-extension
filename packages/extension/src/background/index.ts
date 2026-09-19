@@ -90,7 +90,7 @@ async function restoreAppState() {
 
   // Initialize phishing service early to ensure protection is active
   try {
-    phishingService.forceUpdate();
+    phishingService.ensureUpToDate();
   } catch (error) {
     log.error('[Background] Failed to initialize phishing service:', error);
     // Continue initialization even if phishing service fails

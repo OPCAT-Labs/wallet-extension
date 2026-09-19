@@ -305,6 +305,16 @@ class PhishingService {
   }
 
   /**
+   * Startup path: load a list and refresh it only when the cached one is stale.
+   *
+   * Not forceUpdate(): that re-downloads every remote source, and an MV3 worker restarts often
+   * enough that startup would pull several MB again each time.
+   */
+  public async ensureUpToDate() {
+    return this.updatePhishingList(false);
+  }
+
+  /**
    * Force an immediate update of the phishing list
    */
   public async forceUpdate() {
