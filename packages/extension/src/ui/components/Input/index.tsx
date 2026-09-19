@@ -141,6 +141,14 @@ function AmountInput(props: InputProps) {
     onAmountInputChange(validAmount);
   }, [validAmount]);
 
+  // The field kept its mount-time copy, so pressing Max changed the amount used for the send while
+  // the visible text stayed on whatever had been typed.
+  useEffect(() => {
+    const next = props.value || '';
+    setInputValue((current) => (current === next ? current : next));
+    setValidAmount((current) => (current === next ? current : next));
+  }, [props.value]);
+
   const handleInputAmount = (e) => {
     const value = e.target.value;
     if (disableDecimal) {
@@ -220,7 +228,7 @@ export const AddressInput = (props: InputProps) => {
   const networkType = propsNetworkType || chain.enum;
 
   const SUPPORTED_DOMAINS: string[] = [];
-  const inputAddressPlaceholder = props.addressPlaceholder || t('address_or_name_sats_unisat_etc');
+  const inputAddressPlaceholder = props.addressPlaceholder || t('address_or_name');
 
   useEffect(() => {
     onAddressInputChange({
@@ -357,15 +365,6 @@ export const AddressInput = (props: InputProps) => {
       {parseName ? (
         <Row mt="sm" gap="zero" itemsCenter>
           <Text preset="sub" size="sm" text={t('name_recognized_and_resolved')} />
-          <Text
-            preset="link"
-            color="primary"
-            text={t('more_details')}
-            onClick={() => {
-              window.open('https://docs.unisat.io/unisat-wallet/name-recognized-and-resolved');
-            }}
-          />
-          <Text preset="sub" size="sm" text={')'} />
         </Row>
       ) : null}
       {parseError && <Text text={parseError} preset="regular" color="error" />}

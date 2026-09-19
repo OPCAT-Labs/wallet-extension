@@ -11,6 +11,20 @@ function getBrowser() {
 const browser = getBrowser();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function browserWindowsGetAll(params?: any) {
+  if (typeof browser.windows.getAll === 'function' && browser.windows.getAll.length > 1) {
+    return new Promise<any[]>((resolve) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (browser.windows.getAll as any)(params, (val) => {
+        resolve(val);
+      });
+    });
+  }
+  return await browser.windows.getAll(params);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function browserWindowsGetCurrent(params?: any) {
   if (MANIFEST_VERSION === 'mv2') {
     return new Promise((resolve) => {
@@ -157,6 +171,10 @@ export function browserTabsOnRemoved(listener) {
 
 export function browserRuntimeOnConnect(listener) {
   browser.runtime.onConnect.addListener(listener);
+}
+
+export function browserRuntimeId(): string {
+  return browser.runtime.id;
 }
 
 export function browserRuntimeOnInstalled(listener) {

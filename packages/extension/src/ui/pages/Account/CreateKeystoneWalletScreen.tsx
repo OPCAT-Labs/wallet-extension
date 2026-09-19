@@ -186,7 +186,7 @@ function Step3({
   const navigate = useNavigate();
   const wallet = useWallet();
   const tools = useTools();
-  const [addressType, setAddressType] = useState(AddressType.P2WPKH);
+  const [addressType, setAddressType] = useState(AddressType.P2PKH);
   const addressTypes = useMemo(() => {
     return ADDRESS_TYPES.filter((item) => item.displayIndex < 4).sort((a, b) => a.displayIndex - b.displayIndex);
   }, []);

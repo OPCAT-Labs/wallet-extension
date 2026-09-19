@@ -29,11 +29,9 @@ import eventBus from '@/shared/eventBus';
 import {
   Account,
   AddressType,
-  AddressUserToSignInput,
   BitcoinBalance,
   CAT721Balance,
   NetworkType,
-  PublicKeyUserToSignInput,
   SignPsbtOptions,
   ToSignInput,
   UTXO,
@@ -42,7 +40,7 @@ import {
 import { getChainInfo } from '@/shared/utils';
 import { psbtFromString } from '@/ui/utils/psbt-utils';
 import { txHelpers } from '@opcat-labs/wallet-sdk';
-import { isP2PKHAddress, publicKeyToAddress, scriptPkToAddress } from '@opcat-labs/wallet-sdk/lib/address';
+import { isP2PKHAddress, publicKeyToAddress } from '@opcat-labs/wallet-sdk/lib/address';
 import { bitcoin, ECPair } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
 import { ExtPsbt, Signer, SignOptions, SupportedNetwork, UTXO as ExtUtxo, Transaction, OpenApiProvider } from '@opcat-labs/scrypt-ts-opcat';
 import {mergeSendToken, singleSendNft, toTokenOwnerAddress} from '@opcat-labs/cat-sdk'
@@ -57,11 +55,11 @@ import { toOpcatNetwork, toPsbtNetwork } from '@opcat-labs/wallet-sdk/lib/networ
 import { ContactBookItem } from '../service/contactBook';
 import { OpenApiService } from '../service/openapi';
 import { ConnectedSite } from '../service/permission';
-import { psbtFromBase64 } from '../utils/psbt';
+import { psbtFromBase64, psbtFromHex } from '../utils/psbt';
+import { formatUserToSignInputs, selectAccountInputs } from '../utils/toSignInputs';
 import BaseController from './base';
 import { KeyringSigner } from '../utils/keyringSigner';
 
-const stashKeyrings: Record<string, Keyring> = {};
 export type AccountAsset = {
   name: string;
   symbol: string;
@@ -447,81 +445,11 @@ export class WalletController extends BaseController {
     const account = await this.getCurrentAccount();
     if (!account) throw null;
 
-    let toSignInputs: ToSignInput[] = [];
+    const psbt = typeof _psbt === 'string' ? psbtFromHex<bitcoin.Psbt>(_psbt) : _psbt;
     if (options && options.toSignInputs) {
-      // We expect userToSignInputs objects to be similar to ToSignInput interface,
-      // but we allow address to be specified in addition to publicKey for convenience.
-      toSignInputs = options.toSignInputs.map((input) => {
-        const index = Number(input.index);
-        if (isNaN(index)) throw new Error('invalid index in toSignInput');
-
-        if (!(input as AddressUserToSignInput).address && !(input as PublicKeyUserToSignInput).publicKey) {
-          throw new Error('no address or public key in toSignInput');
-        }
-
-        if ((input as AddressUserToSignInput).address && (input as AddressUserToSignInput).address != account.address) {
-          throw new Error('invalid address in toSignInput');
-        }
-
-        if (
-          (input as PublicKeyUserToSignInput).publicKey &&
-          (input as PublicKeyUserToSignInput).publicKey != account.pubkey
-        ) {
-          throw new Error('invalid public key in toSignInput');
-        }
-
-        const sighashTypes = input.sighashTypes?.map(Number);
-        if (sighashTypes?.some(isNaN)) throw new Error('invalid sighash type in toSignInput');
-
-        return {
-          index,
-          publicKey: account.pubkey,
-          sighashTypes
-        };
-      });
-    } else {
-      const networkType = this.getNetworkType();
-      const psbtNetwork = toPsbtNetwork(networkType);
-
-      const psbt =
-        typeof _psbt === 'string'
-          ? bitcoin.Psbt.fromHex(_psbt as string, { network: psbtNetwork })
-          : (_psbt as bitcoin.Psbt);
-      psbt.data.inputs.forEach((v, index) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let script: any = null;
-        if (v.witnessUtxo) {
-          script = v.witnessUtxo.script;
-        } else if (v.nonWitnessUtxo) {
-          const tx = bitcoin.Transaction.fromBuffer(v.nonWitnessUtxo);
-          const output = tx.outs[psbt.txInputs[index].index];
-          script = output.script;
-        }
-        const isSigned = v.finalScriptSig || v.finalScriptWitness || v.tapKeySig || v.partialSig || v.tapScriptSig;
-        if (script && !isSigned) {
-          const address = scriptPkToAddress(script, networkType);
-          if (account.address === address) {
-            toSignInputs.push({
-              index,
-              publicKey: account.pubkey,
-              sighashTypes: v.sighashType ? [v.sighashType] : undefined
-            });
-          }
-        }
-      });
-
-      if (toSignInputs.length === 0) {
-        psbt.data.inputs.forEach((input, index) => {
-          // if no toSignInputs, sign all inputs
-          toSignInputs.push({
-            index: index,
-            publicKey: account.pubkey
-          });
-        });
-      }
+      return formatUserToSignInputs(psbt, options.toSignInputs, account);
     }
-
-    return toSignInputs;
+    return selectAccountInputs(psbt, account, this.getNetworkType());
   };
 
   signPsbt = async (psbt: bitcoin.Psbt, toSignInputs: ToSignInput[], autoFinalized: boolean) => {
@@ -619,23 +547,6 @@ export class WalletController extends BaseController {
     const account = preferenceService.getCurrentAccount();
     if (!account) throw new Error('no current account');
     return keyringService.signData(account.pubkey, data, type);
-  };
-
-  requestKeyring = (type: string, methodName: string, keyringId: number | null, ...params) => {
-    let keyring;
-    if (keyringId !== null && keyringId !== undefined) {
-      keyring = stashKeyrings[keyringId];
-    } else {
-      try {
-        keyring = this._getKeyringByType(type);
-      } catch {
-        const Keyring = keyringService.getKeyringClassForType(type);
-        keyring = new Keyring();
-      }
-    }
-    if (keyring[methodName]) {
-      return keyring[methodName].call(keyring, ...params);
-    }
   };
 
   private _getKeyringByType = (type: string): Keyring => {
@@ -1256,6 +1167,7 @@ export class WalletController extends BaseController {
   removeConnectedSite = (origin: string) => {
     sessionService.broadcastEvent('accountsChanged', [], origin);
     permissionService.removeConnectedSite(origin);
+    smallPayService.removeFromWhitelist(origin);
   };
 
   grantSitePermissions = (origin: string, permissions: string[]) => {
@@ -1264,6 +1176,9 @@ export class WalletController extends BaseController {
 
   revokeSitePermission = (origin: string, permission: string) => {
     permissionService.revokePermission(origin, permission as any);
+    if (permission === 'smallPay' || permission === 'connect') {
+      smallPayService.removeFromWhitelist(origin);
+    }
   };
 
   setKeyringAlianName = (keyring: WalletKeyring, name: string) => {
@@ -1367,12 +1282,6 @@ export class WalletController extends BaseController {
     // preferenceService.updateAddressBalance(address, data);
     return data;
   };
-
-  setPsbtSignNonSegwitEnable(psbt: bitcoin.Psbt, enabled: boolean) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    psbt.__CACHE.__UNSAFE_SIGN_NONSEGWIT = enabled;
-  }
 
   getShowSafeNotice = () => {
     return preferenceService.getShowSafeNotice();
@@ -1614,17 +1523,24 @@ export class WalletController extends BaseController {
   };
 
   /**
-   * Validate a SmallPay payment
+   * Validate a SmallPay payment and count it against the 24h limit while it is in flight
    */
-  validateSmallPayment = (origin: string, amount: number, feeRate: number) => {
-    return smallPayService.validatePayment(origin, amount, feeRate);
+  reserveSmallPayment = (origin: string, amount: number, feeRate: number) => {
+    return smallPayService.reservePayment(origin, amount, feeRate);
   };
 
   /**
-   * Record a SmallPay payment in history
+   * Record a reserved SmallPay payment in history once it is broadcast
    */
-  recordSmallPayment = (origin: string, amount: number, txid: string) => {
-    smallPayService.addToHistory(origin, amount, txid);
+  settleSmallPayment = (reservationId: number, txid: string) => {
+    smallPayService.settleReservation(reservationId, txid);
+  };
+
+  /**
+   * Drop a reserved SmallPay payment that was not broadcast
+   */
+  releaseSmallPayment = (reservationId: number) => {
+    smallPayService.releaseReservation(reservationId);
   };
 
   getEnableSignData = async () => {
@@ -1944,26 +1860,6 @@ export class WalletController extends BaseController {
 
   createBuyCoinPaymentUrl = (coin: 'FB' | 'BTC', address: string, channel: string) => {
     return openapiService.createBuyCoinPaymentUrl(coin, address, channel);
-  };
-
-  sendCoinBypassHeadOffsets = async (tos: { address: string; satoshis: number }[], feeRate: number) => {
-    const currentAccount = await this.getCurrentAccount();
-    if (!currentAccount) {
-      return;
-    }
-
-    const { psbtBase64, toSignInputs } = await openapiService.createSendCoinBypassHeadOffsets(
-      currentAccount.address,
-      currentAccount.pubkey,
-      tos,
-      feeRate
-    );
-
-    const psbt = bitcoin.Psbt.fromBase64(psbtBase64);
-    this.setPsbtSignNonSegwitEnable(psbt, true);
-    await this.signPsbt(psbt, toSignInputs, true);
-    this.setPsbtSignNonSegwitEnable(psbt, false);
-    return psbt.toHex();
   };
 }
 

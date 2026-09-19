@@ -12,10 +12,12 @@ import KeystoneSignScreen from '@/ui/pages/Wallet/KeystoneSignScreen';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { fontSizes } from '@/ui/theme/font';
 import { shortAddress, useApproval, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import SignPsbt from '../SignPsbt';
 import MultiSignDisclaimerModal from './MultiSignDisclaimerModal';
+import { approvedIndexesOf, SignState } from './signStates';
 
 interface Props {
   header?: React.ReactNode;
@@ -32,12 +34,6 @@ interface Props {
   };
   handleCancel?: () => void;
   handleConfirm?: () => void;
-}
-
-enum SignState {
-  PENDING,
-  SUCCESS,
-  FAILED
 }
 
 // keystone
@@ -125,8 +121,16 @@ export default function MultiSignPsbt({
 
   if (!handleConfirm) {
     handleConfirm = () => {
+      // Transactions the user opened and rejected are reported to the background so they are
+      // returned unsigned; rejecting every one of them is a rejection of the whole request.
+      const approvedIndexes = approvedIndexesOf(signStates, txInfo.psbtHexs.length);
+      if (approvedIndexes.length === 0) {
+        rejectApproval();
+        return;
+      }
       resolveApproval({
-        psbtHexs: txInfo.psbtHexs
+        psbtHexs: txInfo.psbtHexs,
+        approvedIndexes
       });
     };
   }
@@ -183,13 +187,15 @@ export default function MultiSignPsbt({
           }}
           handleCancel={() => {
             setViewingPsbtIndex(-1);
-            signStates[viewingPsbtIndex] = SignState.FAILED;
-            setSignStates(signStates);
+            const newSignStates = [...signStates];
+            newSignStates[viewingPsbtIndex] = SignState.FAILED;
+            setSignStates(newSignStates);
           }}
           handleConfirm={() => {
             setViewingPsbtIndex(-1);
-            signStates[viewingPsbtIndex] = SignState.SUCCESS;
-            setSignStates(signStates);
+            const newSignStates = [...signStates];
+            newSignStates[viewingPsbtIndex] = SignState.SUCCESS;
+            setSignStates(newSignStates);
           }}
         />
       </>
@@ -272,6 +278,7 @@ export default function MultiSignPsbt({
                       preset={preset as any}
                       textStyle={{ fontSize: fontSizes.sm }}
                       text={text}
+                      testid={`${TestIds.MULTI_SIGN.ITEM_ACTION}-${index}`}
                       onClick={() => {
                         setViewingPsbtIndex(index);
                       }}
@@ -287,13 +294,20 @@ export default function MultiSignPsbt({
 
       <Footer>
         <Row full>
-          <Button preset="default" text={t('reject_all')} onClick={handleCancel} full />
+          <Button
+            preset="default"
+            text={t('reject_all')}
+            testid={TestIds.MULTI_SIGN.REJECT_ALL_BUTTON}
+            onClick={handleCancel}
+            full
+          />
 
           {websiteResult.allowQuickMultiSign ? (
             <Button
               preset="primary"
               text={isAllSigned ? t('submit') : `(${signedCount}/${txInfo.psbtHexs.length}) ${t('signed')}`}
               icon={isAllSigned ? undefined : 'alert'}
+              testid={TestIds.MULTI_SIGN.SUBMIT_BUTTON}
               onClick={() => {
                 if (isAllSigned) {
                   handleConfirm();
@@ -307,6 +321,7 @@ export default function MultiSignPsbt({
             <Button
               preset="primary"
               text={isAllSigned ? t('submit') : `(${signedCount}/${txInfo.psbtHexs.length}) ${t('signed')}`}
+              testid={TestIds.MULTI_SIGN.SUBMIT_BUTTON}
               onClick={handleConfirm}
               full
               disabled={isAllSigned == false}
@@ -316,7 +331,7 @@ export default function MultiSignPsbt({
       </Footer>
       {disclaimerVisible && (
         <MultiSignDisclaimerModal
-          txCount={txInfo.psbtHexs.length}
+          txCount={approvedIndexesOf(signStates, txInfo.psbtHexs.length).length}
           onContinue={() => {
             handleConfirm();
           }}

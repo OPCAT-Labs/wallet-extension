@@ -3,6 +3,7 @@ import bitcore from 'bitcore-lib';
 import * as hdkey from 'hdkey';
 import { ECPair, ECPairInterface, bitcoin } from '../bitcoin-core';
 import { SimpleKeyring } from './simple-keyring';
+import { assertNonAccountBip32Path } from './bip32-path';
 
 const hdPathString = "m/44'/0'/0'/0";
 const type = 'HD Key Tree';
@@ -141,19 +142,9 @@ export class HdKeyring extends SimpleKeyring {
       throw new Error('Btc-Hd-Keyring: Not initialized');
     }
 
-    // Validate BIP32 path format
-    if (!path || typeof path !== 'string') {
-      throw new Error('Invalid path: must be a non-empty string');
-    }
-    if (!/^m(\/\d+'?)+$/.test(path)) {
-      throw new Error('Invalid BIP32 path format. Expected format: m/number/number (e.g. m/100/0)');
-    }
-
-    // Block standard BIP44/49/84/86 paths to prevent address tracking
-    const standardPrefixes = ["m/44'", "m/49'", "m/84'", "m/86'"];
-    if (standardPrefixes.some(prefix => path.startsWith(prefix))) {
-      throw new Error('Standard BIP44/49/84/86 derivation paths are not allowed for getPKHByPath to prevent address tracking');
-    }
+    // Parses the path (rejecting leading zeros, out-of-range indexes and over-long paths) and
+    // blocks the standard account trees plus this keyring's own hdPath.
+    assertNonAccountBip32Path(path, this.hdPath);
 
     const child = this.hdWallet.derive(path);
     const ecpair = ECPair.fromPrivateKey(child.privateKey, {

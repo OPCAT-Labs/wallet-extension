@@ -215,6 +215,12 @@ export const TestIds = {
   },
 
   // DApp Approval
+  MULTI_SIGN: {
+    ITEM_ACTION: 'multi-sign-item-action',
+    SUBMIT_BUTTON: 'multi-sign-submit-button',
+    REJECT_ALL_BUTTON: 'multi-sign-reject-all-button',
+  },
+
   APPROVAL: {
     SITE_NAME: 'approval-site-name',
     SITE_URL: 'approval-site-url',

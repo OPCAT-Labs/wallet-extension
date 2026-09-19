@@ -17,7 +17,7 @@ import {
   smallPayService
 } from './service';
 import { storage } from './webapi';
-import { browserRuntimeOnConnect, browserRuntimeOnInstalled } from './webapi/browser';
+import { browserRuntimeId, browserRuntimeOnConnect, browserRuntimeOnInstalled } from './webapi/browser';
 
 // Chrome SidePanel API type declarations
 declare global {
@@ -90,7 +90,7 @@ async function restoreAppState() {
 
   // Initialize phishing service early to ensure protection is active
   try {
-    phishingService.forceUpdate();
+    phishingService.ensureUpToDate();
   } catch (error) {
     log.error('[Background] Failed to initialize phishing service:', error);
     // Continue initialization even if phishing service fails
@@ -112,6 +112,12 @@ walletController.setupAutoLockAlarmListener();
 // for page provider
 browserRuntimeOnConnect((port) => {
   if (port.name === 'popup' || port.name === 'notification' || port.name === 'tab' || port.name === 'sidepanel') {
+    // The wallet-controller channel is for the extension's own pages only.
+    if (port.sender?.id !== browserRuntimeId()) {
+      log.warn('rejected wallet-controller port from', port.sender?.id, port.sender?.url);
+      port.disconnect();
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pm = new PortMessage(port as any);
     pm.listen((data) => {

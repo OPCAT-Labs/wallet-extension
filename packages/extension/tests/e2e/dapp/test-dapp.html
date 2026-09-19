@@ -310,6 +310,15 @@
         Run Test
       </button>
     </div>
+
+    <!-- Test 11: signPsbts (batch signing) -->
+    <div class="test-card">
+      <h3>Test 11: signPsbts (batch)</h3>
+      <p>Sign several PSBTs in one approval. Enter newline-separated PSBT hexes below first.</p>
+      <button data-testid="test-sign-psbts" onclick="testSignPsbts()">
+        Run Test
+      </button>
+    </div>
   </div>
 
   <!-- PSBT Input Section -->
@@ -326,6 +335,22 @@
         id="psbt-output"
         data-testid="psbt-output"
         placeholder="Signed PSBT will appear here..."
+        readonly
+      ></textarea>
+    </div>
+
+    <h3>PSBT Inputs (for signPsbts test, one hex per line)</h3>
+    <textarea
+      id="psbts-input"
+      data-testid="psbts-input"
+      placeholder="Enter one PSBT hex per line..."
+    ></textarea>
+    <div>
+      <strong>Signed PSBTs Output:</strong>
+      <textarea
+        id="psbts-output"
+        data-testid="psbts-output"
+        placeholder="Signed PSBTs will appear here, one per line..."
         readonly
       ></textarea>
     </div>
@@ -598,6 +623,42 @@
         } else {
           showModal('fail', 'Failed', 'Unexpected ECDH result:\n' + JSON.stringify(result, null, 2));
         }
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    // Test 11: signPsbts (batch signing in one approval)
+    async function testSignPsbts() {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+
+      const psbtHexs = document
+        .getElementById('psbts-input')
+        .value.split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      if (psbtHexs.length === 0) {
+        showModal('fail', 'Failed', 'Please enter at least one PSBT hex in the batch input field first.');
+        return;
+      }
+
+      showModal('testing', 'Testing...', 'Please SIGN all ' + psbtHexs.length + ' transactions in the wallet popup.');
+
+      try {
+        const signedPsbts = await window.opcat.signPsbts(psbtHexs);
+
+        if (!Array.isArray(signedPsbts) || signedPsbts.length !== psbtHexs.length) {
+          showModal('fail', 'Failed', 'Expected ' + psbtHexs.length + ' signed PSBTs, got: ' + JSON.stringify(signedPsbts));
+          return;
+        }
+
+        document.getElementById('psbts-output').value = signedPsbts.join('\n');
+
+        showModal('success', 'Success', 'Signed ' + signedPsbts.length + ' PSBTs successfully!');
       } catch (error) {
         showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
       }

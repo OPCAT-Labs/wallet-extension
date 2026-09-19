@@ -57,7 +57,7 @@ export function SearchBar() {
     if (value) {
       if (isAddress(value)) {
         const onSearch = () => {
-          window.open(chain.unisatExplorerUrl + '/address/' + value);
+          window.open(chain.mempoolSpaceUrl + '/address/' + value);
         };
 
         return {
@@ -74,7 +74,7 @@ export function SearchBar() {
 
       if (isTxid(value)) {
         const onSearch = () => {
-          window.open(chain.unisatExplorerUrl + '/tx/' + value);
+          window.open(chain.mempoolSpaceUrl + '/tx/' + value);
         };
         return {
           searchContent: (
@@ -90,7 +90,7 @@ export function SearchBar() {
 
       if (isBlock(value)) {
         const onSearch = () => {
-          window.open(chain.unisatExplorerUrl + '/block/' + value);
+          window.open(chain.mempoolSpaceUrl + '/block/' + value);
         };
         return {
           searchContent: (
@@ -104,24 +104,10 @@ export function SearchBar() {
         };
       }
 
-      const onSearch = () => {
-        window.open(chain.unisatUrl + '/search2?type=text&q=' + value);
-      };
-
-      return {
-        searchContent: (
-          <Row py={'lg'} px={'lg'} clickable onClick={onSearch}>
-            <Text text={t('text_preview')} preset={'sub'} size={'sm'} style={{ whiteSpace: 'nowrap' }} />
-            <Text text={value} fullX ellipsis />
-            <EnterOutlined style={{ color: '#ccc', fontSize: 14 }} />
-          </Row>
-        ),
-        onSearch
-      };
     }
 
     function gotoExplorer() {
-      window.open(chain.unisatExplorerUrl);
+      window.open(chain.mempoolSpaceUrl);
     }
 
     return {
@@ -136,7 +122,7 @@ export function SearchBar() {
             {!info ? <Spin size={'small'} /> : <Text text={info.allAddrs} digital />}{' '}
           </Row>
           <Text
-            text={t('go_to_unisat_explorer')}
+            text={t('go_to_explorer')}
             size={'xs'}
             selfItemsCenter
             color={'primary'}

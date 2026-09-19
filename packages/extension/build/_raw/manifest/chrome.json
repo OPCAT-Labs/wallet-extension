@@ -1,7 +1,3 @@
 {
-  "externally_connectable": {
-    "matches": ["https://opcatlabs.io/*"],
-    "ids": ["*"]
-  },
   "minimum_chrome_version": "88"
 }

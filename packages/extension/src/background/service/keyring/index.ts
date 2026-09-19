@@ -177,6 +177,12 @@ class KeyringService extends EventEmitter {
   };
 
   boot = async (password: string) => {
+    // Re-booting over an existing vault rewrites `booted` under a new password while `vault` stays
+    // encrypted with the old one, locking the wallet under both. Password changes go through
+    // changePassword, re-initialisation through an explicit reset.
+    if (this.isBooted() || this.hasVault()) {
+      throw new Error('wallet is already initialized');
+    }
     this.password = password;
     const encryptBooted = await this.encryptor.encrypt(password, 'true');
     this.store.updateState({ booted: encryptBooted });
@@ -436,29 +442,38 @@ class KeyringService extends EventEmitter {
   };
 
   changePassword = async (oldPassword: string, newPassword: string) => {
-    try {
-      if (this.isUnlocking) {
-        throw new Error(t('change_password_already_in_progress'));
-      }
-      this.isUnlocking = true;
+    // Checked before the try so the finally below cannot clear a flag this call never took.
+    if (this.isUnlocking) {
+      throw new Error(t('change_password_already_in_progress'));
+    }
+    this.isUnlocking = true;
 
+    try {
       await this.verifyPassword(oldPassword);
       await this.unlockKeyrings(oldPassword);
-      this.password = newPassword;
 
-      const encryptBooted = await this.encryptor.encrypt(newPassword, 'true');
-      this.store.updateState({ booted: encryptBooted });
+      // Encrypt everything under the new password first and commit it in a single store update.
+      // Writing `booted` before re-encrypting the vault left the two blobs under different
+      // passwords whenever the worker died in between — the vault then opened with neither.
+      const serializedKeyrings = await this._serializeAllKeyrings();
+      const vault = await this.encryptor.encrypt(newPassword, serializedKeyrings as unknown as Buffer);
+      const booted = await this.encryptor.encrypt(newPassword, 'true');
 
-      if (this.memStore.getState().preMnemonics) {
-        const mnemonic = await this.encryptor.decrypt(oldPassword, this.memStore.getState().preMnemonics);
-        const preMnemonics = await this.encryptor.encrypt(newPassword, mnemonic);
+      const currentPreMnemonics = this.memStore.getState().preMnemonics;
+      const preMnemonics = currentPreMnemonics
+        ? await this.encryptor.encrypt(newPassword, await this.encryptor.decrypt(oldPassword, currentPreMnemonics))
+        : null;
+
+      this.store.updateState({ booted, vault });
+      if (preMnemonics) {
         this.memStore.updateState({ preMnemonics });
       }
+      this.password = newPassword;
 
-      await this.persistAllKeyrings();
       await this._updateMemStoreKeyrings();
       await this.fullUpdate();
     } catch (e) {
+      log.error('changePassword failed:', e);
       throw new Error(t('change_password_failed'));
     } finally {
       this.isUnlocking = false;
@@ -672,10 +687,7 @@ class KeyringService extends EventEmitter {
    * @param {string} password - The keyring controller password.
    * @returns {Promise<boolean>} Resolves to true once keyrings are persisted.
    */
-  persistAllKeyrings = (): Promise<boolean> => {
-    if (!this.password || typeof this.password !== 'string') {
-      return Promise.reject(new Error(t('keyringcontroller_password_is_not_a_string')));
-    }
+  private _serializeAllKeyrings = () => {
     return Promise.all(
       this.keyrings.map((keyring, index) => {
         return Promise.all([keyring.type, keyring.serialize()]).then((serializedKeyringArray) => {
@@ -687,14 +699,17 @@ class KeyringService extends EventEmitter {
           };
         });
       })
-    )
-      .then((serializedKeyrings) => {
-        return this.encryptor.encrypt(this.password as string, serializedKeyrings as unknown as Buffer);
-      })
-      .then((encryptedString) => {
-        this.store.updateState({ vault: encryptedString });
-        return true;
-      });
+    );
+  };
+
+  persistAllKeyrings = async (): Promise<boolean> => {
+    if (!this.password || typeof this.password !== 'string') {
+      throw new Error(t('keyringcontroller_password_is_not_a_string'));
+    }
+    const serializedKeyrings = await this._serializeAllKeyrings();
+    const encryptedString = await this.encryptor.encrypt(this.password, serializedKeyrings as unknown as Buffer);
+    this.store.updateState({ vault: encryptedString });
+    return true;
   };
 
   /**

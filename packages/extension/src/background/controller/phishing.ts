@@ -5,15 +5,35 @@ import phishingService from '@/background/service/phishing';
 import { MANIFEST_VERSION } from '@/shared/constant';
 
 /**
- * Default update interval for phishing rules (24 hours)
+ * True when `rawUrl` is this extension's own phishing warning page.
+ *
+ * Both call sites used `includes('index.html#/phishing')` on an attacker-influenced URL, so a
+ * blacklisted site could skip the check by serving that path (or putting the extension URL in its
+ * own query string). Identity checks parse the URL instead of substring-matching it.
  */
-const DEFAULT_UPDATE_INTERVAL = 24 * 60 * 60 * 1000;
+function isPhishingWarningPage(rawUrl: string): boolean {
+  try {
+    const url = new URL(rawUrl);
+    const warningPage = new URL(chrome.runtime.getURL('index.html'));
+    return (
+      url.protocol === warningPage.protocol &&
+      url.host === warningPage.host &&
+      url.pathname === warningPage.pathname &&
+      url.hash.startsWith('#/phishing')
+    );
+  } catch {
+    return false;
+  }
+}
 
 /**
  * PhishingController class for handling all phishing protection related functionality
  */
 class PhishingController {
-  private updateIntervalId: NodeJS.Timeout | null = null;
+  /**
+   * Serialises rule rebuilds: they are triggered by list updates and by the session whitelist.
+   */
+  private pendingRuleUpdate: Promise<void> = Promise.resolve();
 
   /**
    * Initialize phishing protection features
@@ -93,8 +113,12 @@ class PhishingController {
           }
 
           phishingService.addToWhitelist(message.hostname);
-          sendResponse({ success: true });
-          return false;
+          // addToWhitelist queues the removal of that host's redirect rule. Acknowledging before
+          // it lands sends the navigation that follows straight back to the warning page.
+          this.pendingRuleUpdate
+            .catch(() => undefined)
+            .then(() => sendResponse({ success: true }));
+          return true;
         }
 
         case PhishingMessageType.FORCE_UPDATE_PHISHING_LIST: {
@@ -119,8 +143,8 @@ class PhishingController {
           try {
             const url = new URL(message.url);
 
-            // Skip checks for phishing warning page URL
-            if (message.url.includes(chrome.runtime.getURL('index.html#/phishing'))) {
+            // Skip checks for the warning page itself (loop guard)
+            if (isPhishingWarningPage(message.url)) {
               sendResponse({ isPhishing: false, skipped: true });
               return false;
             }
@@ -161,7 +185,7 @@ class PhishingController {
       const currentUrl = tab.url || '';
 
       // If already on warning page, don't redirect again
-      if (currentUrl.includes('index.html#/phishing')) {
+      if (isPhishingWarningPage(currentUrl)) {
         return;
       }
 
@@ -184,16 +208,20 @@ class PhishingController {
    * Initializes rules and schedules periodic updates
    * @param updateInterval Interval in milliseconds for rule updates
    */
-  public setupDeclarativeRules(updateInterval = DEFAULT_UPDATE_INTERVAL): void {
+  public setupDeclarativeRules(): void {
     if (MANIFEST_VERSION !== 'mv3' || !chrome.declarativeNetRequest) {
       return;
     }
 
-    // Initialize declarative rules when extension loads
-    this.initDeclarativeRules();
-
-    // Schedule periodic updates of the rules
-    this.updateIntervalId = setInterval(() => this.updateDeclarativeRules(), updateInterval);
+    // Rebuild whenever the lists or the session whitelist change. This also fires immediately if
+    // the service already finished loading, which is the common case: init() below used to run
+    // against an empty blacklist and then nothing ever rebuilt the rules, leaving the network
+    // layer inert for the whole service-worker lifetime.
+    phishingService.onChange(() => {
+      this.pendingRuleUpdate = this.pendingRuleUpdate
+        .catch(() => undefined)
+        .then(() => this.updateDeclarativeRules());
+    });
   }
 
   /**
@@ -222,21 +250,14 @@ class PhishingController {
       const config = phishingService.getConfig();
       const blacklist = config.blacklist || [];
 
-      if (!blacklist.length) {
-        log.warn('[Phishing] No blacklisted domains available for rules');
-        return;
-      }
+      // Hosts the user chose to proceed to this session must not be redirected back.
+      const proceeded = new Set(phishingService.getTemporaryWhitelist());
+      const rules = this.createPhishingRules(blacklist.filter((domain) => !proceeded.has(domain)));
 
-      // First, remove existing rules
+      // One call, so a failure to add cannot leave the rule set empty (the removal used to be a
+      // separate await). An empty blacklist now clears stale rules instead of returning early.
       await chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: await this.getCurrentRuleIds()
-      });
-
-      // Create new rules based on blacklist
-      const rules = this.createPhishingRules(blacklist);
-
-      // Update with new rules
-      await chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: await this.getCurrentRuleIds(),
         addRules: rules
       });
 

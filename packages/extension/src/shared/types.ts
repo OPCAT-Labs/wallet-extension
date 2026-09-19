@@ -12,7 +12,7 @@ export enum NetworkType {
 
 // todo: only preserve opcat wallet
 export enum RestoreWalletType {
-  UNISAT,
+  CATENA,
   SPARROW,
   XVERSE,
   OTHERS

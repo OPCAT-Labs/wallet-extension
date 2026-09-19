@@ -2,7 +2,7 @@ import { max } from 'lodash';
 import LRU from 'lru-cache';
 
 import { createPersistStore } from '@/background/utils';
-import { CHAINS_ENUM, INTERNAL_REQUEST_ORIGIN } from '@/shared/constant';
+import { CHAINS_ENUM } from '@/shared/constant';
 
 export type PermissionType = 'connect' | 'ecdh' | 'getPKHByPath' | 'smallPay';
 
@@ -88,14 +88,12 @@ class PermissionService {
 
   touchConnectedSite = (origin) => {
     if (!this.lruCache) return;
-    if (origin === INTERNAL_REQUEST_ORIGIN) return;
     this.lruCache.get(origin);
     this.sync();
   };
 
   updateConnectSite = (origin: string, value: Partial<ConnectedSite>, partialUpdate?: boolean) => {
     if (!this.lruCache || !this.lruCache.has(origin)) return;
-    if (origin === INTERNAL_REQUEST_ORIGIN) return;
 
     if (partialUpdate) {
       const _value = this.lruCache.get(origin);
@@ -109,8 +107,6 @@ class PermissionService {
 
   hasPermission = (origin) => {
     if (!this.lruCache) return;
-    if (origin === INTERNAL_REQUEST_ORIGIN) return true;
-
     const site = this.lruCache.get(origin);
     return site && site.isConnected;
   };
@@ -192,10 +188,6 @@ class PermissionService {
     return this.lruCache.values().filter((item) => item.chain === chain);
   };
 
-  isInternalOrigin = (origin: string) => {
-    return origin === INTERNAL_REQUEST_ORIGIN;
-  };
-
   // ========== Granular Permission Methods ==========
 
   /**
@@ -246,8 +238,6 @@ class PermissionService {
    * Check if a site has a specific permission.
    */
   hasSitePermission = (origin: string, permissionType: PermissionType): boolean => {
-    if (origin === INTERNAL_REQUEST_ORIGIN) return true;
-
     const site = this.lruCache?.get(origin);
     if (!site || !site.isConnected) return false;
 

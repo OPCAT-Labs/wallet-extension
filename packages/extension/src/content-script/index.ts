@@ -307,74 +307,7 @@ XMLHttpRequest.prototype.open = function (
   return originalXHROpen.call(this, method, url, async, username || null, password || null);
 };
 
-// Add navigation interception
-// Listen for all possible navigation events
-window.addEventListener('beforeunload', async (e) => {
-  const url = window.location.href;
-  const result = await new Promise((resolve) => {
-    chromeRuntimeSendMessage(
-      {
-        type: 'CHECK_NAVIGATION',
-        url
-      },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          resolve(false);
-          return;
-        }
-        resolve(response?.isPhishing);
-      }
-    );
-  });
-
-  if (result) {
-    // If it's a phishing site, prevent navigation and show warning
-    e.preventDefault();
-    e.returnValue = '';
-  }
-});
-
-// Listen for click events
-document.addEventListener(
-  'click',
-  async (e) => {
-    const element = e.target as HTMLElement;
-    let url: string | null = null;
-
-    // Check for links
-    if (element instanceof HTMLAnchorElement && element.href) {
-      url = element.href;
-    }
-    // Check other elements that might trigger navigation
-    else if (element.hasAttribute('href')) {
-      url = element.getAttribute('href');
-    }
-
-    if (url) {
-      try {
-        const result = await new Promise((resolve) => {
-          chromeRuntimeSendMessage(
-            {
-              type: 'CHECK_NAVIGATION',
-              url
-            },
-            (response) => {
-              if (chrome.runtime.lastError) {
-                resolve(false);
-                return;
-              }
-              resolve(response?.isPhishing);
-            }
-          );
-        });
-
-        if (result) {
-          e.preventDefault();
-        }
-      } catch (e) {
-        console.log('[Navigation Check] Error:', e);
-      }
-    }
-  },
-  true
-);
+// Navigation is not intercepted here: both handlers awaited a background round-trip before
+// calling preventDefault(), which cannot cancel an already-dispatched default action. Blocking is
+// done by the declarativeNetRequest rules (main-frame redirect) plus the document_start check
+// above.

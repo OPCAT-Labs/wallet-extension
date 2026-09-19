@@ -15,7 +15,7 @@ export function PhishingDetection({ handleCancel }: { handleCancel: () => void }
 
       <Footer>
         <Row full>
-          <Button text={t('reject_blocked_by_unisat_wallet')} preset="danger" onClick={handleCancel} full />
+          <Button text={t('reject_blocked_by_wallet')} preset="danger" onClick={handleCancel} full />
         </Row>
       </Footer>
     </Layout>

@@ -1,16 +1,15 @@
 import { Tooltip } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { COIN_DUST } from '@/shared/constant';
 import { RawTxInfo } from '@/shared/types';
 import { Button, Card, Column, Content, Header, Icon, Image, Input, Layout, Row, Text } from '@/ui/components';
 import { useTools } from '@/ui/components/ActionComponent';
 import { BtcUsd } from '@/ui/components/BtcUsd';
-import { getSpecialLocale, useI18n } from '@/ui/hooks/useI18n';
-import { useUtxoTools } from '@/ui/hooks/useUtxoTools';
+import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
 import { useAccountBalance } from '@/ui/state/accounts/hooks';
-import { useBTCUnit, useChain, useWalletConfig } from '@/ui/state/settings/hooks';
+import { useBTCUnit, useChain } from '@/ui/state/settings/hooks';
 import { useBitcoinTx, useFetchUtxosCallback, usePrepareSendBTCCallback } from '@/ui/state/transactions/hooks';
 import { useUiTxCreateScreen, useUpdateUiTxCreateScreen } from '@/ui/state/ui/hooks';
 import { colors } from '@/ui/theme/colors';
@@ -24,12 +23,6 @@ export default function TxCreateScreen() {
   const navigate = useNavigate();
   const bitcoinTx = useBitcoinTx();
   const btcUnit = useBTCUnit();
-  const [isSpecialLocale, setIsSpecialLocale] = useState(false);
-  useEffect(() => {
-    getSpecialLocale().then(({ isSpecialLocale }) => {
-      setIsSpecialLocale(isSpecialLocale);
-    });
-  }, []);
   const [disabled, setDisabled] = useState(true);
 
   const setUiState = useUpdateUiTxCreateScreen();
@@ -66,14 +59,18 @@ export default function TxCreateScreen() {
   const dustAmount = useMemo(() => satoshisToAmount(COIN_DUST), [COIN_DUST]);
 
   const [rawTxInfo, setRawTxInfo] = useState<RawTxInfo>();
+  const prepareRequestId = useRef(0);
 
-  const availableAmount = satoshisToAmount(+accountBalance.amount * 1e8);
+  // BigNumber, not `+amount * 1e8`: the float product rounds down for many balances (0.29 ->
+  // 28999999.999999996), which made the guard below reject the user's own full balance and left
+  // the Max button dead.
+  const availableSatoshis = useMemo(() => amountToSatoshis(accountBalance.amount), [accountBalance.amount]);
+  const availableAmount = satoshisToAmount(availableSatoshis);
   const unavailableAmount = satoshisToAmount(0);
 
   const showUnavailable = false;
 
   const chain = useChain();
-  const { openUtxoTools } = useUtxoTools(chain);
   useEffect(() => {
     setError('');
     setDisabled(true);
@@ -89,7 +86,7 @@ export default function TxCreateScreen() {
       return;
     }
 
-    if (toSatoshis > +accountBalance.amount * 1e8) {
+    if (toSatoshis > availableSatoshis) {
       setError(t('amount_exceeds_your_available_balance'));
       return;
     }
@@ -109,34 +106,27 @@ export default function TxCreateScreen() {
       return;
     }
 
+    // Each edit supersedes the one before it: without this token a slower earlier call could
+    // resolve last and re-enable Next with a transaction for inputs no longer on screen.
+    prepareRequestId.current += 1;
+    const requestId = prepareRequestId.current;
     prepareSendBTC({ toAddressInfo: toInfo, toAmount: toSatoshis, feeRate, enableRBF })
       .then((data) => {
-        // if (data.fee < data.estimateFee) {
-        //   setError(`Network fee must be at leat ${data.estimateFee}`);
-        //   return;
-        // }
+        if (requestId !== prepareRequestId.current) return;
         setRawTxInfo(data);
         setDisabled(false);
       })
       .catch((e) => {
+        if (requestId !== prepareRequestId.current) return;
         console.log(e);
         setError(e.message);
       });
-  }, [toInfo, inputAmount, feeRate, enableRBF]);
+  }, [toInfo, inputAmount, feeRate, enableRBF, availableSatoshis]);
 
-  const walletConfig = useWalletConfig();
-
-  const unavailableTipText = useMemo(() => {
-    let tipText = '';
-    tipText += t('unavailable_tooltip');
-
-    if (walletConfig.disableUtxoTools) {
-      tipText += t('future_versions_will_support_spending_these_assets');
-    } else {
-      tipText += t('you_can_unlock_these_assets_by_using_the_utxos_tools');
-    }
-    return tipText;
-  }, [chain.enum]);
+  const unavailableTipText = useMemo(
+    () => t('unavailable_tooltip') + t('future_versions_will_support_spending_these_assets'),
+    [chain.enum]
+  );
 
   return (
     <Layout>
@@ -241,18 +231,6 @@ export default function TxCreateScreen() {
                     <Text text={`${unavailableAmount}`} size="sm" />
                     <Text text={btcUnit} size="sm" color="textDim" />
                   </Row>
-                  {walletConfig.disableUtxoTools ? null : (
-                    <Button
-                      preset="minimal"
-                      text={t('unlock')}
-                      textStyle={{
-                        fontSize: isSpecialLocale ? '8px' : '14px'
-                      }}
-                      onClick={() => {
-                        openUtxoTools();
-                      }}
-                    />
-                  )}
                 </Row>
               </Row>
             ) : null}

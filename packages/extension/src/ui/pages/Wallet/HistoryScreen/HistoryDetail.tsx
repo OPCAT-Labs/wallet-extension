@@ -108,15 +108,6 @@ export function HistoryDetail({ detail, close }: HistoryDetailProps) {
         </Card>
 
         <Column gap={'lg'} mt={'lg'}>
-          {chain.unisatExplorerUrl && (
-            <Button
-              text={t('view_on_unisat_explorer')}
-              preset={'primary'}
-              onClick={() => {
-                window.open(`${chain.unisatExplorerUrl}/tx/${detail.txid}`);
-              }}
-            />
-          )}
           {chain.okxExplorerUrl && (
             <Button
               text={t('view_on_okx_explorer')}

@@ -41,6 +41,7 @@ export interface BaseViewProps {
   'data-address'?: string;
   'data-token-symbol'?: string;
   'data-token-name'?: string;
+  'data-token-id'?: string;
   'data-collection-name'?: string;
   'data-collection-id'?: string;
   'data-local-id'?: string;
@@ -83,6 +84,7 @@ export function BaseView(props: BaseViewProps) {
     'data-address': dataAddress,
     'data-token-symbol': dataTokenSymbol,
     'data-token-name': dataTokenName,
+    'data-token-id': dataTokenId,
     'data-collection-name': dataCollectionName,
     'data-collection-id': dataCollectionId,
     'data-local-id': dataLocalId
@@ -130,6 +132,7 @@ export function BaseView(props: BaseViewProps) {
       data-address={dataAddress}
       data-token-symbol={dataTokenSymbol}
       data-token-name={dataTokenName}
+      data-token-id={dataTokenId}
       data-collection-name={dataCollectionName}
       data-collection-id={dataCollectionId}
       data-local-id={dataLocalId}>

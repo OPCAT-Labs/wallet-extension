@@ -1,6 +1,7 @@
 
 import { ExtPsbt, PrivateKey, crypto, Network, Networks, SignOptions, Signer, hexToUint8Array, SupportedNetwork, uint8ArrayToHex, PublicKey, fromSupportedNetwork } from '@opcat-labs/scrypt-ts-opcat'
 import { DisplayedKeyring, Keyring } from '@/background/service/keyring';
+import { checkInputIndex } from './toSignInputs';
 import { Account, AddressUserToSignInput, PublicKeyUserToSignInput, SignPsbtOptions, ToSignInput, WalletKeyring } from '@/shared/types';
 import { KEYRING_TYPE } from '@/shared/constant';
 import {
@@ -92,14 +93,14 @@ export class KeyringSigner implements Signer {
   formatOptionsToSignInputs = async (_psbt: string | ExtPsbt, options?: SignPsbtOptions) => {
     const account = this.account
     if (!account) throw null;
+    const psbt = typeof _psbt === 'string' ? ExtPsbt.fromHex(_psbt) : _psbt;
 
     let toSignInputs: ToSignInput[] = [];
     if (options && options.toSignInputs) {
       // We expect userToSignInputs objects to be similar to ToSignInput interface,
       // but we allow address to be specified in addition to publicKey for convenience.
       toSignInputs = options.toSignInputs.map((input) => {
-        const index = Number(input.index);
-        if (isNaN(index)) throw new Error('invalid index in toSignInput');
+        const index = checkInputIndex(input.index, psbt.data.inputs.length);
 
         if (!(input as AddressUserToSignInput).address && !(input as PublicKeyUserToSignInput).publicKey) {
           throw new Error('no address or public key in toSignInput');
@@ -116,6 +117,9 @@ export class KeyringSigner implements Signer {
           throw new Error('invalid public key in toSignInput');
         }
 
+        // Not restricted to SIGHASH_ALL here: this signer is only driven by ExtPsbt.psbtOptions()
+        // inside wallet-initiated flows, where a contract may legitimately request another type.
+        // Page-facing requests go through WalletController.formatOptionsToSignInputs instead.
         const sighashTypes = input.sighashTypes?.map(Number);
         if (sighashTypes?.some(isNaN)) throw new Error('invalid sighash type in toSignInput');
 

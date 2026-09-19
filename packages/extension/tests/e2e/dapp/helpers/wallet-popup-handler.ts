@@ -96,6 +96,57 @@ async function isSignatureRequest(page: Page): Promise<boolean> {
 }
 
 /**
+ * Check if the page is a batch (multi-sign) request: one approval listing several transactions
+ */
+async function isMultiSignRequest(page: Page): Promise<boolean> {
+  try {
+    const submitButton = page.locator(`[data-testid="${TestIds.MULTI_SIGN.SUBMIT_BUTTON}"]`);
+    return await submitButton.count() > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Sign every transaction of a batch request and submit it.
+ *
+ * Each entry opens the ordinary SignPsbt detail screen, so the per-item sign button is the same
+ * one a single-transaction request uses; the list screen is only reached again once it returns.
+ */
+async function approveMultiSign(page: Page): Promise<void> {
+  const items = page.locator(`[data-testid^="${TestIds.MULTI_SIGN.ITEM_ACTION}-"]`);
+  const count = await items.count();
+  console.log(`[WalletPopupHandler] Multi-sign request with ${count} transaction(s)`);
+
+  for (let index = 0; index < count; index++) {
+    const item = page.locator(`[data-testid="${TestIds.MULTI_SIGN.ITEM_ACTION}-${index}"]`);
+    await item.click({ timeout: WALLET_TIMEOUTS.BUTTON_CLICK });
+
+    const signButton = page.locator(`[data-testid="${TestIds.SEND.SIGN_AND_PAY_BUTTON}"]`);
+    await signButton.waitFor({ timeout: WALLET_TIMEOUTS.BUTTON_CLICK });
+    await signButton.click({ timeout: WALLET_TIMEOUTS.BUTTON_CLICK });
+
+    // Back on the list screen before moving to the next entry
+    await page
+      .locator(`[data-testid="${TestIds.MULTI_SIGN.SUBMIT_BUTTON}"]`)
+      .waitFor({ timeout: WALLET_TIMEOUTS.BUTTON_CLICK });
+  }
+
+  const submitButton = page.locator(`[data-testid="${TestIds.MULTI_SIGN.SUBMIT_BUTTON}"]`);
+  await submitButton.click({ timeout: WALLET_TIMEOUTS.BUTTON_CLICK });
+  await page.waitForEvent('close', { timeout: WALLET_TIMEOUTS.POPUP_CLOSE }).catch(() => {});
+}
+
+/**
+ * Reject a whole batch request
+ */
+async function rejectMultiSign(page: Page): Promise<void> {
+  const rejectAll = page.locator(`[data-testid="${TestIds.MULTI_SIGN.REJECT_ALL_BUTTON}"]`);
+  await rejectAll.click({ timeout: WALLET_TIMEOUTS.BUTTON_CLICK });
+  await page.waitForEvent('close', { timeout: WALLET_TIMEOUTS.POPUP_CLOSE }).catch(() => {});
+}
+
+/**
  * Unlock wallet by entering password
  */
 async function unlockWallet(page: Page, password: string): Promise<void> {
@@ -195,7 +246,8 @@ export function setupWalletPopupHandler(
           const isConnection = await isConnectionApproval(newPage);
           const isRejectable = await isConnectionRejectable(newPage);
           const isSignature = await isSignatureRequest(newPage);
-          console.log(`[WalletPopupHandler] Checking popup state: welcome=${isWelcome}, unlock=${isUnlock}, connection=${isConnection}, rejectable=${isRejectable}, signature=${isSignature}`);
+          const isMultiSign = await isMultiSignRequest(newPage);
+          console.log(`[WalletPopupHandler] Checking popup state: welcome=${isWelcome}, unlock=${isUnlock}, connection=${isConnection}, rejectable=${isRejectable}, signature=${isSignature}, multiSign=${isMultiSign}`);
 
           // If showing welcome screen, service worker state not ready
           // Try reloading the page to trigger fresh state check
@@ -211,7 +263,7 @@ export function setupWalletPopupHandler(
           if (isWelcome) {
             return false;
           }
-          return isUnlock || isConnection || isRejectable || isSignature;
+          return isUnlock || isConnection || isRejectable || isSignature || isMultiSign;
         },
         { timeoutMs: WALLET_TIMEOUTS.POPUP_RENDER, intervalMs: 1000, taskName: 'Wallet popup render' }
       );
@@ -236,6 +288,20 @@ export function setupWalletPopupHandler(
           await rejectConnection(newPage);
         } else {
           await approveConnection(newPage);
+        }
+        return;
+      }
+
+      if (newPage.isClosed()) return;
+
+      // Handle batch request before the single-signature branch: opening one of its entries shows
+      // the same sign button, so the checks would otherwise overlap.
+      if (await isMultiSignRequest(newPage)) {
+        onPopup?.('multi-sign');
+        if (action === 'reject') {
+          await rejectMultiSign(newPage);
+        } else {
+          await approveMultiSign(newPage);
         }
         return;
       }

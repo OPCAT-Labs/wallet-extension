@@ -409,8 +409,8 @@
   "active_addresses_24h": {
     "message": "Active Addresses (24h)"
   },
-  "go_to_unisat_explorer": {
-    "message": "Go to UniScan"
+  "go_to_explorer": {
+    "message": "Go to Explorer"
   },
   "search_address_and_txids": {
     "message": "Search Address and TXIDs"
@@ -855,16 +855,13 @@
   "your_access_to_this_page_has_been_restricted_by_un": {
     "message": "Your access to this page has been restricted by Catena Wallet as it might be unsafe."
   },
-  "reject_blocked_by_unisat_wallet": {
+  "reject_blocked_by_wallet": {
     "message": "Reject (blocked by Catena Wallet)"
   },
   "warning": {
     "message": "Warning"
   },
-  "i_am_aware_of_the_risks": {
-    "message": "I am aware of the risks"
-  },
-  "connect_with_unisat_wallet": {
+  "connect_with_wallet": {
     "message": "Connect with Catena Wallet"
   },
   "select_the_account_to_use_on_this_site": {
@@ -1171,9 +1168,6 @@
   "confirm": {
     "message": "Confirm"
   },
-  "unisat": {
-    "message": "UNISAT"
-  },
   "try_again": {
     "message": "Try again"
   },
@@ -1369,7 +1363,7 @@
   "danger_potential_phishing_website_detected": {
     "message": "Danger! Potential phishing website detected"
   },
-  "this_website_has_been_identified_as_malicious_by_unisat_and_may": {
+  "this_website_has_been_identified_as_malicious_and_may": {
     "message": "This website has been identified as malicious by Catena and may:"
   },
   "steal_your_private_keys_or_seed_phrases": {
@@ -1525,9 +1519,6 @@
   "date": {
     "message": "Date"
   },
-  "view_on_unisat_explorer": {
-    "message": "View on Opcat Explorer"
-  },
   "view_on_okx_explorer": {
     "message": "View on OKX Explorer"
   },
@@ -1681,7 +1672,7 @@
   "address_or_name_fb": {
     "message": "Address"
   },
-  "address_or_name_sats_unisat_etc": {
+  "address_or_name": {
     "message": "Address"
   },
   "does_not_exist": {
@@ -2268,6 +2259,9 @@
   },
   "smallpay_clear_history": {
     "message": "Clear History"
+  },
+  "smallpay_clear_history_note": {
+    "message": "Payments from the last 24 hours are kept so the daily limit stays accurate."
   },
   "smallpay_remove_site": {
     "message": "Remove"

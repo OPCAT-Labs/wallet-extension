@@ -126,11 +126,6 @@ export function useExtensionUpdateUrl() {
   return `${chain.endpoints[0]}/v5/default/redirectUpdate`
 }
 
-export function useUnisatWebsite() {
-  const chainType = useChainType();
-  return CHAINS_MAP[chainType].unisatUrl;
-}
-
 export function useWalletConfig() {
   const accountsState = useSettingsState();
   return accountsState.walletConfig;
@@ -218,11 +213,6 @@ export function useCAT721NFTContentBaseUrl() {
   }
 }
 
-
-export function useCAT20MarketPlaceWebsite(tokenId: string) {
-  const chainType = useChainType();
-  return `${CHAINS_MAP[chainType].unisatUrl}/dex/cat20/${tokenId}`;
-}
 
 export function useIsMainnetChain() {
   const chainType = useChainType();

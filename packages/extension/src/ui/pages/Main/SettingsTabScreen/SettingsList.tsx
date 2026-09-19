@@ -40,14 +40,9 @@ export function SettingsList() {
 
       const origin = new URL(res.url).origin;
 
-      if (origin === 'https://unisat.io') {
+      const sites = await wallet.getConnectedSites();
+      if (sites.find((i) => i.origin === origin)) {
         setConnected(true);
-      } else {
-        const sites = await wallet.getConnectedSites();
-
-        if (sites.find((i) => i.origin === origin)) {
-          setConnected(true);
-        }
       }
     };
     run();

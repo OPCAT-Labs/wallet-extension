@@ -10,13 +10,17 @@ import { ToSignInput, UnspentOutput } from '../types';
 
 import { ExtPsbt, intToByteString, len } from '@opcat-labs/scrypt-ts-opcat';
 
+function isHexMemo(memo: string) {
+  return Buffer.from(memo, 'hex').toString('hex') === memo;
+}
+
+/** Each memo is encoded on its own: a hex-looking first entry used to decide for the whole list. */
+function memosToBuffers(memos: string[]) {
+  return memos.map((memo) => (isHexMemo(memo) ? Buffer.from(memo, 'hex') : Buffer.from(memo)));
+}
+
 function hexifyMemos(memos: string[]) {
-  return memos.map((memo) => {
-    if (Buffer.from(memo, 'hex').toString('hex') === memo) {
-      return memo;
-    }
-    return Buffer.from(memo).toString('hex');
-  });
+  return memos.map((memo) => (isHexMemo(memo) ? memo : Buffer.from(memo).toString('hex')));
 }
 
 function sendOpcatBtc({
@@ -136,17 +140,9 @@ export async function sendBTC({
   });
 
   if (memo) {
-    if (Buffer.from(memo, 'hex').toString('hex') === memo) {
-      tx.addOpreturn([Buffer.from(memo, 'hex')]);
-    } else {
-      tx.addOpreturn([Buffer.from(memo)]);
-    }
-  } else if (memos) {
-    if (Buffer.from(memos[0], 'hex').toString('hex') === memos[0]) {
-      tx.addOpreturn(memos.map((memo) => Buffer.from(memo, 'hex')));
-    } else {
-      tx.addOpreturn(memos.map((memo) => Buffer.from(memo)));
-    }
+    tx.addOpreturn(memosToBuffers([memo]));
+  } else if (memos && memos.length > 0) {
+    tx.addOpreturn(memosToBuffers(memos));
   }
 
   const toSignInputs = await tx.addSufficientUtxosForFee(btcUtxos);

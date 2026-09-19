@@ -162,11 +162,20 @@ export class Transaction {
   }
 
   removeChangeOutput() {
+    // Without the guard, splice(-1, 1) drops the *last* output — normally the recipient's — and
+    // its value silently becomes miner fee.
+    if (this.changeOutputIndex < 0) {
+      return;
+    }
     this.outputs.splice(this.changeOutputIndex, 1);
     this.changeOutputIndex = -1;
   }
 
   removeRecentOutputs(count: number) {
+    // splice(-0) is splice(0), which would empty the output list.
+    if (count <= 0) {
+      return;
+    }
     this.outputs.splice(-count);
   }
 

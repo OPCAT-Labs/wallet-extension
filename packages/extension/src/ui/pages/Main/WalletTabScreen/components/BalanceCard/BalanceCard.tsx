@@ -9,7 +9,6 @@ import { BtcUsd } from '@/ui/components/BtcUsd';
 import { Icon } from '@/ui/components/Icon';
 import { RefreshButton } from '@/ui/components/RefreshButton';
 import { getSpecialLocale, useI18n } from '@/ui/hooks/useI18n';
-import { useUtxoTools } from '@/ui/hooks/useUtxoTools';
 import { AppState } from '@/ui/state';
 import { useFetchBalanceCallback } from '@/ui/state/accounts/hooks';
 import { accountActions } from '@/ui/state/accounts/reducer';
@@ -37,7 +36,7 @@ const tooltipStyle = {
   marginLeft: '-50px'
 };
 
-export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRefresh = false }: BalanceCardProps) {
+export function BalanceCard({ accountBalance, enableRefresh = false }: BalanceCardProps) {
   const { t } = useI18n();
   const btcUnit = useBTCUnit();
   const chain = useChain();
@@ -56,8 +55,6 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       setIsSpecialLocale(isSpecialLocale);
     });
   }, []);
-
-  const { openUtxoTools } = useUtxoTools(chain);
 
   const backgroundImage = './images/artifacts/balance-bg-btc.png';
 
@@ -126,12 +123,6 @@ export function BalanceCard({ accountBalance, disableUtxoTools = true, enableRef
       <Icon icon={isBalanceHidden ? 'balance-eyes-closed' : 'balance-eyes'} size={16} />
     </div>
   );
-
-  const handleUnlock = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (disableUtxoTools) return;
-    openUtxoTools();
-  };
 
   return (
     <div

@@ -32,6 +32,7 @@ export function CAT20BalanceCard(props: CAT20BalanceCardProps) {
       testid={TestIds.CAT20.TOKEN_ITEM}
       data-token-symbol={tokenBalance.symbol}
       data-token-name={tokenBalance.name}
+      data-token-id={tokenBalance.tokenId}
       onClick={() => {
         onClick && onClick();
       }}>

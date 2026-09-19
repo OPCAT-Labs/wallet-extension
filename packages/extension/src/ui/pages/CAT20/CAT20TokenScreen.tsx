@@ -12,7 +12,7 @@ import { TickUsdWithoutPrice, TokenType } from '@/ui/components/TickUsd';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { useCurrentKeyring } from '@/ui/state/keyrings/hooks';
-import { useCAT20MarketPlaceWebsite, useCAT20TokenInfoExplorerUrl, useChainType } from '@/ui/state/settings/hooks';
+import { useCAT20TokenInfoExplorerUrl } from '@/ui/state/settings/hooks';
 import { colors } from '@/ui/theme/colors';
 import { fontSizes } from '@/ui/theme/font';
 import { copyToClipboard, shortAddress, showLongNumber, useLocationState, useWallet } from '@/ui/utils';
@@ -73,12 +73,6 @@ export default function CAT20TokenScreen() {
     }
     return enable;
   }, [tokenSummary]);
-
-  const chainType = useChainType();
-  const enableTrade = useMemo(() => {
-    return false;
-  }, [chainType]);
-  const marketPlaceUrl = useCAT20MarketPlaceWebsite(tokenId);
 
   if (loading) {
     return (
@@ -181,19 +175,6 @@ export default function CAT20TokenScreen() {
                 }}
                 full
               />
-
-              {enableTrade ? (
-                <Button
-                  text={t('trade')}
-                  preset="home"
-                  icon="trade"
-                  disabled={!enableTrade}
-                  onClick={(_e) => {
-                    window.open(marketPlaceUrl);
-                  }}
-                  full
-                />
-              ) : null}
             </Row>
           </Column>
 

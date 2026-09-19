@@ -1,6 +1,6 @@
 import { notificationService, permissionService, sessionService } from '@/background/service';
-import { CHAINS, CHAINS_MAP, NETWORK_TYPES, VERSION } from '@/shared/constant';
-import { NetworkType, RequestMethodSendBitcoinParams, RequestMethodSignMessageParams, RequestMethodSignMessagesParams, RequestMethodSignPsbtParams, RequestMethodSignPsbtsParams } from '@/shared/types';
+import { CHAINS, CHAINS_MAP, KEYRING_TYPE, NETWORK_TYPES, VERSION } from '@/shared/constant';
+import { NetworkType, RequestMethodSendBitcoinParams, RequestMethodSignMessageParams, RequestMethodSignMessagesParams, RequestMethodSignPsbtParams, RequestMethodSignPsbtsParams, TxType } from '@/shared/types';
 import { getChainInfo } from '@/shared/utils';
 import { amountToSatoshis } from '@/ui/utils';
 import { bitcoin } from '@opcat-labs/wallet-sdk/lib/bitcoin-core';
@@ -11,9 +11,14 @@ import BaseController from '../base';
 import wallet from '../wallet';
 
 import { psbtFromHex, estimatePsbtFeeInfo } from '@/background/utils/psbt';
+import { assertNonAccountBip32Path } from '@opcat-labs/wallet-sdk/lib/keyring';
+import { findSighashNoneInputs } from '@/background/utils/toSignInputs';
 import { formatPsbtHex } from '@/ui/utils/psbt-utils';
 
 
+
+// Page-supplied batch sizes are rendered one card per entry in the approval window.
+const MAX_MULTI_SIGN_ITEMS = 100;
 
 class ProviderController extends BaseController {
 
@@ -258,7 +263,10 @@ class ProviderController extends BaseController {
     params.psbtHex = formatPsbtHex(params.psbtHex);
   }])
   signPsbt = async ({ data: { params: { psbtHex, options } }, approvalRes }) => {
-    if (approvalRes && approvalRes.signed==true) {
+    // Only the Keystone flow produces a signed PSBT inside the approval UI; the `signed` flag is
+    // derived from page-supplied params there, so it is never trusted for software keyrings.
+    const account = await wallet.getCurrentAccount();
+    if (approvalRes?.signed === true && account?.type === KEYRING_TYPE.KeystoneKeyring) {
       return approvalRes.psbtHex
     }
     const psbt = psbtFromHex(psbtHex)
@@ -270,6 +278,12 @@ class ProviderController extends BaseController {
 
   @Reflect.metadata('APPROVAL', ['MultiSignPsbt', (req) => {
     const params:RequestMethodSignPsbtsParams = req.data.params;
+    if (!Array.isArray(params.psbtHexs) || params.psbtHexs.length === 0) {
+      throw new Error('psbtHexs is required')
+    }
+    if (params.psbtHexs.length > MAX_MULTI_SIGN_ITEMS) {
+      throw new Error(`psbtHexs is limited to ${MAX_MULTI_SIGN_ITEMS} entries`)
+    }
     params.psbtHexs.forEach(psbtHex=>{
       if(!psbtHex){
         throw new Error('psbtHex is required')
@@ -278,16 +292,35 @@ class ProviderController extends BaseController {
 
     params.psbtHexs = params.psbtHexs.map(psbtHex => formatPsbtHex(psbtHex));
   }])
-  multiSignPsbt = async ({ data: { params: { psbtHexs, options } } }) => {
+  multiSignPsbt = async ({ data: { params: { psbtHexs, options } }, approvalRes }) => {
     const account = await wallet.getCurrentAccount();
     if (!account) throw null;
-    const networkType = wallet.getNetworkType()
-    const psbtNetwork = toPsbtNetwork(networkType)
+    // The approval screen reports the entries the user did not reject. Anything else is handed
+    // back unsigned, so an explicit rejection can never produce a signature.
+    const approvedIndexes: number[] | null = Array.isArray(approvalRes?.approvedIndexes)
+      ? approvalRes.approvedIndexes
+      : null;
+    // Keystone signs inside the approval UI; the background keyring cannot sign for it, so its
+    // results are taken from the approval instead of being re-derived (and discarded) here.
+    const uiSignedHexs: string[] | null =
+      account.type === KEYRING_TYPE.KeystoneKeyring && Array.isArray(approvalRes?.psbtHexs)
+        ? approvalRes.psbtHexs
+        : null;
     const result: string[] = [];
     for (let i = 0; i < psbtHexs.length; i++) {
-      const psbt = bitcoin.Psbt.fromHex(psbtHexs[i], { network: psbtNetwork });
-      const autoFinalized = (options && options[i] && options[i].autoFinalized == false) ? false : true;
-      const toSignInputs = await wallet.formatOptionsToSignInputs(psbtHexs[i], options[i]);
+      if (approvedIndexes && !approvedIndexes.includes(i)) {
+        result.push(psbtHexs[i]);
+        continue;
+      }
+      if (uiSignedHexs) {
+        result.push(uiSignedHexs[i]);
+        continue;
+      }
+      // psbtFromHex (the OPCAT Psbt) and not bitcoinjs: signing goes through the OPCAT sighash,
+      // as in signPsbt.
+      const psbt = psbtFromHex(psbtHexs[i]);
+      const autoFinalized = options?.[i]?.autoFinalized === false ? false : true;
+      const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, options?.[i]);
       await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
       result.push(psbt.toHex())
     }
@@ -297,8 +330,11 @@ class ProviderController extends BaseController {
 
   @Reflect.metadata('APPROVAL', ['MultiSignMessage', (req) => {
     const params:RequestMethodSignMessagesParams = req.data.params;
-    if(params.messages.length == 0){
+    if(!Array.isArray(params.messages) || params.messages.length == 0){
       throw new Error('data is required')
+    }
+    if (params.messages.length > MAX_MULTI_SIGN_ITEMS) {
+      throw new Error(`messages is limited to ${MAX_MULTI_SIGN_ITEMS} entries`)
     }
     for (let i = 0; i < params.messages.length; i++) {
       const message = params.messages[i];
@@ -310,11 +346,19 @@ class ProviderController extends BaseController {
       }
     }
   }])
-  multiSignMessage = async ({ data: { params: { messages } } }) => {
+  multiSignMessage = async ({ data: { params: { messages } }, approvalRes }) => {
     const account = await wallet.getCurrentAccount();
     if (!account) throw null;
+    // As in multiSignPsbt: messages the user rejected come back as an empty signature.
+    const approvedIndexes: number[] | null = Array.isArray(approvalRes?.approvedIndexes)
+      ? approvalRes.approvedIndexes
+      : null;
     const result: string[] = [];
     for (let i = 0; i < messages.length; i++) {
+      if (approvedIndexes && !approvedIndexes.includes(i)) {
+        result.push('');
+        continue;
+      }
       const message = messages[i];
       if (message.type === 'bip322-simple') {
         result.push(await wallet.signBIP322Simple(message.text))
@@ -382,13 +426,9 @@ class ProviderController extends BaseController {
     if (!params.path || typeof params.path !== 'string') {
       throw new Error('path is required and must be a string');
     }
-    if (!/^m(\/\d+'?)+$/.test(params.path)) {
-      throw new Error('Invalid BIP32 path format');
-    }
-    const blocked = ["m/44'", "m/49'", "m/84'", "m/86'"];
-    if (blocked.some(p => params.path.startsWith(p))) {
-      throw new Error('Standard BIP44/49/84/86 paths are not allowed');
-    }
+    // Same parser the keyring uses, so this pre-check cannot disagree with the real gate.
+    // The keyring additionally blocks its own hdPath, which is not known synchronously here.
+    assertNonAccountBip32Path(params.path);
     // Skip approval if site already has getPKHByPath permission
     if (permissionService.hasSitePermission(req.session.origin, 'getPKHByPath')) {
       return true;
@@ -546,24 +586,30 @@ class ProviderController extends BaseController {
     // Estimate fee using ExtPsbt's proper size calculation (handles data/OP_RETURN outputs)
     const { feeRate } = estimatePsbtFeeInfo(psbtHex);
     const toSignInputs = await wallet.formatOptionsToSignInputs(psbt, params.options);
+    // No approval screen can warn the user here, and a SIGHASH_NONE signature commits to none of the
+    // outputs the limit checks above were computed from, so it is refused outright.
+    if (findSighashNoneInputs(psbt.data.inputs, toSignInputs).length > 0) {
+      throw new Error('SmallPay does not auto-sign SIGHASH_NONE inputs');
+    }
 
-    // Validate the payment
-    const validation = wallet.validateSmallPayment(origin, amount, feeRate);
-    if (!validation.valid) {
-      // Fallback to signPsbt approval popup when SmallPay limits exceeded
+    // Reserve the amount against the 24h limit before the first await, so concurrent requests
+    // cannot all validate against the same pre-spend total.
+    const reservation = wallet.reserveSmallPayment(origin, amount, feeRate);
+    if (!reservation.valid) {
+      // Fallback to signPsbt approval popup when SmallPay cannot auto-sign
       const approvalRes = await notificationService.requestApproval({
         approvalComponent: 'SignPsbt',
         params: {
           method: 'signPsbt',
-          data: { psbtHex: params.psbtHex, options: params.options },
+          data: { psbtHex: params.psbtHex, options: params.options, type: TxType.SIGN_TX },
           session: { origin: session.origin, name: session.name, icon: session.icon }
         },
         origin: session.origin
       });
 
-      // Sign the PSBT after user approval
+      // Only the Keystone flow signs inside the approval UI; software keyrings sign here.
       let fallbackSignedHex: string;
-      if (approvalRes && approvalRes.signed === true) {
+      if (approvalRes?.signed === true && account.type === KEYRING_TYPE.KeystoneKeyring) {
         fallbackSignedHex = approvalRes.psbtHex;
       } else {
         const fallbackPsbt = psbtFromHex(formatPsbtHex(params.psbtHex));
@@ -582,44 +628,49 @@ class ProviderController extends BaseController {
       };
     }
 
-    // P2PKH wallet check already done above — safe to sign
+    try {
+      // P2PKH wallet check already done above — safe to sign
 
-    // Sign the PSBT (reuse signPsbt logic)
-    const autoFinalized = params.options?.autoFinalized !== false;
-    await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
-    const signedPsbtHex = psbt.toHex();
+      // Sign the PSBT (reuse signPsbt logic)
+      const autoFinalized = params.options?.autoFinalized !== false;
+      await wallet.signPsbt(psbt, toSignInputs, autoFinalized);
+      const signedPsbtHex = psbt.toHex();
 
-    // Finalize any remaining unfinalized inputs (e.g., dApp-signed inputs)
-    for (let i = 0; i < psbt.data.inputs.length; i++) {
-      const input = psbt.data.inputs[i];
-      if (!input.finalScriptSig && !input.finalScriptWitness) {
-        try {
-          psbt.finalizeInput(i);
-        } catch {
-          // Input may not be ready to finalize — extractTransaction will catch this
+      // Finalize any remaining unfinalized inputs (e.g., dApp-signed inputs)
+      for (let i = 0; i < psbt.data.inputs.length; i++) {
+        const input = psbt.data.inputs[i];
+        if (!input.finalScriptSig && !input.finalScriptWitness) {
+          try {
+            psbt.finalizeInput(i);
+          } catch {
+            // Input may not be ready to finalize — extractTransaction will catch this
+          }
         }
       }
-    }
 
-    // Extract transaction and broadcast
-    let txid: string;
-    try {
-      const tx = psbt.extractTransaction(true);
-      const rawtx = tx.toHex();
-      txid = tx.id;
-      await wallet.pushTx(rawtx);
+      // Extract transaction and broadcast
+      let txid: string;
+      try {
+        const tx = psbt.extractTransaction(true);
+        const rawtx = tx.toHex();
+        txid = tx.id;
+        await wallet.pushTx(rawtx);
+      } catch (e) {
+        throw new Error(`Failed to broadcast transaction: ${(e as Error).message}`);
+      }
+
+      // Record the payment in history
+      wallet.settleSmallPayment(reservation.reservationId, txid);
+
+      return {
+        status: 'success',
+        txid,
+        signedPsbtHex
+      };
     } catch (e) {
-      throw new Error(`Failed to broadcast transaction: ${(e as Error).message}`);
+      wallet.releaseSmallPayment(reservation.reservationId);
+      throw e;
     }
-
-    // Record the payment in history
-    wallet.recordSmallPayment(origin, amount, txid);
-
-    return {
-      status: 'success',
-      txid,
-      signedPsbtHex
-    };
   };
 }
 
