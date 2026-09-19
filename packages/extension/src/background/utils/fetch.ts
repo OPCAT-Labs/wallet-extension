@@ -1,194 +1,104 @@
 import log from 'loglevel';
 
-// todo: add opcat phishing list source
-
 /**
- * Data sources for phishing site lists
+ * Storage key for the cached scam-host list
  */
-const PHISHING_SOURCES = {
-  /**
-   * Primary source from GitHub raw content
-   */
-  PRIMARY: 'https://raw.githubusercontent.com/MetaMask/eth-phishing-detect/refs/heads/main/src/config.json',
-
-  /**
-   * Backup source from CDN
-   */
-  BACKUP: 'https://cdn.jsdelivr.net/gh/MetaMask/eth-phishing-detect@main/src/config.json'
-};
+const SCAM_HOSTS_CACHE_KEY = 'phishing_list_fallback';
 
 /**
- * Storage key for cached phishing list
- */
-const PHISHING_CACHE_KEY = 'phishing_list_fallback';
-
-/**
- * Default timeout for fetch operations in milliseconds
+ * Give up on a request that never settles, so a hung fetch cannot wedge the updater.
  */
 const FETCH_TIMEOUT = 15000;
 
 /**
- * Minimum phishing list cache age before attempting refresh (12 hours)
+ * Minimum cache age before attempting refresh (12 hours)
  */
 const MIN_CACHE_AGE = 12 * 60 * 60 * 1000;
 
-/**
- * Fetch with timeout functionality
- * @param url URL to fetch
- * @param options Fetch options
- * @param timeoutMs Timeout in milliseconds
- * @returns Response object
- */
-async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = FETCH_TIMEOUT): Promise<Response> {
-  const controller = new AbortController();
-  const { signal } = controller;
+export interface ScamHostList {
+  hosts: string[];
+  lastFetchTime: number;
+}
 
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, { ...options, signal });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
+function withTimeout<T>(promise: Promise<T>, timeoutMs = FETCH_TIMEOUT): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Request timed out')), timeoutMs))
+  ]);
 }
 
 /**
- * Fetch phishing list from available sources with fallback mechanisms
- * @param forceRefresh Force refresh from remote sources even if cache is available
- * @returns Phishing configuration object
+ * Fetch the scam-host list from the wallet backend, falling back to the local cache.
+ *
+ * The list is first-party and per-network: it comes from the same endpoint as the rest of the
+ * wallet API, so switching chains switches the list with it.
+ *
+ * @param forceRefresh Skip the cache and go to the backend even if the cached list is recent
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const fetchPhishingList = async (forceRefresh = false): Promise<any> => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let cachedData: any = null;
-  let useCache = false;
-
-  // If not forcing refresh, try to use cache first
+export const fetchScamHosts = async (forceRefresh = false): Promise<ScamHostList> => {
   if (!forceRefresh) {
     try {
-      cachedData = await getFromLocalCache();
-      if (cachedData && cachedData.lastFetchTime) {
-        const cacheAge = Date.now() - cachedData.lastFetchTime;
-
-        // If cache is fresh enough, use it directly
-        if (cacheAge < MIN_CACHE_AGE) {
-          log.debug('[Phishing] Using recent cache, age:', Math.round(cacheAge / 60000), 'minutes');
-          useCache = true;
-        }
+      const cached = await getFromLocalCache();
+      if (cached && cached.lastFetchTime && Date.now() - cached.lastFetchTime < MIN_CACHE_AGE) {
+        log.debug('[Phishing] Using recent cache, age:', Math.round((Date.now() - cached.lastFetchTime) / 60000), 'minutes');
+        return cached;
       }
     } catch (error) {
       log.error('[Phishing] Cache check failed:', error);
     }
   }
 
-  // If using cache and not forcing refresh, return early
-  if (useCache && !forceRefresh) {
-    return cachedData;
-  }
-
-  // If not using cache, fetch from all sources
-  const fetchOptions: RequestInit = {
-    cache: 'no-cache',
-    headers: {
-      Accept: 'application/json'
-    }
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mergedData: any = {
-    version: 2,
-    tolerance: 1,
-    fuzzylist: [],
-    whitelist: [],
-    blacklist: [],
-    lastFetchTime: Date.now(),
-    sources: []
-  };
-
-  let hasAnySourceSucceeded = false;
-
   try {
-    const response = await fetchWithTimeout(PHISHING_SOURCES.PRIMARY, fetchOptions);
-
-    if (response.ok) {
-      const data = await response.json();
-      mergePhishingData(mergedData, data);
-      mergedData.sources.push('PRIMARY');
-      hasAnySourceSucceeded = true;
-      log.debug('[Phishing] Successfully fetched from PRIMARY source');
-    }
+    // Imported on demand: a static import would pull the whole API service (and the signing SDK
+    // behind it) into every module that touches phishing state.
+    const { default: openapiService } = await import('@/background/service/openapi');
+    const data = await withTimeout(openapiService.getScamHosts());
+    const list: ScamHostList = {
+      hosts: normalizeHosts(data?.hosts),
+      lastFetchTime: Date.now()
+    };
+    await saveToLocalCache(list);
+    log.debug(`[Phishing] Fetched ${list.hosts.length} scam hosts from the wallet backend`);
+    return list;
   } catch (error) {
-    log.error('[Phishing] Primary source fetch failed:', error);
+    log.error('[Phishing] Scam host fetch failed:', error);
   }
 
+  // The backend is unreachable: keep whatever was cached, at any age, rather than dropping
+  // protection entirely.
   try {
-    const response = await fetchWithTimeout(PHISHING_SOURCES.BACKUP, fetchOptions);
-
-    if (response.ok) {
-      const data = await response.json();
-      // Merge data
-      mergePhishingData(mergedData, data);
-      mergedData.sources.push('BACKUP');
-      hasAnySourceSucceeded = true;
-      log.debug('[Phishing] Successfully fetched from BACKUP source');
-    }
-  } catch (error) {
-    log.error('[Phishing] Backup source fetch failed:', error);
-  }
-
-  // If at least one source succeeded, save merged data to cache
-  if (hasAnySourceSucceeded) {
-    await saveToLocalCache(mergedData);
-    return mergedData;
-  }
-
-  // All remote sources failed, try using cache (regardless of age)
-  try {
-    cachedData = await getFromLocalCache();
-    if (cachedData) {
-      log.warn('[Phishing] Using cached data as all remote sources failed');
-      return cachedData;
+    const cached = await getFromLocalCache();
+    if (cached) {
+      log.warn('[Phishing] Using cached data as the backend is unreachable');
+      return cached;
     }
   } catch (error) {
     log.error('[Phishing] Cache retrieval failed:', error);
   }
 
-  // All sources failed
-  throw new Error('Failed to fetch phishing list from all available sources');
+  throw new Error('Failed to fetch the scam host list');
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mergePhishingData(target: any, source: any): void {
-  if (Array.isArray(source.blacklist)) {
-    target.blacklist = [...new Set([...target.blacklist, ...source.blacklist])];
-  }
-
-  if (Array.isArray(source.whitelist)) {
-    target.whitelist = [...new Set([...target.whitelist, ...source.whitelist])];
-  }
-
-  if (Array.isArray(source.fuzzylist)) {
-    target.fuzzylist = [...new Set([...target.fuzzylist, ...source.fuzzylist])];
-  }
-
-  if (typeof source.tolerance === 'number' && (!target.tolerance || source.tolerance > target.tolerance)) {
-    target.tolerance = source.tolerance;
-  }
+/**
+ * Hostnames are compared as lowercase strings against a Set, so normalise them once here rather
+ * than at every lookup.
+ */
+function normalizeHosts(hosts: unknown): string[] {
+  if (!Array.isArray(hosts)) return [];
+  const normalized = hosts
+    .filter((host): host is string => typeof host === 'string')
+    .map((host) => host.trim().toLowerCase().replace(/^www\./, '').replace(/\.$/, ''))
+    .filter((host) => host.length > 0);
+  return Array.from(new Set(normalized));
 }
 
 /**
- * Save phishing list to local cache
- * @param data Phishing data to cache
- * @returns Promise resolving to success status
+ * Save the scam-host list to local cache
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function saveToLocalCache(data: any): Promise<boolean> {
+async function saveToLocalCache(data: ScamHostList): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
     try {
-      chrome.storage.local.set({ [PHISHING_CACHE_KEY]: data }, () => {
+      chrome.storage.local.set({ [SCAM_HOSTS_CACHE_KEY]: data }, () => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
@@ -203,24 +113,18 @@ async function saveToLocalCache(data: any): Promise<boolean> {
 }
 
 /**
- * Retrieve phishing list from local cache
- * @returns Promise resolving to cached data or null
+ * Retrieve the scam-host list from local cache
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getFromLocalCache(): Promise<any> {
+async function getFromLocalCache(): Promise<ScamHostList | null> {
   return new Promise((resolve, reject) => {
     try {
-      chrome.storage.local.get(PHISHING_CACHE_KEY, (result) => {
+      chrome.storage.local.get(SCAM_HOSTS_CACHE_KEY, (result) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
         }
 
-        if (result && result[PHISHING_CACHE_KEY]) {
-          resolve(result[PHISHING_CACHE_KEY]);
-        } else {
-          resolve(null);
-        }
+        resolve(result?.[SCAM_HOSTS_CACHE_KEY] ?? null);
       });
     } catch (error) {
       log.error('[Phishing] Failed to get from local cache:', error);
@@ -230,13 +134,12 @@ async function getFromLocalCache(): Promise<any> {
 }
 
 /**
- * Clear the phishing list cache
- * @returns Promise resolving to success status
+ * Clear the scam-host cache
  */
 export async function clearPhishingCache(): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
     try {
-      chrome.storage.local.remove(PHISHING_CACHE_KEY, () => {
+      chrome.storage.local.remove(SCAM_HOSTS_CACHE_KEY, () => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
@@ -252,82 +155,29 @@ export async function clearPhishingCache(): Promise<boolean> {
 }
 
 /**
- * Export cached phishing list to a downloadable file
- * Useful for debugging
- * @returns Promise resolving to a Blob URL
- */
-export async function exportPhishingList(): Promise<string> {
-  try {
-    // Try to get the latest data
-    let data;
-    try {
-      data = await fetchPhishingList();
-    } catch (error) {
-      // If fetch fails, try to get from cache
-      data = await getFromLocalCache();
-      if (!data) {
-        throw new Error('No phishing data available to export');
-      }
-    }
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    return URL.createObjectURL(blob);
-  } catch (error) {
-    log.error('[Phishing] Export failed:', error);
-    throw error;
-  }
-}
-
-/**
  * Get cache statistics
- * @returns Promise resolving to cache statistics
  */
 export async function getPhishingCacheStats(): Promise<{
   available: boolean;
   lastFetchTime: number | null;
   age: number | null;
-  size: number | null;
-  entries: {
-    blacklist: number;
-    whitelist: number;
-    fuzzylist: number;
-  } | null;
+  hosts: number | null;
 }> {
   try {
-    const cachedData = await getFromLocalCache();
-    if (!cachedData) {
-      return {
-        available: false,
-        lastFetchTime: null,
-        age: null,
-        size: null,
-        entries: null
-      };
+    const cached = await getFromLocalCache();
+    if (!cached) {
+      return { available: false, lastFetchTime: null, age: null, hosts: null };
     }
 
-    const size = JSON.stringify(cachedData).length;
-    const lastFetchTime = cachedData.lastFetchTime || null;
-    const age = lastFetchTime ? Date.now() - lastFetchTime : null;
-
+    const lastFetchTime = cached.lastFetchTime || null;
     return {
       available: true,
       lastFetchTime,
-      age,
-      size,
-      entries: {
-        blacklist: Array.isArray(cachedData.blacklist) ? cachedData.blacklist.length : 0,
-        whitelist: Array.isArray(cachedData.whitelist) ? cachedData.whitelist.length : 0,
-        fuzzylist: Array.isArray(cachedData.fuzzylist) ? cachedData.fuzzylist.length : 0
-      }
+      age: lastFetchTime ? Date.now() - lastFetchTime : null,
+      hosts: Array.isArray(cached.hosts) ? cached.hosts.length : 0
     };
   } catch (error) {
     log.error('[Phishing] Failed to get cache stats:', error);
-    return {
-      available: false,
-      lastFetchTime: null,
-      age: null,
-      size: null,
-      entries: null
-    };
+    return { available: false, lastFetchTime: null, age: null, hosts: null };
   }
 }

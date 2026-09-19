@@ -5,13 +5,13 @@
  */
 export enum PhishingMessageType {
   /**
-   * Check if a hostname is in the phishing blacklist
+   * Check if a hostname is in the scam-host list
    *
    * Expected parameters:
    * - hostname: string - The hostname to check
    *
    * Response:
-   * - isPhishing: boolean - Whether the hostname is in the blacklist
+   * - isPhishing: boolean - Whether the hostname is in the scam-host list
    */
   CHECK_PHISHING = 'CHECK_PHISHING',
 
@@ -91,7 +91,7 @@ export enum PhishingMessageType {
 
   /**
    * Get statistics about the phishing protection
-   * Returns information about blacklist and whitelist sizes
+   * Returns information about the scam-host list size
    *
    * Expected parameters: none
    *

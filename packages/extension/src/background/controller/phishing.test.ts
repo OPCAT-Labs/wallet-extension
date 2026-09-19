@@ -39,11 +39,8 @@ beforeEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const service = phishingService as any;
   service.config = {
-    version: 2,
-    tolerance: 1,
-    fuzzylist: [],
-    whitelist: [],
-    blacklist: ['evil.example'],
+    version: 3,
+    hosts: ['evil.example'],
     lastFetchTime: Date.now(),
     cacheExpireTime: 24 * 60 * 60 * 1000
   };

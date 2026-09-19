@@ -93,7 +93,7 @@ class PhishingController {
             return false;
           }
 
-          // Verify the domain is still in the blacklist before redirecting
+          // Verify the host is still in the scam-host list before redirecting
           const isPhishing = phishingService.checkPhishing(message.hostname);
           if (!isPhishing) {
             sendResponse({ success: false, skipped: true });
@@ -248,11 +248,11 @@ class PhishingController {
 
     try {
       const config = phishingService.getConfig();
-      const blacklist = config.blacklist || [];
+      const hosts = config.hosts || [];
 
       // Hosts the user chose to proceed to this session must not be redirected back.
       const proceeded = new Set(phishingService.getTemporaryWhitelist());
-      const rules = this.createPhishingRules(blacklist.filter((domain) => !proceeded.has(domain)));
+      const rules = this.createPhishingRules(hosts.filter((host) => !proceeded.has(host)));
 
       // One call, so a failure to add cannot leave the rule set empty (the removal used to be a
       // separate await). An empty blacklist now clears stale rules instead of returning early.
@@ -262,7 +262,7 @@ class PhishingController {
       });
 
       log.debug(
-        `[Phishing] Updated MV3 declarative rules: ${rules.length} rules created from ${blacklist.length} domains`
+        `[Phishing] Updated MV3 declarative rules: ${rules.length} rules created from ${hosts.length} hosts`
       );
     } catch (error) {
       log.error('[Phishing] Failed to update declarative rules:', error);
@@ -284,15 +284,15 @@ class PhishingController {
   }
 
   /**
-   * Create declarative network request rules from blacklisted domains
-   * @param blacklist Array of blacklisted domains
+   * Create declarative network request rules from scam hosts
+   * @param hosts Array of hostnames reported as scams
    * @returns Array of declarative network request rules
    */
-  private createPhishingRules(blacklist: string[]): chrome.declarativeNetRequest.Rule[] {
+  private createPhishingRules(hosts: string[]): chrome.declarativeNetRequest.Rule[] {
     // Limit number of rules to avoid hitting Chrome's limits
     // Chrome has a limit of 5,000 dynamic rules
     const MAX_RULES = 4900;
-    const domains = blacklist.slice(0, MAX_RULES);
+    const domains = hosts.slice(0, MAX_RULES);
 
     return domains.map((domain, index) => {
       // Rule IDs should be between 1 and 2^32-1
@@ -347,11 +347,7 @@ class PhishingController {
 
       // Get updated statistics
       const stats = phishingService.getConfig();
-      log.debug(
-        `[PhishingController] Updated stats: blacklist size: ${stats.blacklist?.length || 0}, whitelist size: ${
-          stats.whitelist?.length || 0
-        }`
-      );
+      log.debug(`[PhishingController] Updated stats: ${stats.hosts?.length || 0} scam hosts`);
 
       return Promise.resolve();
     } catch (error) {
@@ -361,24 +357,14 @@ class PhishingController {
   }
 
   /**
-   * Check if a hostname is in the phishing blacklist
+   * Check if a hostname is in the scam-host list
    * @param hostname Hostname to check
-   * @returns True if hostname is in blacklist
+   * @returns True if hostname is in the list
    */
   public checkPhishing(hostname: string): boolean {
     // Basic validation
     if (!hostname || typeof hostname !== 'string') {
       log.warn(`[PhishingController] Invalid hostname: ${hostname}`);
-      return false;
-    }
-
-    // Get phishing service stats
-    const stats = phishingService.getConfig();
-    const blacklistSize = stats.blacklist?.length || 0;
-    const whitelistSize = stats.whitelist?.length || 0;
-
-    // If blacklist is empty but whitelist exists, might be an initialization issue
-    if (blacklistSize === 0 && whitelistSize > 0) {
       return false;
     }
 
