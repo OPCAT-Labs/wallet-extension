@@ -297,6 +297,50 @@ test.describe('PageProvider API', () => {
     await closeModal(dappPage);
   });
 
+  test('signPsbts should sign every transaction of a batch', async () => {
+    // Batch signing goes through multiSignPsbt, a different background path from signPsbt: it
+    // parses and signs each entry itself. bvmVerify below is what proves those signatures are
+    // valid under OPCAT's sighash and not just well-formed.
+    setupWalletPopupHandler(context, {
+      password: TEST_WALLET.password,
+      action: 'approve',
+    });
+
+    await dappPage.click('[data-testid="test-request-accounts-approve"]');
+    await waitForModalStatus(dappPage, 'success', 30000);
+    await closeModal(dappPage);
+
+    // Two PSBTs spending the same wallet, with different change so they are distinct requests
+    const provider = new DummyProvider('opcat-testnet');
+    const utxos = await provider.getUtxos(TEST_WALLET.address);
+    const psbtHexs = [1, 2].map((feeRate) =>
+      new ExtPsbt({ network: 'opcat-testnet' })
+        .spendUTXO(utxos)
+        .change(TEST_WALLET.address, feeRate)
+        .seal()
+        .toHex()
+    );
+    expect(psbtHexs[0]).not.toEqual(psbtHexs[1]);
+
+    await dappPage.fill('[data-testid="psbts-input"]', psbtHexs.join('\n'));
+
+    await dappPage.click('[data-testid="test-sign-psbts"]');
+
+    const content = await waitForModalStatus(dappPage, 'success', 90000);
+    expect(content).toContain('Signed 2 PSBTs successfully');
+
+    const signedOutput = await dappPage.locator('[data-testid="psbts-output"]').inputValue();
+    const signedPsbtHexs = signedOutput.split('\n').filter((line) => line.trim().length > 0);
+    expect(signedPsbtHexs).toHaveLength(2);
+
+    signedPsbtHexs.forEach((signedPsbtHex, index) => {
+      expect(signedPsbtHex.length).toBeGreaterThan(psbtHexs[index].length);
+      expect(bvmVerify(ExtPsbt.fromHex(signedPsbtHex), 0)).toBe(true);
+    });
+
+    await closeModal(dappPage);
+  });
+
   test('smallPay should fallback to signPsbt popup when limits exceeded', async () => {
     // Setup popup handler to approve all popups (connection + autoPayment + signPsbt fallback)
     setupWalletPopupHandler(context, {

@@ -12,6 +12,7 @@ import KeystoneSignScreen from '@/ui/pages/Wallet/KeystoneSignScreen';
 import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { fontSizes } from '@/ui/theme/font';
 import { shortAddress, useApproval, useWallet } from '@/ui/utils';
+import { TestIds } from '@/ui/utils/test-ids';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import SignPsbt from '../SignPsbt';
@@ -277,6 +278,7 @@ export default function MultiSignPsbt({
                       preset={preset as any}
                       textStyle={{ fontSize: fontSizes.sm }}
                       text={text}
+                      testid={`${TestIds.MULTI_SIGN.ITEM_ACTION}-${index}`}
                       onClick={() => {
                         setViewingPsbtIndex(index);
                       }}
@@ -292,13 +294,20 @@ export default function MultiSignPsbt({
 
       <Footer>
         <Row full>
-          <Button preset="default" text={t('reject_all')} onClick={handleCancel} full />
+          <Button
+            preset="default"
+            text={t('reject_all')}
+            testid={TestIds.MULTI_SIGN.REJECT_ALL_BUTTON}
+            onClick={handleCancel}
+            full
+          />
 
           {websiteResult.allowQuickMultiSign ? (
             <Button
               preset="primary"
               text={isAllSigned ? t('submit') : `(${signedCount}/${txInfo.psbtHexs.length}) ${t('signed')}`}
               icon={isAllSigned ? undefined : 'alert'}
+              testid={TestIds.MULTI_SIGN.SUBMIT_BUTTON}
               onClick={() => {
                 if (isAllSigned) {
                   handleConfirm();
@@ -312,6 +321,7 @@ export default function MultiSignPsbt({
             <Button
               preset="primary"
               text={isAllSigned ? t('submit') : `(${signedCount}/${txInfo.psbtHexs.length}) ${t('signed')}`}
+              testid={TestIds.MULTI_SIGN.SUBMIT_BUTTON}
               onClick={handleConfirm}
               full
               disabled={isAllSigned == false}
