@@ -40,3 +40,6 @@ playwright/.cache/
 
 # Test artifacts
 *.trace.zip
+
+# generated bundle for tests/e2e/dapp/test-dapp.html (npm run build:test-dapp)
+tests/e2e/dapp/psbt-builder.js

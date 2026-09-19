@@ -324,6 +324,13 @@
   <!-- PSBT Input Section -->
   <div class="psbt-section">
     <h3>PSBT Input (for signPsbt test)</h3>
+    <button
+      data-testid="generate-psbt"
+      onclick="generatePsbt()"
+      style="margin-bottom: 10px;"
+    >
+      Generate from connected wallet
+    </button>
     <textarea
       id="psbt-input"
       data-testid="psbt-input"
@@ -340,6 +347,13 @@
     </div>
 
     <h3>PSBT Inputs (for signPsbts test, one hex per line)</h3>
+    <button
+      data-testid="generate-psbts"
+      onclick="generatePsbts()"
+      style="margin-bottom: 10px;"
+    >
+      Generate 2 from connected wallet
+    </button>
     <textarea
       id="psbts-input"
       data-testid="psbts-input"
@@ -371,6 +385,8 @@
       </div>
     </div>
   </div>
+
+  <script src="psbt-builder.js"></script>
 
   <script>
     // Global state
@@ -526,6 +542,51 @@
       } catch (error) {
         showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
       }
+    }
+
+    // PSBT generation, for the signPsbt / signPsbts tests below.
+    // Builds against the connected account so the wallet recognises the inputs as its own;
+    // a PSBT spending someone else's outputs is rejected with "no input of the current
+    // account found in the psbt".
+    async function connectedAddress() {
+      if (currentAddress) return currentAddress;
+      const accounts = await window.opcat.getAccounts();
+      if (!Array.isArray(accounts) || accounts.length === 0) return null;
+      updateStatus(true, accounts[0]);
+      return accounts[0];
+    }
+
+    async function generateInto(elementId, count) {
+      if (!checkWallet()) {
+        showModal('fail', 'Failed', 'Wallet not detected');
+        return;
+      }
+      if (typeof window.psbtBuilder === 'undefined') {
+        showModal('fail', 'Failed', 'psbt-builder.js is missing.\nRun: npm run build:test-dapp');
+        return;
+      }
+
+      try {
+        const address = await connectedAddress();
+        if (!address) {
+          showModal('fail', 'Failed', 'Connect the wallet first (Test 2).');
+          return;
+        }
+
+        const hexes = await window.psbtBuilder.generate(address, count);
+        document.getElementById(elementId).value = hexes.join('\n');
+        showModal('success', 'Success', 'Generated ' + hexes.length + ' PSBT(s) for ' + address);
+      } catch (error) {
+        showModal('fail', 'Failed', 'Error: ' + (error.message || String(error)));
+      }
+    }
+
+    function generatePsbt() {
+      return generateInto('psbt-input', 1);
+    }
+
+    function generatePsbts() {
+      return generateInto('psbts-input', 2);
     }
 
     // Test 6: signPsbt

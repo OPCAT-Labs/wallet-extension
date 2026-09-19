@@ -20,6 +20,7 @@
     "build:edge": "gulp build --env=pro --browser=edge --manifest=mv2 --channel=github",
     "build:chrome:mv3:dev": "webpack --progress --env browser=chrome manifest=mv3 config=dev channel=github",
     "build:chrome:mv3": "gulp build --env=pro --browser=chrome --manifest=mv3 --channel=store",
+    "build:test-dapp": "webpack --config tests/e2e/dapp/webpack.config.js",
     "lint": "eslint src --fix --ext .js,.ts,.tsx,.json  && npm run format",
     "lint:fix": "eslint --fix src/**/*.{js,jsx,ts,tsx,json}",
     "_prettier": "prettier --write .",
