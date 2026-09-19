@@ -1,4 +1,4 @@
-import { fetchPhishingList } from '@/background/utils/fetch';
+import { fetchScamHosts } from '@/background/utils/fetch';
 import { storage } from '@/background/webapi';
 
 /**
@@ -11,27 +11,12 @@ interface PhishingConfig {
   version: number;
 
   /**
-   * Tolerance level for fuzzy matching (higher = more strict)
+   * Hostnames the wallet backend reports as scams
    */
-  tolerance: number;
+  hosts: string[];
 
   /**
-   * List of patterns for fuzzy matching against hostnames
-   */
-  fuzzylist: string[];
-
-  /**
-   * List of hostnames that should never be considered phishing sites
-   */
-  whitelist: string[];
-
-  /**
-   * List of hostnames that are confirmed phishing sites
-   */
-  blacklist: string[];
-
-  /**
-   * Timestamp of when the phishing list was last fetched
+   * Timestamp of when the scam-host list was last fetched
    */
   lastFetchTime: number;
 
@@ -50,30 +35,13 @@ const STORE_KEY = 'phishing';
  */
 const UPDATE_ALARM_NAME = 'phishing:update-list';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-const VERSION = 2;
+/**
+ * Bumped when the stored shape changes, so a cache from an older format is discarded rather than
+ * read as the current one.
+ */
+const VERSION = 3;
 const RETRY_DELAY = 60 * 60 * 1000; // 1 hour retry delay
 const MAX_RETRIES = 3;
-
-/**
- * Levenshtein distance, abandoned as soon as it exceeds `max` (the caller only cares whether the
- * hostname is within `tolerance` of a fuzzylist entry).
- */
-function levenshteinWithin(a: string, b: string, max: number): number {
-  if (Math.abs(a.length - b.length) > max) return max + 1;
-  let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
-  for (let i = 1; i <= a.length; i++) {
-    const current = [i];
-    let rowMin = i;
-    for (let j = 1; j <= b.length; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      current[j] = Math.min(current[j - 1] + 1, previous[j] + 1, previous[j - 1] + cost);
-      rowMin = Math.min(rowMin, current[j]);
-    }
-    if (rowMin > max) return max + 1;
-    previous = current;
-  }
-  return previous[b.length];
-}
 
 /** Every parent suffix of a hostname, longest first, down to the registrable two-label form. */
 function hostnameSuffixes(hostname: string): string[] {
@@ -87,10 +55,7 @@ function hostnameSuffixes(hostname: string): string[] {
 
 const initConfig: PhishingConfig = {
   version: VERSION,
-  tolerance: 1,
-  fuzzylist: [],
-  whitelist: [],
-  blacklist: [],
+  hosts: [],
   lastFetchTime: 0,
   cacheExpireTime: CACHE_DURATION
 };
@@ -100,7 +65,7 @@ const initConfig: PhishingConfig = {
  */
 class PhishingService {
   /**
-   * Current phishing configuration including lists and settings
+   * Current phishing configuration including the list and settings
    */
   private config: PhishingConfig = initConfig;
 
@@ -115,14 +80,9 @@ class PhishingService {
   private temporaryWhitelist: Set<string> = new Set();
 
   /**
-   * Set version of blacklist for O(1) lookups
+   * Set version of the scam-host list for O(1) lookups
    */
-  private blacklistSet: Set<string> = new Set();
-
-  /**
-   * Set version of whitelist for O(1) lookups
-   */
-  private whitelistSet: Set<string> = new Set();
+  private scamHostSet: Set<string> = new Set();
 
   /**
    * Counter for tracking update retry attempts
@@ -130,12 +90,12 @@ class PhishingService {
   private retryCount = 0;
 
   /**
-   * True once a config (cached or freshly fetched) has been loaded into the sets
+   * True once a config (cached or freshly fetched) has been loaded into the set
    */
   private loaded = false;
 
   /**
-   * Called whenever the lists or the session whitelist change, so the declarative rules the
+   * Called whenever the list or the session whitelist change, so the declarative rules the
    * controller maintains can be rebuilt. Nothing rebuilt them before: the controller built rules
    * once at startup while this service was still loading, and the 24h setInterval never fired.
    */
@@ -173,43 +133,28 @@ class PhishingService {
   }
 
   /**
-   * Initialize the phishing service
+   * Load whatever is cached and schedule the next refresh.
+   *
+   * This runs at module load, before the API service has an endpoint, so it deliberately does not
+   * fetch: the backend call is driven by ensureUpToDate() during background bootstrap and by the
+   * alarm scheduled here. A stale or missing cache schedules the alarm at its one-minute floor.
    */
   private async init() {
     try {
       const stored = await storage.get(STORE_KEY);
-      if (stored) {
-        if (
-          stored.version !== VERSION ||
-          !stored.lastFetchTime ||
-          Date.now() - stored.lastFetchTime > stored.cacheExpireTime
-        ) {
-          await this.updatePhishingList();
-        } else {
-          // Ensure default whitelist is always present
-          const mergedWhitelist = Array.from(new Set([...(stored.whitelist || []), ...initConfig.whitelist]));
-
-          this.config = {
-            ...stored,
-            whitelist: mergedWhitelist
-          };
-
-          this.updateSets();
-          this.notifyChanged();
-        }
+      if (stored && stored.version === VERSION && Array.isArray(stored.hosts)) {
+        this.config = stored;
       } else {
-        // No stored config, use initial config
         this.config = { ...initConfig };
-        this.updateSets();
-        await this.updatePhishingList();
       }
-
+      this.updateSets();
+      this.notifyChanged();
       this.scheduleNextUpdate();
-
     } catch (error) {
       console.error('[PhishingService] Init error:', error);
       this.config = { ...initConfig };
       this.updateSets();
+      this.notifyChanged();
 
       // Retry after initialization failure
       this.scheduleNextUpdate(RETRY_DELAY);
@@ -227,57 +172,25 @@ class PhishingService {
   }
 
   /**
-   * Update internal sets for faster lookups
+   * Update the internal set for faster lookups
    */
   private updateSets() {
-    this.blacklistSet = new Set(this.config.blacklist);
-    this.whitelistSet = new Set(this.config.whitelist);
+    this.scamHostSet = new Set(this.config.hosts);
     this.loaded = true;
   }
 
   /**
-   * Update the phishing list from remote source
+   * Update the scam-host list from the wallet backend
    */
   private async updatePhishingList(forceRefresh = false) {
     if (this.updating) return;
 
     try {
       this.updating = true;
-      const newConfig = await fetchPhishingList(forceRefresh);
-
-      // Ensure domains in default whitelist are not in the blacklist
-      const defaultWhitelist = new Set(initConfig.whitelist);
-
-      // Filter blacklist, remove whitelisted domains and their subdomains
-      let filteredBlacklist: string[] = [];
-      if (Array.isArray(newConfig.blacklist)) {
-        filteredBlacklist = newConfig.blacklist.filter((domain) => {
-          // Remove domains in whitelist
-          if (defaultWhitelist.has(domain)) {
-            return false;
-          }
-
-          // Remove subdomains of whitelisted domains
-          const domainParts = domain.split('.');
-          if (domainParts.length > 2) {
-            const mainDomain = domainParts.slice(domainParts.length - 2).join('.');
-            if (defaultWhitelist.has(mainDomain)) {
-              return false;
-            }
-          }
-
-          // Keep other domains
-          return true;
-        });
-      }
-
-      // Merge remote whitelist and default whitelist
-      const mergedWhitelist = Array.from(new Set([...(newConfig.whitelist || []), ...initConfig.whitelist]));
+      const { hosts } = await fetchScamHosts(forceRefresh);
 
       this.config = {
-        ...newConfig,
-        blacklist: filteredBlacklist,
-        whitelist: mergedWhitelist,
+        hosts,
         version: VERSION,
         lastFetchTime: Date.now(),
         cacheExpireTime: CACHE_DURATION
@@ -307,15 +220,15 @@ class PhishingService {
   /**
    * Startup path: load a list and refresh it only when the cached one is stale.
    *
-   * Not forceUpdate(): that re-downloads every remote source, and an MV3 worker restarts often
-   * enough that startup would pull several MB again each time.
+   * Not forceUpdate(): that goes to the backend every time, and an MV3 worker restarts often
+   * enough that startup would hit the API on every wake.
    */
   public async ensureUpToDate() {
     return this.updatePhishingList(false);
   }
 
   /**
-   * Force an immediate update of the phishing list
+   * Force an immediate update of the scam-host list
    */
   public async forceUpdate() {
     this.retryCount = 0;
@@ -346,8 +259,8 @@ class PhishingService {
         return false;
       }
 
-      // Security check: if blacklist is empty, consider all domains safe
-      if (this.blacklistSet.size === 0) {
+      // Security check: if the list is empty, consider all domains safe
+      if (this.scamHostSet.size === 0) {
         return false;
       }
 
@@ -356,38 +269,10 @@ class PhishingService {
         return false;
       }
 
-      // An exact blacklist hit wins over a parent-domain whitelist entry.
-      if (this.blacklistSet.has(cleanHostname)) {
-        return true;
-      }
-
-      const suffixes = hostnameSuffixes(cleanHostname);
-
-      if (suffixes.some((suffix) => this.whitelistSet.has(suffix))) {
-        return false;
-      }
-
-      // The lists name apex domains and the declarative rules match subdomains (`||domain/`), so
+      // The list names apex domains and the declarative rules match subdomains (`||domain/`), so
       // the message-based check has to walk the label suffixes too — otherwise login.evil.com is
       // reported safe while evil.com is blocked.
-      if (suffixes.some((suffix) => this.blacklistSet.has(suffix))) {
-        return true;
-      }
-
-      // Look-alike domains: the fuzzylist and its tolerance were fetched and stored but never
-      // consulted, so 0pcatlabs.io was never flagged for a fuzzylist entry of opcatlabs.io.
-      // Distance 0 means the hostname is the legitimate domain itself.
-      const tolerance = this.config.tolerance || 0;
-      if (tolerance > 0 && Array.isArray(this.config.fuzzylist)) {
-        for (const entry of this.config.fuzzylist) {
-          const distance = levenshteinWithin(cleanHostname, entry, tolerance);
-          if (distance > 0 && distance <= tolerance) {
-            return true;
-          }
-        }
-      }
-
-      return false;
+      return hostnameSuffixes(cleanHostname).some((suffix) => this.scamHostSet.has(suffix));
     } catch (error) {
       console.error('[PhishingService] Check error:', error);
       // Default to safe on error
@@ -422,8 +307,7 @@ class PhishingService {
     return {
       ...this.config,
       temporaryWhitelistSize: this.temporaryWhitelist.size,
-      blacklistSetSize: this.blacklistSet.size,
-      whitelistSetSize: this.whitelistSet.size
+      scamHostSetSize: this.scamHostSet.size
     };
   }
 }

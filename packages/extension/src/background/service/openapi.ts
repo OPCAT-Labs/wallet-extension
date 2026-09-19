@@ -397,6 +397,10 @@ export class OpenApiService {
     return this.httpPost('/v5/default/check-website', { website });
   }
 
+  async getScamHosts(): Promise<{ hosts: string[]; updatedAt: string }> {
+    return this.httpGet('/v5/default/scam-hosts', {});
+  }
+
   async getVersionDetail(version: string): Promise<VersionDetail> {
     return this.httpGet('/v5/version/detail', {
       version
