@@ -6,7 +6,6 @@ import { EVENTS } from '@/shared/constant';
 import eventBus from '@/shared/eventBus';
 import { runesUtils } from '@/shared/lib/runes-utils';
 import {
-  AddressCAT20UtxoSummary,
   CAT20Balance,
   CAT20TokenInfo,
   TxType
@@ -19,7 +18,6 @@ import { MergeBTCPopover } from '@/ui/components/MergeBTCPopover';
 import { TickUsdWithoutPrice, TokenType } from '@/ui/components/TickUsd';
 import { useI18n } from '@/ui/hooks/useI18n';
 import { useNavigate } from '@/ui/pages/MainRoute';
-import { useCurrentAccount } from '@/ui/state/accounts/hooks';
 import { usePushBitcoinTxCallback } from '@/ui/state/transactions/hooks';
 import { colors } from '@/ui/theme/colors';
 import { isValidAddress, shortAddress, showLongNumber, useFeeRate, useWallet } from '@/ui/utils';
@@ -52,7 +50,6 @@ export default function SendCAT20Screen() {
   const navigate = useNavigate();
   const { t } = useI18n();
   const tools = useTools();
-  const account = useCurrentAccount();
   const pushBitcoinTx = usePushBitcoinTxCallback();
 
   // Input form state
@@ -65,13 +62,6 @@ export default function SendCAT20Screen() {
   const feeRate = useFeeRate()
   const [error, setError] = useState('');
   const [showMergeBTCUTXOPopover, setShowMergeBTCUTXOPopover] = useState(false);
-
-  // Token UTXO summary
-  const [tokenUtxoSummary, setTokenUtxoSummary] = useState<AddressCAT20UtxoSummary>({
-    totalUtxoCount: 0,
-    availableUtxoCount: 0,
-    availableTokenAmounts: []
-  });
 
   // Transfer state
   const [step, setStep] = useState<Step>(Step.INPUT);
@@ -94,23 +84,8 @@ export default function SendCAT20Screen() {
     networkFee: '0'
   });
 
-  // Load token UTXO summary
-  useEffect(() => {
-    tools.showLoading(true);
-    wallet
-      .getAddressCAT20UtxoSummary(account.address, cat20Balance.tokenId)
-      .then((data) => {
-        setTokenUtxoSummary(data);
-      })
-      .finally(() => {
-        tools.showLoading(false);
-      });
-  }, []);
-
   // Calculate available token amount
   const availableTokenAmount = cat20Balance.amount
-
-  const shouldShowMerge = availableTokenAmount !== cat20Balance.amount;
 
   // Listen for progress updates from background
   useEffect(() => {
@@ -423,30 +398,6 @@ export default function SendCAT20Screen() {
             }}
             testid={TestIds.CAT20.SEND_AMOUNT_INPUT}
           />
-
-          {shouldShowMerge && (
-            <Column style={{ borderWidth: 1, borderRadius: 10, borderColor: 'rgba(var(--color-background-rgb),0.2)' }}>
-              <Column mx="md" my="md">
-                <Text
-                  text={t('to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance')}
-                  size="xs"
-                  color="textDim"
-                />
-
-                <Text
-                  text={t('merge_utxos_to_increase_the_available_balance')}
-                  size="xs"
-                  color="primary"
-                  onClick={() => {
-                    navigate('MergeCAT20Screen', {
-                      cat20Balance: cat20Balance,
-                      cat20Info: cat20Info
-                    });
-                  }}
-                />
-              </Column>
-            </Column>
-          )}
 
           {error && (
             <Column mt="lg">

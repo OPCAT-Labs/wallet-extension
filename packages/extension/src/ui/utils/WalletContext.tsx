@@ -17,7 +17,6 @@ import {
   BitcoinBalanceV2,
   BtcChannelItem,
   CAT20Balance,
-  CAT20MergeOrder,
   CAT721Balance,
   CoinPrice,
   DecodedPsbt,
@@ -261,8 +260,6 @@ export interface WalletController {
     allPsbtHexs: string[];
     allTxHexs: string[];
   }>;
-
-  mergeCAT20Prepare(tokenId: string, utxoCount: number, feeRate: number): Promise<CAT20MergeOrder>;
 
   getAppList(): Promise<{ tab: string; items: AppInfo[] }[]>;
   getBannerList(): Promise<{ id: string; img: string; link: string }[]>;

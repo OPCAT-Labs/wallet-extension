@@ -66,32 +66,8 @@
   "search_address_and_txids": {
     "message": "搜索地址和交易ID"
   },
-  "to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance": {
-    "message": "要发送更大的金额，请合并您的 UTXOs 以增加可用余额。"
-  },
-  "merge_utxos_to_increase_the_available_balance": {
-    "message": "合并 UTXOs->"
-  },
-  "merge_utxos_for_cat20_asset": {
-    "message": "合并 UTXOs 为 CAT20 资产"
-  },
-  "you_need_at_least_2_utxos_to_merge": {
-    "message": "您需要至少 2 个 UTXOs 才能合并"
-  },
-  "this_feature_is_currently_in_the_experimental_test_phase_please_proceed_with_caution": {
-    "message": "此功能目前处于实验测试阶段。请谨慎操作。"
-  },
-  "set_utxo_amount_to_be_merged": {
-    "message": "设置要合并的 UTXO 数量"
-  },
   "selected": {
     "message": "已选择"
-  },
-  "merge_transactions": {
-    "message": "合并交易"
-  },
-  "retry_in_10s": {
-    "message": "10秒后重试"
   },
   "transfer_amount": {
     "message": "转账金额"
@@ -357,9 +333,6 @@
   "premine": {
     "message": "预铸"
   },
-  "merge_history": {
-    "message": "合并历史"
-  },
   "the_recipient_must_be_p2tr_or_p2wpkh_address_type": {
     "message": "接收方必须为 P2TR 或 P2WPKH 地址类型"
   },
@@ -579,20 +552,8 @@
   "estimated_fee": {
     "message": "预估手续费"
   },
-  "start_merging": {
-    "message": "开始合并"
-  },
-  "merge_progress": {
-    "message": "合并进度"
-  },
   "start": {
     "message": "开始"
-  },
-  "merging": {
-    "message": "合并中..."
-  },
-  "quit_merging_process": {
-    "message": "退出合并过程"
   },
   "disclaimer": {
     "message": "免责声明"
@@ -976,9 +937,6 @@
   },
   "transaction": {
     "message": "交易"
-  },
-  "merge_failed": {
-    "message": "合并失败"
   },
   "dealing": {
     "message": "处理中"

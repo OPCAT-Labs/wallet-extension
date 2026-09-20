@@ -550,9 +550,6 @@
   "decimals": {
     "message": "decimales"
   },
-  "merge_history": {
-    "message": "Historial de Fusiones"
-  },
   "the_recipient_must_be_p2tr_or_p2wpkh_address_type": {
     "message": "El destinatario debe ser de tipo de dirección P2TR o P2WPKH"
   },
@@ -568,50 +565,14 @@
   "send_cat20": {
     "message": "Enviar CAT20"
   },
-  "to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance": {
-    "message": "Para enviar una cantidad mayor, por favor fusiona tus UTXOs para aumentar el saldo disponible."
-  },
-  "merge_utxos_to_increase_the_available_balance": {
-    "message": "Fusionar UTXOs->"
-  },
   "selected": {
     "message": "Seleccionado(s)"
-  },
-  "merge_transactions": {
-    "message": "Fusionar Transacciones"
-  },
-  "retry_in_10s": {
-    "message": "Reintentar en 10s"
-  },
-  "merge_utxos_for_cat20_asset": {
-    "message": "Fusionar UTXOs para Activo CAT20"
-  },
-  "you_need_at_least_2_utxos_to_merge": {
-    "message": "Necesitas al menos 2 UTXOs para fusionar"
-  },
-  "this_feature_is_currently_in_the_experimental_test_phase_please_proceed_with_caution": {
-    "message": "Esta función se encuentra actualmente en fase de prueba experimental. Procede con precaución."
-  },
-  "set_utxo_amount_to_be_merged": {
-    "message": "Establecer cantidad de UTXO a fusionar"
   },
   "estimated_fee": {
     "message": "Tarifa Estimada"
   },
-  "start_merging": {
-    "message": "Iniciar Fusión"
-  },
-  "merge_progress": {
-    "message": "Progreso de la Fusión"
-  },
   "start": {
     "message": "Iniciar"
-  },
-  "merging": {
-    "message": "Fusionando..."
-  },
-  "quit_merging_process": {
-    "message": "Salir del Proceso de Fusión"
   },
   "disclaimer": {
     "message": "Descargo de Responsabilidad"
@@ -924,9 +885,6 @@
   },
   "transaction": {
     "message": "Transacción"
-  },
-  "merge_failed": {
-    "message": "Fusión Fallida."
   },
   "dealing": {
     "message": "Procesando"

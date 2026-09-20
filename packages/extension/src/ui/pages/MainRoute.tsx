@@ -2,8 +2,6 @@ import { useCallback, useEffect, useRef } from 'react';
 import { HashRouter, Route, Routes, useNavigate as useNavigateOrigin } from 'react-router-dom';
 
 import CAT20TokenScreen from '@/ui/pages/CAT20/CAT20TokenScreen';
-import MergeCAT20HistoryScreen from '@/ui/pages/CAT20/MergeCAT20HistoryScreen';
-import MergeCAT20Screen from '@/ui/pages/CAT20/MergeCAT20Screen';
 import SendCAT20Screen from '@/ui/pages/CAT20/SendCAT20Screen';
 import { LoadingOutlined } from '@ant-design/icons';
 
@@ -228,14 +226,6 @@ export const routes = {
   SendCAT20Screen: {
     path: '/cat20/send-cat20',
     element: <SendCAT20Screen />
-  },
-  MergeCAT20Screen: {
-    path: '/cat20/merge-cat20',
-    element: <MergeCAT20Screen />
-  },
-  MergeCAT20HistoryScreen: {
-    path: '/cat20/merge-history',
-    element: <MergeCAT20HistoryScreen />
   },
 
   CAT721CollectionScreen: {
