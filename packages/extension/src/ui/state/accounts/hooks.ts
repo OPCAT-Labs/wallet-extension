@@ -46,6 +46,19 @@ export function useAccountBalance() {
   );
 }
 
+/**
+ * Whether the balance of the current account has been fetched at least once.
+ *
+ * `balanceMap` entries are only created by `setBalance`, so a missing entry means the
+ * balance request has not come back yet and the UI is still showing the zero placeholder.
+ * The flag stays true afterwards, including while a refresh marks the entry as expired.
+ */
+export function useAccountBalanceLoaded() {
+  const accountsState = useAccountsState();
+  const currentAccount = useCurrentAccount();
+  return Boolean(accountsState.balanceMap[currentAccount.address]);
+}
+
 export function useAddressSummary() {
   const accountsState = useAccountsState();
   return accountsState.addressSummary;

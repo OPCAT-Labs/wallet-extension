@@ -378,6 +378,10 @@ export async function getTotalBTCBalance(page: Page): Promise<number> {
   const balanceDisplay = locateTestId(page, TestIds.WALLET.BALANCE_DISPLAY);
   await expect(balanceDisplay).toBeVisible({ timeout: 10000 });
 
+  // The card renders a zero placeholder until the balance request comes back, so reading
+  // the text straight away can report 0 for a funded account right after a wallet switch.
+  await expect(balanceDisplay).toHaveAttribute('data-balance-loaded', 'true', { timeout: 30000 });
+
   // Get the balance text content
   const balanceText = await balanceDisplay.textContent();
   if (!balanceText) {

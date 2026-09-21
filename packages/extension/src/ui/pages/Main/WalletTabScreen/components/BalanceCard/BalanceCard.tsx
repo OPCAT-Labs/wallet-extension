@@ -10,7 +10,7 @@ import { Icon } from '@/ui/components/Icon';
 import { RefreshButton } from '@/ui/components/RefreshButton';
 import { getSpecialLocale, useI18n } from '@/ui/hooks/useI18n';
 import { AppState } from '@/ui/state';
-import { useFetchBalanceCallback } from '@/ui/state/accounts/hooks';
+import { useAccountBalanceLoaded, useFetchBalanceCallback } from '@/ui/state/accounts/hooks';
 import { accountActions } from '@/ui/state/accounts/reducer';
 import { useBTCUnit, useChain } from '@/ui/state/settings/hooks';
 import { uiActions } from '@/ui/state/ui/reducer';
@@ -49,6 +49,7 @@ export function BalanceCard({ accountBalance, enableRefresh = false }: BalanceCa
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchBalance = useFetchBalanceCallback();
+  const balanceLoaded = useAccountBalanceLoaded();
 
   useEffect(() => {
     getSpecialLocale().then(({ isSpecialLocale }) => {
@@ -142,7 +143,10 @@ export function BalanceCard({ accountBalance, enableRefresh = false }: BalanceCa
         </div>
       </div>
 
-      <div className={styles.balanceWrapper} data-testid={TestIds.WALLET.BALANCE_DISPLAY}>
+      <div
+        className={styles.balanceWrapper}
+        data-testid={TestIds.WALLET.BALANCE_DISPLAY}
+        data-balance-loaded={balanceLoaded}>
         <div className={styles.balanceContent} title={btcTooltip}>
           {!isBalanceHidden && (
             <>
