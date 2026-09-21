@@ -78,6 +78,9 @@ export class SimpleKeyring extends EventEmitter {
   async signData(publicKey: string, data: string, type: 'ecdsa' = 'ecdsa') {
     const keyPair = this._getPrivateKeyFor(publicKey);
     if (type === 'ecdsa') {
+      if (!/^[0-9a-fA-F]{64}$/.test(data)) {
+        throw new Error('Expected Hash');
+      }
       return keyPair.sign(Buffer.from(data, 'hex')).toString('hex');
     }
     throw new Error('Not support type');

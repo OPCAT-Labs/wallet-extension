@@ -10,6 +10,13 @@ export interface ExtensionInfo {
 
 // Store console messages for debugging
 const consoleMessages: { type: string; text: string; location: string }[] = [];
+function resolveChromeExecutablePath(): string | undefined {
+  const envPath = process.env.PW_CHROME_EXECUTABLE_PATH || process.env.CHROME_EXECUTABLE_PATH;
+  if (envPath && fs.existsSync(envPath)) {
+    return envPath;
+  }
+  return undefined;
+}
 
 /**
  * Setup console listener on a page to capture all console messages
@@ -83,10 +90,12 @@ export async function loadExtension(): Promise<ExtensionInfo> {
 
   // Create a temporary user data directory
   const userDataDir = path.resolve(__dirname, '../test-user-data/test-user-data-' + Date.now());
+  const executablePath = resolveChromeExecutablePath();
 
   // Launch Chrome with the extension
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
+    executablePath,
     args: [
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,
