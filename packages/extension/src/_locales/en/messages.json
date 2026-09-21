@@ -553,9 +553,6 @@
   "decimals": {
     "message": "decimals"
   },
-  "merge_history": {
-    "message": "Merge History"
-  },
   "the_recipient_must_be_p2tr_or_p2wpkh_address_type": {
     "message": "The recipient must be P2TR or P2WPKH address type"
   },
@@ -571,50 +568,14 @@
   "send_cat20": {
     "message": "Send CAT20"
   },
-  "to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance": {
-    "message": "To send a larger amount, please merge your UTXOs to increase the available balance."
-  },
-  "merge_utxos_to_increase_the_available_balance": {
-    "message": "Merge UTXOs->"
-  },
   "selected": {
     "message": "Selected"
-  },
-  "merge_transactions": {
-    "message": "Merge Transactions"
-  },
-  "retry_in_10s": {
-    "message": "Retry in 10s"
-  },
-  "merge_utxos_for_cat20_asset": {
-    "message": "Merge UTXOs for CAT20 Asset"
-  },
-  "you_need_at_least_2_utxos_to_merge": {
-    "message": "You need at least 2 UTXOs to merge"
-  },
-  "this_feature_is_currently_in_the_experimental_test_phase_please_proceed_with_caution": {
-    "message": "This feature is currently in the experimental test phase. Please proceed with caution."
-  },
-  "set_utxo_amount_to_be_merged": {
-    "message": "Set UTXO amount to be merged"
   },
   "estimated_fee": {
     "message": "Estimated Fee"
   },
-  "start_merging": {
-    "message": "Start Merging"
-  },
-  "merge_progress": {
-    "message": "Merge Progress"
-  },
   "start": {
     "message": "Start"
-  },
-  "merging": {
-    "message": "Merging..."
-  },
-  "quit_merging_process": {
-    "message": "Quit Merging Process"
   },
   "disclaimer": {
     "message": "Disclaimer"
@@ -924,9 +885,6 @@
   },
   "transaction": {
     "message": "Transaction"
-  },
-  "merge_failed": {
-    "message": "Merge Failed."
   },
   "dealing": {
     "message": "Dealing"

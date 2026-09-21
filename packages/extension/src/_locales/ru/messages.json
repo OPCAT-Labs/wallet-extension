@@ -552,9 +552,6 @@
   "decimals": {
     "message": "децималы"
   },
-  "merge_history": {
-    "message": "История объединений"
-  },
   "the_recipient_must_be_p2tr_or_p2wpkh_address_type": {
     "message": "Адрес получателя должен быть типа P2TR или P2WPKH"
   },
@@ -570,50 +567,14 @@
   "send_cat20": {
     "message": "Отправить CAT20"
   },
-  "to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance": {
-    "message": "Чтобы отправить большую сумму, пожалуйста, объедините ваши UTXO, чтобы увеличить доступный баланс."
-  },
-  "merge_utxos_to_increase_the_available_balance": {
-    "message": "Объединить UTXO->"
-  },
   "selected": {
     "message": "Выбрано"
-  },
-  "merge_transactions": {
-    "message": "Транзакции объединения"
-  },
-  "retry_in_10s": {
-    "message": "Повторить через 10 сек"
-  },
-  "merge_utxos_for_cat20_asset": {
-    "message": "Объединить UTXO для актива CAT20"
-  },
-  "you_need_at_least_2_utxos_to_merge": {
-    "message": "Для объединения необходимо как минимум 2 UTXO"
-  },
-  "this_feature_is_currently_in_the_experimental_test_phase_please_proceed_with_caution": {
-    "message": "Эта функция в настоящее время находится на стадии экспериментального тестирования. Пожалуйста, действуйте с осторожностью."
-  },
-  "set_utxo_amount_to_be_merged": {
-    "message": "Установите сумму UTXO для объединения"
   },
   "estimated_fee": {
     "message": "Примерная комиссия"
   },
-  "start_merging": {
-    "message": "Начать объединение"
-  },
-  "merge_progress": {
-    "message": "Прогресс объединения"
-  },
   "start": {
     "message": "Начать"
-  },
-  "merging": {
-    "message": "Объединение..."
-  },
-  "quit_merging_process": {
-    "message": "Прервать процесс объединения"
   },
   "disclaimer": {
     "message": "Отказ от ответственности"
@@ -920,9 +881,6 @@
   },
   "transaction": {
     "message": "Транзакция"
-  },
-  "merge_failed": {
-    "message": "Объединение не удалось."
   },
   "dealing": {
     "message": "В обработке"

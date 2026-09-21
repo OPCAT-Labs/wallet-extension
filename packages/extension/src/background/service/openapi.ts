@@ -437,16 +437,6 @@ export class OpenApiService {
     })
   }
 
-  async mergeCAT20Prepare(address: string, pubkey: string, tokenId: string, utxoCount: number, feeRate: number) {
-    return this.httpPost('/v5/cat20/merge-token-prepare', {
-      address,
-      pubkey,
-      tokenId,
-      utxoCount,
-      feeRate
-    });
-  }
-
   async getCAT721CollectionList(
     address: string,
     cursor: number,

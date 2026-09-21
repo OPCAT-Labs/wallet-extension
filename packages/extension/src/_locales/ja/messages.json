@@ -552,9 +552,6 @@
   "decimals": {
     "message": "小数桁数"
   },
-  "merge_history": {
-    "message": "マージ履歴"
-  },
   "the_recipient_must_be_p2tr_or_p2wpkh_address_type": {
     "message": "受信者はP2TRまたはP2WPKHアドレスタイプである必要があります"
   },
@@ -570,50 +567,14 @@
   "send_cat20": {
     "message": "CAT20を送信"
   },
-  "to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance": {
-    "message": "より大きな金額を送信するには、UTXOをマージして利用可能な残高を増やしてください。"
-  },
-  "merge_utxos_to_increase_the_available_balance": {
-    "message": "UTXOをマージ->"
-  },
   "selected": {
     "message": "選択済み"
-  },
-  "merge_transactions": {
-    "message": "マージトランザクション"
-  },
-  "retry_in_10s": {
-    "message": "10秒後に再試行"
-  },
-  "merge_utxos_for_cat20_asset": {
-    "message": "CAT20アセットのUTXOをマージ"
-  },
-  "you_need_at_least_2_utxos_to_merge": {
-    "message": "マージするには少なくとも2つのUTXOが必要です"
-  },
-  "this_feature_is_currently_in_the_experimental_test_phase_please_proceed_with_caution": {
-    "message": "この機能は現在実験的なテスト段階にあります。注意して進めてください。"
-  },
-  "set_utxo_amount_to_be_merged": {
-    "message": "マージするUTXOの量を設定"
   },
   "estimated_fee": {
     "message": "推定手数料"
   },
-  "start_merging": {
-    "message": "マージを開始"
-  },
-  "merge_progress": {
-    "message": "マージ進捗"
-  },
   "start": {
     "message": "開始"
-  },
-  "merging": {
-    "message": "マージ中..."
-  },
-  "quit_merging_process": {
-    "message": "マージプロセスを終了"
   },
   "disclaimer": {
     "message": "免責事項"
@@ -920,9 +881,6 @@
   },
   "transaction": {
     "message": "トランザクション"
-  },
-  "merge_failed": {
-    "message": "マージに失敗しました。"
   },
   "dealing": {
     "message": "処理中"

@@ -553,9 +553,6 @@
   "decimals": {
     "message": "小數位數"
   },
-  "merge_history": {
-    "message": "合併歷史紀錄"
-  },
   "the_recipient_must_be_p2tr_or_p2wpkh_address_type": {
     "message": "收款地址必須是 P2TR 或 P2WPKH 地址類型"
   },
@@ -571,50 +568,14 @@
   "send_cat20": {
     "message": "發送 CAT20"
   },
-  "to_send_a_larger_amount_please_merge_your_utxos_to_increase_the_available_balance": {
-    "message": "若要發送更大金額，請合併您的 UTXO 以增加可用餘額。"
-  },
-  "merge_utxos_to_increase_the_available_balance": {
-    "message": "合併 UTXO->"
-  },
   "selected": {
     "message": "已選擇"
-  },
-  "merge_transactions": {
-    "message": "合併交易"
-  },
-  "retry_in_10s": {
-    "message": "10 秒後重試"
-  },
-  "merge_utxos_for_cat20_asset": {
-    "message": "合併 CAT20 資產的 UTXO"
-  },
-  "you_need_at_least_2_utxos_to_merge": {
-    "message": "您至少需要 2 個 UTXO 才能合併"
-  },
-  "this_feature_is_currently_in_the_experimental_test_phase_please_proceed_with_caution": {
-    "message": "此功能目前處於實驗測試階段。請謹慎操作。"
-  },
-  "set_utxo_amount_to_be_merged": {
-    "message": "設定要合併的 UTXO 數量"
   },
   "estimated_fee": {
     "message": "預估手續費"
   },
-  "start_merging": {
-    "message": "開始合併"
-  },
-  "merge_progress": {
-    "message": "合併進度"
-  },
   "start": {
     "message": "開始"
-  },
-  "merging": {
-    "message": "合併中..."
-  },
-  "quit_merging_process": {
-    "message": "退出合併流程"
   },
   "disclaimer": {
     "message": "免責聲明"
@@ -924,9 +885,6 @@
   },
   "transaction": {
     "message": "交易"
-  },
-  "merge_failed": {
-    "message": "合併失敗。"
   },
   "dealing": {
     "message": "處理中"

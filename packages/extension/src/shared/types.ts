@@ -323,12 +323,6 @@ export interface AddressCAT20UtxoSummary {
   totalUtxoCount: number;
 }
 
-export interface CAT20MergeOrder {
-  mergeData: string;
-  batchCount: number;
-  // ct: number;
-}
-
 export interface WebsiteResult {
   isScammer: boolean;
   warning: string;

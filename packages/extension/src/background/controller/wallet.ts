@@ -1744,22 +1744,6 @@ export class WalletController extends BaseController {
     }
   }
 
-  mergeCAT20Prepare = async (tokenId: string, utxoCount: number, feeRate: number) => {
-    const currentAccount = await this.getCurrentAccount();
-    if (!currentAccount) {
-      return;
-    }
-
-    const _res = await openapiService.mergeCAT20Prepare(
-      currentAccount.address,
-      currentAccount.pubkey,
-      tokenId,
-      utxoCount,
-      feeRate
-    );
-    return _res;
-  };
-
   getAppList = async () => {
     const data = await openapiService.getAppList();
     return data;
