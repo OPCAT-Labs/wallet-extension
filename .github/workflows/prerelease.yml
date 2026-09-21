@@ -22,6 +22,8 @@ jobs:
         with:
           node-version: '22'
           cache: 'yarn'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@opcat-labs'
 
       - name: Check if release already exists
         run: |
@@ -39,6 +41,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update package.json version
         run: |
