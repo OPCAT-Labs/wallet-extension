@@ -32,6 +32,11 @@ jobs:
         env:
           CI: true
 
+      - name: Build test dApp bundle
+        run: yarn workspace @opcat-labs/wallet-extension build:test-dapp
+        env:
+          CI: true
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
